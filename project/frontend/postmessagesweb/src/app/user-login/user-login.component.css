@@ -1,0 +1,10 @@
+
+
+.loginlogo {
+    width: 80px;
+    height: 80px;
+}
+
+.login-title {
+  font-size: clamp(1rem, 5vw, 1.5rem);
+}

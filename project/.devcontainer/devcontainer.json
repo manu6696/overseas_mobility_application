@@ -1,0 +1,14 @@
+{
+  "name": "Progetto Web TAW",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "backend",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

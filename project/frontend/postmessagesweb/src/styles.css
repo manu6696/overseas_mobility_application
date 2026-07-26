@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --bs-primary: #af0539;
+}
+
+.btn-primary {
+  background-color: #af0539;
+  border-color: #af0539;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #8a0430;
+  border-color: #8a0430;
+}
+
+a {
+  color: #af0539;
+}
+
+a:hover {
+  color: #8a0430;
+}
