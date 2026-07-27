@@ -1,6 +1,6 @@
 {
-    "name": "postmessages",
-    "main": "postmessages",
+    "name": "mobility_application",
+    "main": "mobility_application",
     "version": "0.0.1",
     "author": "Filippo Bergamasco",
     "dependencies": {
@@ -27,7 +27,7 @@
     },
     "scripts": {
         "compile": "tsc",
-        "start": "node postmessages.js"
+        "start": "node mobility_application.js"
     },
     "private": true
 }

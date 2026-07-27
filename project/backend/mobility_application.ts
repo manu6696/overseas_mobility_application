@@ -56,7 +56,7 @@
  *  $ node postmesages.js
  * 
  *  To manually inspect the database:
- *  > use postmessages
+ *  > use mobility_application
  *  > show collections
  *  > db.messages.find( {} )
  *  
@@ -115,6 +115,8 @@ import cors = require('cors');                  // Enable CORS middleware
 import { Server as SocketIOServer} from 'socket.io';               // Socket.io websocket library
 import { nextTick } from 'process';
 
+import { Buffer } from 'node:buffer';
+import { open } from 'node:fs/promises';
 
 
 // Let's add some custom type definition to the Express
@@ -283,9 +285,181 @@ app.get("/api/v1", (req,res) => {
 
 
 
-//////////////
-// Agreements
-//////////////
+////////////////
+// Applications
+////////////////
+
+/*
+export interface Application {
+
+    id: String,
+    status: String,
+    uploadDate: Date,
+    academicYear: String,
+    semester: String,
+    matrNumber: String,
+    name: String,
+    surname: String,
+    departement: String,
+    sendingInst: String,
+    sendingCountry: String,
+    hostInst: String,
+    hostCountry: String,
+    courses: CourseEval[],
+    referent: String,
+    approved: Boolean,
+    modified: Boolean,
+    lecturerReason: String
+}
+*/
+
+app.get("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req,res,next) => {
+
+  application.getModel().find( {matrNumber: req.params.matrNumber, status: req.params.applicationstatus} ).then( 
+    ( q )=> {
+
+      if( q.length > 0)
+        return res.status(200).json( {q} );
+      else 
+        return res.status(404).json( {error:true, errormessage:"no application present"} );
+  }).catch( (reason)=> {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+  })
+
+});
+
+app.get("/api/v1/applications/", auth, (req,res,next) => {
+
+  if(req.user.roles.includes("moderator") || req.user.roles.includes("admin")) {
+    application.getModel().find( {matrNumber: req.body.matrNumber} ).then( 
+      ( q )=> {
+
+        if( q.length > 0)
+          return res.status(200).json( {q} );
+        else 
+          return res.status(404).json( {error:true, errormessage:"no application present"} );
+    }).catch( (reason)=> {
+        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
+
+  } else {
+    application.getModel().find( {referent: req.body.referent} ).then( 
+      ( q )=> {
+
+        if( q.length > 0)
+          return res.status(200).json( {q} );
+        else 
+          return res.status(404).json( {error:true, errormessage:"no application present"} );
+    }).catch( (reason)=> {
+        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
+  }
+});
+
+
+
+app.post("/api/v1/applications/", auth, (req,res,next) => {
+
+  console.log("Received: " + JSON.stringify(req.body) );
+  let recvapplications= req.body;
+  recvapplications.status = 'created';
+  recvapplications.approved = false;
+  recvapplications.modified = false;
+  recvapplications.lecturerReason = '';
+  recvapplications.uploadDate = new Date();
+
+  if(application.isApplication(recvapplications)) {
+
+    application.getModel().create(recvapplications).then((data) => {
+
+      if(ios) {
+        // Notify all socket.io clients
+        console.log("socket.io send");
+        ios.emit( "broadcast", JSON.stringify(data) );
+      }
+
+      return res.status(200).json({ error: false, errormessage: "", id: data._id });
+    }).catch((reason) => {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
+  } else {
+    return next({ statusCode:404, error: true, errormessage: "Data is not a valid application" });
+  }
+
+});
+
+
+app.put("/api/v1/applications/:applicationid", auth, (req,res,next) => {
+
+  console.log("Update request for application with id: "+req.params.applicationid)
+
+  if(req.body) {
+
+      let recvapplications= req.body;
+      recvapplications.uploadDate = new Date();
+      recvapplications.modified = true;
+
+      if(req.user.roles.includes("moderator") || req.user.roles.includes("admin")) { 
+        recvapplications.approved = false;
+        recvapplications.lecturerReason = '';
+      } else {
+        recvapplications.status = req.body.status;
+        recvapplications.approved = req.body.approved;
+        recvapplications.lecturerReason = req.body.lecturerReason;
+      }      
+
+    if(application.isApplication(recvapplications)) {
+
+      application.getModel().updateOne( {_id: req.params.applicationid}, recvapplications ).then( 
+      ( q )=> {
+
+        if( q.modifiedCount > 0 )
+          return res.status(200).json( {error:false, errormessage:""} );
+        else
+          return next({ statusCode:404, error: true, errormessage: "Data is not a valid application"});
+        
+      }).catch( (reason)=> {
+          return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+      })
+
+    } else {
+      return next({ statusCode:404, error: true, errormessage: "Data is not a valid application" });
+    }
+
+  } else {
+      return next({ statusCode:404, error: true, errormessage: "Application missing"});
+  }
+
+});
+
+
+
+app.delete("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req,res,next) => {
+
+  console.log("Delete request for application of matriculation number: "+req.params.matrNumber )
+
+  application.getModel().deleteOne( {matrNumber: req.params.matrNumber, status: req.params.applicationstatus} ).then( 
+    ( q )=> {
+
+      if( q.deletedCount > 0 )
+        return res.status(200).json( {error:false, errormessage:""} );
+      else 
+        return res.status(404).json( {error:true, errormessage:"Invalid matriculation number"} );
+      
+  }).catch( (reason)=> {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+  }) 
+
+});
+
+
+
+///////////////////////
+// Learning Agreements
+///////////////////////
+
+// Multer used for handling pdf file
+// The file is not stored on disk but in database as a Buffer
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -372,6 +546,7 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
   if(req.file) {
 
     // req.params.applicationid contains the :applicationid URL component
+
       let recvagreements= req.body;
       recvagreements.filename = req.file.originalname;
       recvagreements.content = req.file.buffer;
@@ -409,9 +584,13 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
 });
 
 
-//////////////////////
-// Transcript Records
-//////////////////////
+
+
+
+/////////////////////////
+// Transcript of Records
+/////////////////////////
+
 
 app.post("/api/v1/transcriptRecords", auth, (req,res,next) => {
 
@@ -510,18 +689,59 @@ app.put("/api/v1/transcriptRecords/:transcriptid", auth, (req,res,next) => {
 
 
 
+/////////////////////
+// Host institutions
+/////////////////////
 
-// Hosts
+
+app.get("/api/v1/hosts/", auth, (req,res,next) => {
+
+  let skip = parseInt( req.query.skip as string || "0" ) || 0;
+  let limit = parseInt( req.query.limit as string || "20" ) || 20;
+
+  host.getModel().find().sort({timestamp:-1}).skip( skip ).limit( limit ).then( (documents) => {
+    return res.status(200).json( documents );
+  }).catch( (reason) => {
+    return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+  })
+
+});
+
+app.post("/api/v1/hosts/", auth, ensureModeratorRole , (req,res,next) => {
+
+ console.log("Received: " + JSON.stringify(req.body) );
+ let recvhost= req.body;
+
+  if(host.isHost(recvhost)) {
+    host.getModel().create(recvhost).then((data) => {
+
+      if(ios) {
+        // Notify all socket.io clients
+        console.log("socket.io send");
+        ios.emit( "broadcast", JSON.stringify(data) );
+      }   
+
+      return res.status(200).json({ error: false, errormessage: "", id: data._id });
+
+    }).catch((reason) => {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
+  } else {
+    return next({ statusCode:404, error: true, errormessage: "Data is not a valid host" });
+  }
+
+});
 
 
-app.get("/api/v1/host/:hostid", auth, (req,res,next) => {
 
-  transcriptRecord.getModel().find( {_id: req.params.hostid } ).then( 
+app.get("/api/v1/hosts/:hostid", auth, (req,res,next) => {
+
+  host.getModel().findOne( {_id: req.params.hostid } ).then( 
     ( q )=> {
-      if( q.length > 0 )
+      if( q )
         return res.status(200).json( {q} );
       else 
-        return res.status(404).json( {error:true, errormessage:"no transcript of records present"} );
+        return res.status(404).json( {error:true, errormessage:"no host with that ID present"} );
   }).catch( (reason)=> {
       return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
   })
@@ -529,8 +749,19 @@ app.get("/api/v1/host/:hostid", auth, (req,res,next) => {
 });
 
 
+app.delete("/api/v1/hosts/:hostid", auth, ensureModeratorRole , (req,res,next) => {
 
+  host.getModel().deleteOne( {_id: req.params.hostid } ).then( 
+    ( q )=> {
+      if( q.deletedCount > 0 )
+        return res.status(200).json( {q} );
+      else 
+        return res.status(404).json( {error:true, errormessage:"no host with that ID present"} );
+  }).catch( (reason)=> {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+  })
 
+});
 
 
 
@@ -760,7 +991,7 @@ app.use( (req,res,next) => {
 
 // Connect to mongodb and launch the HTTP server trough Express
 //
-mongoose.connect( 'mongodb://mymongo:27017/postmessages' )
+mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
 .then( 
   () => {
 
@@ -787,39 +1018,109 @@ mongoose.connect( 'mongodb://mymongo:27017/postmessages' )
   }
 )
 .then(
+  (doc) => {
+    if (!doc) {
+      console.log("Creating random user");
+
+      let u = user.newUser({
+        username: "123456",
+        mail: "123456@stud.unive.it"
+      });
+      u.setPassword("123456");
+      return u.save()
+    } else {
+      console.log("Random user already exists");
+    }
+  }
+)
+.then(
   () => {
-    return message.getModel().countDocuments({})
+    return application.getModel().countDocuments({})
   }
 ).then(
   (count) => {
     if (count == 0) {
       console.log("Adding some test into the database");
-      let m1 = message
+
+      let host1 = host
         .getModel()
         .create({
-          tags: ["Tag1", "Tag2", "Tag3"],
-          content: "Post 1",
-          timestamp: new Date(),
-          authormail: "admin@cafoscari.it"
-        });
-      let m2 = message
-        .getModel()
-        .create({
-          tags: ["Tag1", "Tag5"],
-          content: "Post 2",
-          timestamp: new Date(),
-          authormail: "admin@cafoscari.it"
-        });
-      let m3 = message
-        .getModel()
-        .create({
-          tags: ["Tag6", "Tag10"],
-          content: "Post 3",
-          timestamp: new Date(),
-          authormail: "admin@cafoscari.it"
+          name: "University of Edinburgh",
+          mail: "test@ed.ac.uk",
+          country: "Scotland",
         });
 
-      return Promise.all([m1, m2, m3]);
+      const buf = Buffer.alloc(16384);
+      const file = await open('./asset/learning_agreement.pdf');
+
+      try {
+        const contents = await file.readFile({ buffer: buf });
+        console.log(contents); // A view over `buf` containing only the bytes read
+      } finally {
+        await file.close();
+      }
+
+      let agreement1 = agreement
+        .getModel()
+        .create({
+          filename: "testone.pdf",
+          content:  buf,
+          mimetype:  "application/pdf",
+          uploadDate: new Date(),
+          applicationid: "123",
+          matrNumber: "123456",
+          approved: false,
+          modified: false,
+          lecturerReason: "",
+        });
+
+
+      let transcriptRecords1 = transcriptRecord
+        .getModel()
+        .create({
+          records: [
+            { code: "CS101", grade: 25 },
+            { code: "CS102", grade: 26 },
+            { code: "CS103", grade: 27 }
+          ],
+          uploadDate: new Date(),
+          applicationid: "123",
+          matrNumber: "123456",
+        });
+
+
+      let application1 = application
+        .getModel()
+        .create({
+          id: "123",
+          status: "Pending",
+          uploadDate: new Date(),
+          academicYear: "2023-2024",
+          semester: "Spring",
+          matrNumber: "123456",
+          name: "John",
+          surname: "Snow",
+          departement: "Computer Science",
+          sendingInst: "University of Venezia",
+          sendingCountry: "Italy",
+          hostInst: "University of Edinburgh",
+          hostCountry: "Scotland",
+          courses: [
+            { 
+              originalCourse: { code: "CS101", title: "Introduction to Computer Science", credits: 6 }, 
+              equivalentCourse: { code: "CS999", title: "Algorithm and data structures", credits: 12 } 
+            }
+          ],
+          referent: "Tyrion Lannister",
+          approved: false,
+          modified: false,
+          lecturerReason: "No reason provided",
+        });
+
+
+
+
+      return Promise.all([agreement1, application1, transcriptRecords1,host1]);
       }
     }
 ).then(      

@@ -1,71 +1,36 @@
-
-import mongoose = require('mongoose');
-
-
-interface Course {
-    code: String,
-    title: String,
-    credits: Number,
-}
-
-interface CourseEval {
-    originalCourse : Course,
-    equivalentCourse: Course,
-}
-
-
-export interface Application {
-
-    id: String,
-    status: String,
-    uploadDate: Date,
-    academicYear: String,
-    semester: String,
-    matrNumber: String,
-    name: String,
-    surname: String,
-    departement: String,
-    sendingInst: String,
-    sendingCountry: String,
-    hostInst: String,
-    hostCountry: String,
-    courses: CourseEval[],
-    referent: String,
-    approved: Boolean,
-    modified: Boolean,
-    lecturerReason: String
-}
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isApplication = isApplication;
+exports.getSchema = getSchema;
+exports.getModel = getModel;
+const mongoose = require("mongoose");
 // User defined type guard
 // Type checking cannot be performed during the execution (we don't have the Application interface anyway)
 // but we can create a function to check if the supplied parameter is compatible with a given type
 //
 // A better approach is to use JSON schema
 //
-export function isApplication(arg: any): arg is Application {
-    return arg 
-    && arg.id && typeof(arg.id) == 'string' 
-    && arg.status && typeof(arg.status) == 'string'
-    && arg.uploadDate && arg.uploadDate instanceof Date
-    && arg.academicYear && typeof(arg.academicYear) == 'string' 
-    && arg.semester && typeof(arg.semester) == 'string' 
-    && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
-    && arg.name && typeof(arg.name) == 'string' 
-    && arg.surname && typeof(arg.surname) == 'string' 
-    && arg.departement && typeof(arg.departement) == 'string' 
-    && arg.sendingInst && typeof(arg.sendingInst) == 'string' 
-    && arg.sendingCountry && typeof(arg.sendingCountry) == 'string' 
-    && arg.hostInst && typeof(arg.hostInst) == 'string' 
-    && arg.hostCountry && typeof(arg.hostCountry) == 'string' 
-    && arg.courses && Array.isArray(arg.courses)
-    && arg.referent && typeof(arg.referent) == 'string'
-    && typeof(arg.approved) == 'boolean'
-    && typeof(arg.modified) == 'boolean'
-    && typeof(arg.lecturerReason) == 'string'
+function isApplication(arg) {
+    return arg
+        && arg.id && typeof (arg.id) == 'string'
+        && arg.status && typeof (arg.status) == 'string'
+        && arg.uploadDate && arg.uploadDate instanceof Date
+        && arg.academicYear && typeof (arg.academicYear) == 'string'
+        && arg.semester && typeof (arg.semester) == 'string'
+        && arg.matrNumber && typeof (arg.matrNumber) == 'string'
+        && arg.name && typeof (arg.name) == 'string'
+        && arg.surname && typeof (arg.surname) == 'string'
+        && arg.departement && typeof (arg.departement) == 'string'
+        && arg.sendingInst && typeof (arg.sendingInst) == 'string'
+        && arg.sendingCountry && typeof (arg.sendingCountry) == 'string'
+        && arg.hostInst && typeof (arg.hostInst) == 'string'
+        && arg.hostCountry && typeof (arg.hostCountry) == 'string'
+        && arg.courses && Array.isArray(arg.courses)
+        && arg.referent && typeof (arg.referent) == 'string'
+        && typeof (arg.approved) == 'boolean'
+        && typeof (arg.modified) == 'boolean'
+        && typeof (arg.lecturerReason) == 'string';
 }
-
-
-
 // We use Mongoose to perform the ODM between our application and
 // mongodb. To do that we need to create a Schema and an associated
 // data model that will be mapped into a mongodb collection
@@ -74,43 +39,31 @@ export function isApplication(arg: any): arg is Application {
 // of correctly matching the Application interface with the ApplicationSchema 
 //
 // Mongoose Schema
-
-
-const CourseSchema = new mongoose.Schema<Course>({
-
+const CourseSchema = new mongoose.Schema({
     code: {
-        type: String, 
+        type: String,
         required: true
     },
-
     title: {
-        type: String, 
+        type: String,
         required: true
     },
-
     credits: {
-        type: Number, 
+        type: Number,
         required: true
     }
-
-
 }, { _id: false });
-
-const CourseEvalSchema = new mongoose.Schema<CourseEval>({
-
+const CourseEvalSchema = new mongoose.Schema({
     originalCourse: {
         type: CourseSchema,
         required: true
     },
-
     equivalentCourse: {
         type: CourseSchema,
         required: true
     }
-})
-
-let ApplicationSchema = new mongoose.Schema<Application>( {
-
+});
+let ApplicationSchema = new mongoose.Schema({
     id: {
         type: mongoose.SchemaTypes.String,
         required: true
@@ -170,7 +123,7 @@ let ApplicationSchema = new mongoose.Schema<Application>( {
     referent: {
         type: mongoose.SchemaTypes.String,
         required: true
-    },    
+    },
     approved: {
         type: mongoose.SchemaTypes.Boolean,
         required: true
@@ -183,18 +136,14 @@ let ApplicationSchema = new mongoose.Schema<Application>( {
         type: mongoose.SchemaTypes.String,
         required: true
     }
-})
-
-
-
-export function getSchema() { return ApplicationSchema; }
-
+});
+function getSchema() { return ApplicationSchema; }
 // Mongoose Model
-let ApplicationModel:mongoose.Model<Application>|undefined;  // This is not exposed outside the model
-
-export function getModel() : mongoose.Model< Application > { // Return Model as singleton
-    if( !ApplicationModel ) {
-        ApplicationModel = mongoose.model('Application', getSchema() )
+let ApplicationModel; // This is not exposed outside the model
+function getModel() {
+    if (!ApplicationModel) {
+        ApplicationModel = mongoose.model('Application', getSchema());
     }
     return ApplicationModel;
 }
+//# sourceMappingURL=Application.js.map

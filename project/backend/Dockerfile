@@ -8,4 +8,4 @@ WORKDIR /app
 COPY . /app
 RUN npm install
 
-CMD ["sh", "-c", "npm run compile && node postmessages"]
+CMD ["sh", "-c", "npm run compile && node mobility_application"]
