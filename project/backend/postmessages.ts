@@ -514,7 +514,19 @@ app.put("/api/v1/transcriptRecords/:transcriptid", auth, (req,res,next) => {
 // Hosts
 
 
+app.get("/api/v1/host/:hostid", auth, (req,res,next) => {
 
+  transcriptRecord.getModel().find( {_id: req.params.hostid } ).then( 
+    ( q )=> {
+      if( q.length > 0 )
+        return res.status(200).json( {q} );
+      else 
+        return res.status(404).json( {error:true, errormessage:"no transcript of records present"} );
+  }).catch( (reason)=> {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+  })
+
+});
 
 
 
