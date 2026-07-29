@@ -22,7 +22,7 @@ export interface Agreement {
 //
 export function isAgreement(arg: any): arg is Agreement {
     return arg 
-    && arg.content
+    && arg.content.byteLength > 0
     && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.filename && typeof(arg.filename) == 'string' 
@@ -69,7 +69,7 @@ let AgreementSchema = new mongoose.Schema<Agreement>( {
     },
     matrNumber: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: false
     },
     approved: {
         type: mongoose.SchemaTypes.Boolean,

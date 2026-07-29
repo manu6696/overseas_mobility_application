@@ -53,15 +53,15 @@
  * -------------------------------------------------
  * 
  *  To run:
- *  $ node postmesages.js
+ *  $ node mobility_application.js
  * 
  *  To manually inspect the database:
  *  > use mobility_application
  *  > show collections
- *  > db.messages.find( {} )
+ *  > db.host.find( {} )
  *  
  *  to delete all the messages:
- *  > db.messages.deleteMany( {} )
+ *  > db.host.deleteMany( {} )
  * 
  */
 
@@ -268,12 +268,12 @@ app.use( (req,res,next) => {
 
 
 /*
-  LOGIN -> GET
+  LOGIN -> GET, POST
   USERS -> GET, POST, DELETE, PUT
   APPLICATIONS -> GET, POST, DELETE, PUT
   LEARNING AGREEMENTS -> GET, POST, DELETE, PUT (APPROVED / MODIFIED sono campi della risorsa)
   TRANSCRIPTS OF RECORDS -> GET, POST, DELETE, PUT
-  HOST INSTITUTIONS -> GET, POST, DELETE
+  HOST INSTITUTIONS -> GET, POST, DELETE, PUT
 */
 
 
@@ -313,6 +313,7 @@ export interface Application {
 }
 */
 
+
 app.get("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req,res,next) => {
 
   application.getModel().find( {matrNumber: req.params.matrNumber, status: req.params.applicationstatus} ).then( 
@@ -328,49 +329,58 @@ app.get("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req,res,ne
 
 });
 
+
 app.get("/api/v1/applications/", auth, (req,res,next) => {
 
-  if(req.user.roles.includes("moderator") || req.user.roles.includes("admin")) {
-    application.getModel().find( {matrNumber: req.body.matrNumber} ).then( 
-      ( q )=> {
+    console.log(req.query);
 
-        if( q.length > 0)
-          return res.status(200).json( {q} );
-        else 
-          return res.status(404).json( {error:true, errormessage:"no application present"} );
-    }).catch( (reason)=> {
-        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-    })
+    if(req.query.referent) {
+      application.getModel().find( {referent: req.query.referent} ).then( 
+        ( q )=> {
 
-  } else {
-    application.getModel().find( {referent: req.body.referent} ).then( 
-      ( q )=> {
+          if( q.length > 0)
+            return res.status(200).json( {q} );
+          else
+            return res.status(404).json( {error:true, errormessage:"no application present"} );
+      }).catch( (reason)=> {
+          return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+      })
+    } else if( req.query.matrNumber ) {
+        application.getModel().find( {matrNumber: req.query.matrNumber} ).then( 
+        ( q )=> {
 
-        if( q.length > 0)
-          return res.status(200).json( {q} );
-        else 
-          return res.status(404).json( {error:true, errormessage:"no application present"} );
-    }).catch( (reason)=> {
-        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-    })
-  }
+          if( q.length > 0)
+            return res.status(200).json( {q} );
+          else
+            return res.status(404).json( {error:true, errormessage:"no application present"} );
+      }).catch( (reason)=> {
+          return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+      })
+    } else {
+        return res.status(404).json( {error:true, errormessage:"no valid query parameters"} );
+    }
 });
 
 
-
-app.post("/api/v1/applications/", auth, (req,res,next) => {
+app.post("/api/v1/applications/:matrNumber", auth, async(req,res,next) => {
 
   console.log("Received: " + JSON.stringify(req.body) );
   let recvapplications= req.body;
-  recvapplications.status = 'created';
+  recvapplications.status = 'Created';
+  recvapplications.matrNumber = req.params.matrNumber;
   recvapplications.approved = false;
   recvapplications.modified = false;
-  recvapplications.lecturerReason = '';
+  recvapplications.lecturerReason = 'No reason provided';
   recvapplications.uploadDate = new Date();
 
-  if(application.isApplication(recvapplications)) {
+  if(application.isApplication(recvapplications) && !req.params.matrNumber.includes('matrNumber')) {
+    const existingApp = await application.getModel().findOne({matrNumber: req.params.matrNumber});
 
-    application.getModel().create(recvapplications).then((data) => {
+    if(existingApp) {
+      return next({ statusCode:409, error: true, errormessage: "Data is already present" });
+    }
+
+    const data = await application.getModel().create(recvapplications).then((data) => {
 
       if(ios) {
         // Notify all socket.io clients
@@ -392,23 +402,27 @@ app.post("/api/v1/applications/", auth, (req,res,next) => {
 app.put("/api/v1/applications/:applicationid", auth, (req,res,next) => {
 
   console.log("Update request for application with id: "+req.params.applicationid)
+  console.log(req.query);
 
-  if(req.body) {
+  if(req.body && Object.keys(req.body).length > 0) {
 
       let recvapplications= req.body;
       recvapplications.uploadDate = new Date();
       recvapplications.modified = true;
 
-      if(req.user.roles.includes("moderator") || req.user.roles.includes("admin")) { 
-        recvapplications.approved = false;
-        recvapplications.lecturerReason = '';
-      } else {
+      if(req.query.referent) {
         recvapplications.status = req.body.status;
-        recvapplications.approved = req.body.approved;
-        recvapplications.lecturerReason = req.body.lecturerReason;
-      }      
+        if(req.body.approved === 'true' || req.body.approved === 'True' || req.body.approved === true ) {
+          recvapplications.approved = true;
+        } else {
+          recvapplications.approved = false;
+        }
+        recvapplications.lecturerReason = req.body.lecturerReason || 'No reason provided';
+      } else {
+        recvapplications.approved = false;
+        recvapplications.lecturerReason = 'No reason provided';
+      }  
 
-    if(application.isApplication(recvapplications)) {
 
       application.getModel().updateOne( {_id: req.params.applicationid}, recvapplications ).then( 
       ( q )=> {
@@ -422,16 +436,12 @@ app.put("/api/v1/applications/:applicationid", auth, (req,res,next) => {
           return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
       })
 
-    } else {
-      return next({ statusCode:404, error: true, errormessage: "Data is not a valid application" });
-    }
 
   } else {
       return next({ statusCode:404, error: true, errormessage: "Application missing"});
   }
 
 });
-
 
 
 app.delete("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req,res,next) => {
@@ -444,7 +454,7 @@ app.delete("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req,res
       if( q.deletedCount > 0 )
         return res.status(200).json( {error:false, errormessage:""} );
       else 
-        return res.status(404).json( {error:true, errormessage:"Invalid matriculation number"} );
+        return res.status(404).json( {error:true, errormessage:"Invalid matriculation number or application status"} );
       
   }).catch( (reason)=> {
       return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
@@ -466,62 +476,83 @@ const upload = multer({ storage: storage });
 
 app.post("/api/v1/agreements/:applicationid", auth, upload.single('agreement'), (req,res,next) => {
 
-  console.log("Received: " + JSON.stringify(req.body) );
-  let recvagreements= req.body;
-  recvagreements.filename = req.file.originalname;
-  recvagreements.content = req.file.buffer;
-  recvagreements.mimetype = req.file.mimetype;
-  recvagreements.uploadDate = new Date();
-  recvagreements.applicationid = req.params.applicationid;
-  recvagreements.matrNumber = req.body.matrnumber;
-  recvagreements.approved = false;
-  recvagreements.modified = true;
-  recvagreements.lecturerReason = '';
+  console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
+  console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
+  if(req.file && req.file.buffer.byteLength > 0 && req.file.mimetype === 'application/pdf') {
+    console.log("Received: " + JSON.stringify(req.body) );
+    //console.log("Received file: " + JSON.stringify(req.file) );
+    
+    let recvagreements= req.body;
+    recvagreements.filename = req.file.originalname;
+    recvagreements.content = req.file.buffer;
+    recvagreements.mimetype = req.file.mimetype;
+    recvagreements.uploadDate = new Date();
+    recvagreements.applicationid = req.params.applicationid;
+    recvagreements.matrNumber = req.body.matrNumber;
+    recvagreements.approved = false;
+    recvagreements.modified = true;
+    recvagreements.lecturerReason = 'No reason provided';
 
-  if(agreement.isAgreement(recvagreements)) {
+    if(agreement.isAgreement(recvagreements)) {
 
-    agreement.getModel().create(recvagreements).then((data) => {
+      agreement.getModel().create(recvagreements).then((data) => {
 
-      if(ios) {
-        // Notify all socket.io clients
-        console.log("socket.io send");
-        ios.emit( "broadcast", JSON.stringify(data) );
-      }
+        if(ios) {
+          // Notify all socket.io clients
+          console.log("socket.io send");
+          ios.emit( "broadcast", JSON.stringify(data) );
+        }
 
-      return res.status(200).json({ error: false, errormessage: "", id: data._id });
-    }).catch((reason) => {
-      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-    })
+        return res.status(200).json({ error: false, errormessage: "", id: data._id });
+      }).catch((reason) => {
+        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+      })
+    } else {
+      return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement" });
+    }
   } else {
-    return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement" });
+    return next({ statusCode:404, error: true, errormessage: "Learning agreement missing or not a PDF file"});
   }
-
 });
 
 
-app.get("/api/v1/agreements/:applicationid", auth, (req,res,next) => {
+app.get("/api/v1/agreements/", auth, (req,res,next) => {
 
-  // req.params.applicationid contains the :applicationid URL component
+  if(req.query.applicationid) {
 
-  agreement.getModel().find( {applicationid: req.params.applicationid } ).then( 
+    agreement.getModel().find( {applicationid: req.query.applicationid} ).then( 
     ( q )=> {
 
       if( q.length > 0)
         return res.status(200).json( {q} );
       else 
-        return res.status(404).json( {error:true, errormessage:"no learning agreement present"} );
-  }).catch( (reason)=> {
-      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-  })
+        return res.status(404).json( {error:true, errormessage:"Invalid application id"} );
+    }).catch( (reason)=> {
+        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
+  } else if (req.query.matrNumber) {
+
+    agreement.getModel().find( {matrNumber: req.query.matrNumber} ).then( 
+    ( q )=> {
+
+      if( q.length > 0)
+        return res.status(200).json( {q} );
+      else 
+        return res.status(404).json( {error:true, errormessage:"Invalid matriculation number"} );
+    }).catch( (reason)=> {
+        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
+  } else {
+    return res.status(404).json( {error:true, errormessage:"no valid query parameters"} );
+  }
 
 });
+
 
 
 app.delete("/api/v1/agreements/:applicationid", auth, (req,res,next) => {
 
   console.log("Delete request for learning agreement with application id: "+req.params.applicationid )
-
-  // req.params.applicationid contains the :applicationid URL component
 
   agreement.getModel().deleteMany( {applicationid: req.params.applicationid } ).then( 
     ( q )=> {
@@ -542,31 +573,36 @@ app.delete("/api/v1/agreements/:applicationid", auth, (req,res,next) => {
 app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (req,res,next) => {
 
   console.log("Update request for learning agreement with id: "+req.params.agreementid)
+  console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
+  console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
 
-  if(req.file) {
+  if(req.file.buffer.byteLength > 0 && req.file.mimetype === 'application/pdf') {
 
-    // req.params.applicationid contains the :applicationid URL component
+    console.log("Received: " + JSON.stringify(req.body) );
 
-      let recvagreements= req.body;
-      recvagreements.filename = req.file.originalname;
-      recvagreements.content = req.file.buffer;
-      recvagreements.mimetype = req.file.mimetype;
-      recvagreements.uploadDate = new Date();
-      recvagreements.applicationid = req.body.applicationid;
-      recvagreements.matrNumber = req.body.matrnumber;
-      recvagreements.approved = req.body.approved;
-      recvagreements.modified = true;
-      recvagreements.lecturerReason = req.body.lecturerReason;
-
+    let recvagreements= req.body;
+    recvagreements.filename = req.file.originalname;
+    recvagreements.content = req.file.buffer;
+    recvagreements.mimetype = req.file.mimetype;
+    recvagreements.uploadDate = new Date();
+    recvagreements.applicationid = req.body.applicationid;
+    recvagreements.matrNumber = req.body.matrNumber;
+    if(req.body.approved === 'true' || req.body.approved === 'True' || req.body.approved === true ) {
+      recvagreements.approved = true;
+    } else {
+      recvagreements.approved = false;
+    }
+    recvagreements.modified = true;
+    recvagreements.lecturerReason = req.body.lecturerReason || 'No reason provided';
+      
     if(agreement.isAgreement(recvagreements)) {
-
       agreement.getModel().updateOne( {_id: req.params.agreementid}, recvagreements ).then( 
       ( q )=> {
 
         if( q.modifiedCount > 0 )
           return res.status(200).json( {error:false, errormessage:""} );
         else
-          return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement"});
+          return next({ statusCode:404, error: true, errormessage: "Mongo - Data is not a valid learning agreement"});
         
       }).catch( (reason)=> {
           return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
@@ -623,7 +659,7 @@ app.get("/api/v1/transcriptRecords/:applicationid", auth, (req,res,next) => {
 
   // req.params.applicationid contains the :applicationid URL component
 
-  transcriptRecord.getModel().find( {applicationID: req.params.applicationid } ).then( 
+  transcriptRecord.getModel().find( {applicationid: req.params.applicationid } ).then( 
     ( q )=> {
       if( q.length > 0 )
         return res.status(200).json( {q} );
@@ -642,7 +678,7 @@ app.delete("/api/v1/transcriptRecords/:applicationid", auth, (req,res,next) => {
 
   // req.params.applicationid contains the :applicationid URL component
 
-  transcriptRecord.getModel().deleteMany( {applicationID: req.params.applicationid } ).then( 
+  transcriptRecord.getModel().deleteMany( {applicationid: req.params.applicationid } ).then( 
     ( q )=> {
 
       if( q.deletedCount > 0 )
@@ -733,6 +769,29 @@ app.post("/api/v1/hosts/", auth, ensureModeratorRole , (req,res,next) => {
 });
 
 
+app.put("/api/v1/hosts/:hostid", auth, ensureModeratorRole , (req,res,next) => {
+
+ console.log("Update request for host with id: "+req.params.hostid)
+ let recvhost= req.body;
+
+  if(host.isHost(recvhost)) {
+    host.getModel().updateOne({_id:req.params.hostid}, recvhost ).then(
+      (q) => {
+
+        if( q.modifiedCount > 0 )
+          return res.status(200).json( {error:false, errormessage:""} );
+        else
+          return next({ statusCode:404, error: true, errormessage: "Data is not a valid host"});
+
+    }).catch((reason) => {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
+  } else {
+    return next({ statusCode:404, error: true, errormessage: "Data is not a valid host" });
+  }
+
+});
+
 
 app.get("/api/v1/hosts/:hostid", auth, (req,res,next) => {
 
@@ -754,7 +813,7 @@ app.delete("/api/v1/hosts/:hostid", auth, ensureModeratorRole , (req,res,next) =
   host.getModel().deleteOne( {_id: req.params.hostid } ).then( 
     ( q )=> {
       if( q.deletedCount > 0 )
-        return res.status(200).json( {q} );
+        return res.status(200).json( {error:false, errormessage:""}  );
       else 
         return res.status(404).json( {error:true, errormessage:"no host with that ID present"} );
   }).catch( (reason)=> {
@@ -766,89 +825,10 @@ app.delete("/api/v1/hosts/:hostid", auth, ensureModeratorRole , (req,res,next) =
 
 
 
+/////////
+// User
+////////
 
-
-
-
-
-
-
-
-
-
-
-/*
-
-app.route("/api/v1/messages").get( auth, (req,res,next) => {
-
-    let filter = {};
-    if( req.query.tags ) {
-        filter = { tags: {$all: req.query.tags } };
-    }
-    console.log("Using filter: " + JSON.stringify(filter) );
-    console.log(" Using query: " + JSON.stringify(req.query) );
-
-    let skip = parseInt( req.query.skip as string || "0" ) || 0;
-    let limit = parseInt( req.query.limit as string || "20" ) || 20;
-
-    message.getModel().find( filter ).sort({timestamp:-1}).skip( skip ).limit( limit ).then( (documents) => {
-      return res.status(200).json( documents );
-    }).catch( (reason) => {
-      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-    })
-
-}).post( auth, (req,res,next) => {
-
-    console.log("Received: " + JSON.stringify(req.body) );
-
-    let recvmessage = req.body;
-    recvmessage.timestamp = new Date();
-    recvmessage.authormail = req.auth.mail;
-
-    if( message.isMessage( recvmessage ) ) {
-
-      message.getModel().create( recvmessage ).then( ( data ) => {
-
-        if( ios ) {
-          // Notify all socket.io clients
-          console.log("socket.io send");
-          ios.emit( "broadcast", JSON.stringify(data) );
-        } 
-
-        return res.status(200).json({ error: false, errormessage: "", id: data._id });
-
-      }).catch((reason) => {
-        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-      })
-
-    } else {
-      return next({ statusCode:404, error: true, errormessage: "Data is not a valid Message" });
-    }
-
-});
-
-
-
-
-
-
-app.delete( '/api/v1/messages/:messageid', auth, ensureModeratorRole, (req,res,next) => {
-
-  console.log("Delete request for message id: "+req.params.messageid )
-  
-  // req.params.messageid contains the :messageid URL component
-
-  message.getModel().deleteOne( {_id: req.params.messageid } ).then( 
-    ( q )=> {
-      if( q.deletedCount > 0 )
-        return res.status(200).json( {error:false, errormessage:""} );
-      else 
-        return res.status(404).json( {error:true, errormessage:"Invalid message ID"} );
-  }).catch( (reason)=> {
-      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-  })
-
-});
 
 
 app.get('/api/v1/users', auth, ensureModeratorRole, (req,res,next) => {
@@ -883,7 +863,7 @@ app.route('/api/v1/users/:mail').get(auth, ensureModeratorRole, (req,res,next) =
       return next({ statusCode:404, error: true, errormessage: "Invalid user" });
 
     if( user.hasAdminRole() ) 
-      return next({ statusCode:404, error: true, errormessage: "Cannot delete an admin user user" });
+      return next({ statusCode:404, error: true, errormessage: "Cannot delete an admin user" });
 
     user.deleteOne().then( () => {
       return res.status(200).json( {error:false, errormessage:"" } );
@@ -894,7 +874,7 @@ app.route('/api/v1/users/:mail').get(auth, ensureModeratorRole, (req,res,next) =
   })
 
 });
-*/
+
 
 
 
@@ -978,7 +958,7 @@ app.use(( (err,req,res,next) => {
 //  the requested endpoint is not matched by any route)
 //
 app.use( (req,res,next) => {
-  res.status(404).json({statusCode:404, error:true, errormessage: "Invalid endpoint"} );
+  res.status(404).json({statusCode:404, error:true, errormessage: "Invalid endpoint: " + req} );
 })
 
 
@@ -1018,6 +998,11 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
   }
 )
 .then(
+  () => {
+    return user.getModel().findOne( {mail:"123456@stud.unive.it"} );
+  }
+)
+.then(
   (doc) => {
     if (!doc) {
       console.log("Creating random user");
@@ -1038,7 +1023,7 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
     return application.getModel().countDocuments({})
   }
 ).then(
-  (count) => {
+  async (count) => {
     if (count == 0) {
       console.log("Adding some test into the database");
 
@@ -1050,30 +1035,32 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
           country: "Scotland",
         });
 
-      const buf = Buffer.alloc(16384);
-      const file = await open('./asset/learning_agreement.pdf');
-
-      try {
-        const contents = await file.readFile({ buffer: buf });
-        console.log(contents); // A view over `buf` containing only the bytes read
-      } finally {
-        await file.close();
-      }
+        const file = await open('./asset/learning_agreement.pdf');
+        let contents;
+        try{
+          contents = await file.readFile();
+          console.log("File read successfully");
+        } catch (err) {
+          console.log("Error reading file" + err);
+          throw err;
+        } finally {
+          await file.close();
+        }
 
       let agreement1 = agreement
         .getModel()
         .create({
-          filename: "testone.pdf",
-          content:  buf,
+          filename: "learning_agreement.pdf",
+          content:  contents,
           mimetype:  "application/pdf",
           uploadDate: new Date(),
           applicationid: "123",
           matrNumber: "123456",
           approved: false,
           modified: false,
-          lecturerReason: "",
+          lecturerReason: 'No reason provided',
         });
-
+      
 
       let transcriptRecords1 = transcriptRecord
         .getModel()
@@ -1088,7 +1075,7 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
           matrNumber: "123456",
         });
 
-
+        
       let application1 = application
         .getModel()
         .create({
@@ -1114,10 +1101,10 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
           referent: "Tyrion Lannister",
           approved: false,
           modified: false,
-          lecturerReason: "No reason provided",
+          lecturerReason: 'No reason provided',
         });
 
-
+        
 
 
       return Promise.all([agreement1, application1, transcriptRecords1,host1]);
@@ -1156,3 +1143,44 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
     console.log(err);
   }
 )
+
+
+
+
+
+
+
+
+/*
+
+123456@stud.unive.it
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtYWlsIjoiMTIzNDU2QHN0dWQudW5pdmUuaXQiLCJ1c2VybmFtZSI6IjEyMzQ1NiJ9.YXM6JAk34rW3Y0EX2xiNPNsfJLCq5DXDjQ0HAm4E2mY
+
+
+
+admin@cafoscari.it
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtYWlsIjoiYWRtaW5AY2Fmb3NjYXJpLml0IiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIiwiTU9ERVJBVE9SIl19.LINiAYxZiKprBWVLbLn9La2yPAiISamitJ03jLcbLuY
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,7 +10,7 @@ interface CourseResult {
 export interface TranscriptRecord {
     records: CourseResult[],
     uploadDate: Date,
-    applicationID: string,
+    applicationid: string,
     matrNumber: string
 }
 
@@ -22,7 +22,7 @@ export interface TranscriptRecord {
 //
 export function isTranscriptRecord(arg: any): arg is TranscriptRecord {
     return arg 
-    && arg.applicationID && typeof(arg.applicationID) == 'string'
+    && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.records && Array.isArray(arg.records) 
     && arg.uploadDate && arg.uploadDate instanceof Date;
@@ -41,8 +41,14 @@ export function isTranscriptRecord(arg: any): arg is TranscriptRecord {
 // Mongoose Schema.
 
 const CourseResultSchema = new mongoose.Schema<CourseResult>({
-    code: { type: Number, required: true },
-    grade: { type: Number, required: true }
+    code: { 
+        type: String, 
+        required: true 
+    },
+    grade: { 
+        type: Number, 
+        required: true 
+    }
 }, { _id: false });
 
 let TranscriptRecordSchema = new mongoose.Schema<TranscriptRecord>( {
@@ -54,7 +60,7 @@ let TranscriptRecordSchema = new mongoose.Schema<TranscriptRecord>( {
         type: mongoose.SchemaTypes.Date,
         required: true
     },
-    applicationID: {
+    applicationid: {
         type: mongoose.SchemaTypes.String,
         required: true
     },

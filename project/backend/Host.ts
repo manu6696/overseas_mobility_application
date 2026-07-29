@@ -36,7 +36,8 @@ export function isHost(arg: any): arg is Host {
 let HostSchema = new mongoose.Schema<Host>( {
     name: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: true,
+        unique: true
     },
     mail: {
         type: mongoose.SchemaTypes.String,

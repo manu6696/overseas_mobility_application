@@ -113,7 +113,8 @@ let ApplicationSchema = new mongoose.Schema<Application>( {
 
     id: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: true,
+        unique: true
     },
     status: {
         type: mongoose.SchemaTypes.String,
@@ -181,7 +182,7 @@ let ApplicationSchema = new mongoose.Schema<Application>( {
     },
     lecturerReason: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: false
     }
 })
 

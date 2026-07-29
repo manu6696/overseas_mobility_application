@@ -1,0 +1,911 @@
+{
+  "info": {
+    "_postman_id": "f4c92663-fc31-4501-9b49-f7dce7d3fceb",
+    "name": "overseas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54350422"
+  },
+  "item": [
+    {
+      "name": "application",
+      "item": [
+        {
+          "name": "http://localhost:8080/api/v1/applications/",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_secret_12ep}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/applications/?matrNumber=901771",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "applications",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "referent",
+                  "value": "Equino Pony",
+                  "type": "default",
+                  "disabled": true
+                },
+                {
+                  "key": "matrNumber",
+                  "value": "901771"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/applications/:matrNumber/:applicationstatus",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{json_web_token_0tc0}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/applications/:matrNumber/:applicationstatus",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "applications",
+                ":matrNumber",
+                ":applicationstatus"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null,
+                  "type": "default",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "matrNumber",
+                  "value": "1111111"
+                },
+                {
+                  "key": "applicationstatus",
+                  "value": "Created"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/applications/:matrNumber/:applicationstatus",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{json_web_token_0tc0}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"69\",\r\n    \"status\": \"Created\",\r\n    \"uploadDate\": \"2026-07-28T08:57:59.503Z\",\r\n    \"academicYear\": \"2023-2024\",\r\n    \"semester\": \"Spring\",\r\n    \"name\": \"John\",\r\n    \"surname\": \"Fucking\",\r\n    \"departement\": \"Computer Science\",\r\n    \"sendingInst\": \"University of Venezia\",\r\n    \"sendingCountry\": \"Italy\",\r\n    \"hostInst\": \"University of Edinburgh\",\r\n    \"hostCountry\": \"Scotland\",\r\n    \"courses\": [\r\n        {\r\n            \"originalCourse\": {\r\n                \"code\": \"CS6969\",\r\n                \"title\": \"TAW\",\r\n                \"credits\": 6\r\n            },\r\n            \"equivalentCourse\": {\r\n                \"code\": \"CS999\",\r\n                \"title\": \"Algorithm and data structures\",\r\n                \"credits\": 12\r\n            },\r\n            \"_id\": \"6a686f17eec088926dde3ab0\"\r\n        }\r\n    ],\r\n    \"referent\": \"Equino Cavallo\",\r\n    \"approved\": true,\r\n    \"modified\": false,\r\n    \"lecturerReason\": \"No reason provided\",\r\n    \"__v\": 0\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/applications/:matrNumber/:applicationstatus",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "applications",
+                ":matrNumber",
+                ":applicationstatus"
+              ],
+              "variable": [
+                {
+                  "key": "matrNumber",
+                  "value": "1111113"
+                },
+                {
+                  "key": "applicationstatus",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/applications/:applicationid",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{json_web_token_0tc0}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"69\",\r\n    \"status\": \"Created\",\r\n    \"uploadDate\": \"2026-07-28T08:57:59.503Z\",\r\n    \"semester\": \"SummerPD\",\r\n    \"name\": \"John\",\r\n    \"surname\": \"Pezzotto\",\r\n    \"departement\": \"Computer Science\",\r\n    \"sendingInst\": \"University of Venezia\",\r\n    \"sendingCountry\": \"Italy\",\r\n    \"hostInst\": \"University of Edinburgh\",\r\n    \"hostCountry\": \"Scotland\",\r\n    \"courses\": [\r\n        {\r\n            \"originalCourse\": {\r\n                \"code\": \"CS6969\",\r\n                \"title\": \"TAW\",\r\n                \"credits\": 99\r\n            },\r\n            \"equivalentCourse\": {\r\n                \"code\": \"CS999\",\r\n                \"title\": \"Algorithm and data structures\",\r\n                \"credits\": 12\r\n            },\r\n            \"_id\": \"6a686f17eec088926dde3ab0\"\r\n        }\r\n    ],\r\n    \"referent\": \"Equino Pony\",\r\n    \"approved\": false,\r\n    \"modified\": false,\r\n    \"lecturerReason\": \"Esimia testa di cazzo\",\r\n    \"__v\": 0\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/applications/:applicationid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "applications",
+                ":applicationid"
+              ],
+              "query": [
+                {
+                  "key": "referent",
+                  "value": "eccomi",
+                  "type": "default",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "applicationid",
+                  "value": "6a688626a5d4de6b31841eb4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/applications/:matrNumber/:applicationstatus",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_secret_0tc0}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "",
+                  "type": "file",
+                  "src": "/C:/Users/mrosace/Desktop/overseas_mobilty_application-main/overseas_mobilty_application-main/project/backend/asset/learning_agreement.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/applications/:matrNumber/:applicationstatus",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "applications",
+                ":matrNumber",
+                ":applicationstatus"
+              ],
+              "variable": [
+                {
+                  "key": "matrNumber",
+                  "value": "901772"
+                },
+                {
+                  "key": "applicationstatus",
+                  "value": "created"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "agreement",
+      "item": [
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_service_role_api_key_0tc0}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/agreements/:applicationid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "agreements",
+                ":applicationid"
+              ],
+              "variable": [
+                {
+                  "key": "applicationid",
+                  "value": "456"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_secret_0tc0}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "agreement",
+                  "type": "file",
+                  "fileNotInWorkingDirectoryWarning": "This file isn't in your working directory. Teammates you share this request with won't be able to use this file. To make collaboration easier you can setup your working directory in Settings.",
+                  "src": "/C:/Users/mrosace/Desktop/overseas_mobilty_application-main/overseas_mobilty_application-main/project/backend/asset/learning_agreement.pdf"
+                },
+                {
+                  "key": "filename",
+                  "value": "String",
+                  "type": "text"
+                },
+                {
+                  "key": "mimetype",
+                  "value": "String",
+                  "type": "text"
+                },
+                {
+                  "key": "uploadDate",
+                  "value": "Date",
+                  "type": "text"
+                },
+                {
+                  "key": "applicationid",
+                  "value": "789",
+                  "type": "text"
+                },
+                {
+                  "key": "matrNumber",
+                  "value": "901771",
+                  "type": "text"
+                },
+                {
+                  "key": "approved",
+                  "value": "false",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "modified",
+                  "value": "false",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "lecturerReason",
+                  "value": "String",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/agreements/:applicationid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "agreements",
+                ":applicationid"
+              ],
+              "variable": [
+                {
+                  "key": "applicationid",
+                  "value": "456"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid Copy",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/agreements/:applicationid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "agreements",
+                ":applicationid"
+              ],
+              "variable": [
+                {
+                  "key": "applicationid",
+                  "value": "456"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid Copy",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "agreement",
+                  "type": "file",
+                  "fileNotInWorkingDirectoryWarning": "This file isn't in your working directory. Teammates you share this request with won't be able to use this file. To make collaboration easier you can setup your working directory in Settings.",
+                  "src": "/C:/Users/Manuel/Desktop/Cv AM 2025.pdf"
+                },
+                {
+                  "key": "filename",
+                  "value": "String",
+                  "type": "text"
+                },
+                {
+                  "key": "mimetype",
+                  "value": "String",
+                  "type": "text"
+                },
+                {
+                  "key": "uploadDate",
+                  "value": "Date",
+                  "type": "text"
+                },
+                {
+                  "key": "applicationid",
+                  "value": "789",
+                  "type": "text"
+                },
+                {
+                  "key": "matrNumber",
+                  "value": "901771",
+                  "type": "text"
+                },
+                {
+                  "key": "approved",
+                  "value": "false",
+                  "type": "text"
+                },
+                {
+                  "key": "modified",
+                  "value": "false",
+                  "type": "text"
+                },
+                {
+                  "key": "lecturerReason",
+                  "value": "String",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/agreements/:agreementid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "agreements",
+                ":agreementid"
+              ],
+              "variable": [
+                {
+                  "key": "agreementid",
+                  "value": "6a6a3d0b173adcc386ad2789"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "transcriptRecords",
+      "item": [
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid Copy",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"records\": [\r\n        {\r\n            \"code\": \"CS6969\",\r\n            \"grade\": \"28\"\r\n        },\r\n        {\r\n            \"code\": \"CS1717\",\r\n            \"grade\": \"26\"\r\n        }\r\n    ],\r\n    \"uploadDate\": \"2026-07-28T08:57:59.503Z\",\r\n    \"applicationid\": \"456\",\r\n    \"matrNumber\": \"901771\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/transcriptRecords",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "transcriptRecords"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"records\": [\r\n        {\r\n            \"code\": \"CS6969\",\r\n            \"grade\": \"28\"\r\n        },\r\n        {\r\n            \"code\": \"CS1717\",\r\n            \"grade\": \"26\"\r\n        }\r\n    ],\r\n    \"uploadDate\": \"2026-07-28T08:57:59.503Z\",\r\n    \"applicationid\": \"456\",\r\n    \"matrNumber\": \"901771\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/transcriptRecords",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "transcriptRecords"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/transcriptRecords/:applicationid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "transcriptRecords",
+                ":applicationid"
+              ],
+              "variable": [
+                {
+                  "key": "applicationid",
+                  "value": "456"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/agreements/:applicationid",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"records\": [\r\n        {\r\n            \"code\": \"CS6969\",\r\n            \"grade\": \"28\"\r\n        },\r\n        {\r\n            \"code\": \"CS1717\",\r\n            \"grade\": \"26\"\r\n        }\r\n    ],\r\n    \"uploadDate\": \"2026-07-28T08:57:59.503Z\",\r\n    \"applicationid\": \"456\",\r\n    \"matrNumber\": \"Inferno1\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/transcriptRecords/:transcriptid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "transcriptRecords",
+                ":transcriptid"
+              ],
+              "variable": [
+                {
+                  "key": "transcriptid",
+                  "value": "6a6a5ea66fad9bc330859a7e"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "host",
+      "item": [
+        {
+          "name": "http://localhost:8080/api/v1/hosts/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/hosts/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "hosts",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/hosts/ Copy",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/hosts/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "hosts",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/hosts/ Copy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/hosts/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "hosts",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/hosts/ Copy 2",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/hosts/:hostid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "hosts",
+                ":hostid"
+              ],
+              "variable": [
+                {
+                  "key": "hostid",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/api/v1/hosts/ Copy 2",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/hosts/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "hosts",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "supabase_service_role_api_key_0tc0",
+      "secret": true
+    },
+    {
+      "key": "auth_secret_12ep",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0tc0",
+      "secret": true
+    },
+    {
+      "key": "auth_secret_0tc0",
+      "secret": true
+    },
+    {
+      "key": "student_secret",
+      "value": ""
+    },
+    {
+      "key": "admin_secret",
+      "value": ""
+    }
+  ]
+}
