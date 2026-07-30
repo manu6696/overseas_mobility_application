@@ -7,7 +7,7 @@ LABEL maintainer="Filippo Bergamasco <filippo.bergamasco@unive.it>"
 EXPOSE 4200
 
 WORKDIR /app
-COPY postmessagesweb /app
+COPY overseasweb /app
 RUN npm install -g @angular/cli@19
 RUN npm install
 ENV NG_FORCE_TTY=0
