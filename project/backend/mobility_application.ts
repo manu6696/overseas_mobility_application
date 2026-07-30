@@ -560,7 +560,7 @@ app.delete("/api/v1/agreements/:applicationid", auth, (req,res,next) => {
       if( q.deletedCount > 0 )
         return res.status(200).json( {error:false, errormessage:""} );
       else 
-        return res.status(404).json( {error:true, errormessage:"Invalid application ID"} );
+        return res.status(404).json( {error:true, errormessage:"Invalid application id"} );
       
   }).catch( (reason)=> {
       return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
@@ -602,7 +602,7 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
         if( q.modifiedCount > 0 )
           return res.status(200).json( {error:false, errormessage:""} );
         else
-          return next({ statusCode:404, error: true, errormessage: "Mongo - Data is not a valid learning agreement"});
+          return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement"});
         
       }).catch( (reason)=> {
           return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
