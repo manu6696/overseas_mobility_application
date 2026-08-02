@@ -11,4 +11,5 @@ COPY overseasweb /app
 RUN npm install -g @angular/cli@19
 RUN npm install
 ENV NG_FORCE_TTY=0
-CMD ["npm", "run", "--", "ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
+# CMD ["npm", "run", "--", "ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
+CMD ["npm", "run", "--", "ng", "serve", "--host", "0.0.0.0", "--poll", "2000"]

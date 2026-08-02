@@ -30,7 +30,7 @@ export class UserHttpService {
 
   private token: string = '';
   public host = 'http://localhost:8080'
-  public url = this.host+'/api/v3'; // WebService URL
+  public url = this.host+'/api/v1'; // WebService URL
 
   constructor( private http: HttpClient ) {
     console.log('User service instantiated');

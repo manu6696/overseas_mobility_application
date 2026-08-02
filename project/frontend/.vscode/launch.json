@@ -8,7 +8,7 @@
             "type": "editor-browser",
             "request": "launch",
             "name": "Open user-login.component.html",
-            "url": "file:///workspaces/frontend/postmessagesweb/src/app/user-login/user-login.component.html"
+            "url": "file:///workspaces/frontend/overseasweb/src/app/user-login/user-login.component.html"
         }
     ]
 }
