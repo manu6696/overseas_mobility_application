@@ -891,7 +891,7 @@ passport.use( new passportHTTP.BasicStrategy(
     // to verify user credentials 
 
     console.log("New login attempt from ".green + username );
-
+    
     user.getModel().findOne( {mail: username}).then( (user)=>{
 
       if( !user ) {

@@ -35,7 +35,7 @@ export class UserHttpService {
   constructor( private http: HttpClient ) {
     console.log('User service instantiated');
     
-    const loadedtoken = localStorage.getItem('postmessages_token');
+    const loadedtoken = localStorage.getItem('mobility_application_token');
     if ( !loadedtoken || loadedtoken.length < 1 ) {
       console.log("No token found in local storage");
       this.token = ""
@@ -76,7 +76,7 @@ export class UserHttpService {
         this.token = (data as ReceivedToken).token;
         if ( remember ) {
           console.log("Saving token to localstorage")
-          localStorage.setItem('postmessages_token', this.token as string);
+          localStorage.setItem('mobility_application_token', this.token as string);
         } else {
           console.log("Token not saved to local storage.")
         }
@@ -86,7 +86,7 @@ export class UserHttpService {
   logout() {
     console.log('Logging out');
     this.token = '';
-    localStorage.setItem('postmessages_token', this.token);
+    localStorage.setItem('mobility_application_token', this.token);
   }
 
   register( user:User ): Observable<any> {

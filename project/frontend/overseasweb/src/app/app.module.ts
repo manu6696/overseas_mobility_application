@@ -15,6 +15,12 @@ import { UserLoginComponent } from './user-login/user-login.component';
 import { AppRoutingModule } from './/app-routing.module';
 import { UserSignupComponent } from './user-signup/user-signup.component';
 import { SocketioService } from './socketio.service';
+import { DashboardProvaComponent } from './dashboard-prova/dashboard-prova.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @NgModule({ declarations: [
@@ -22,12 +28,18 @@ import { SocketioService } from './socketio.service';
         MessageEditorComponent,
         MessageListComponent,
         UserLoginComponent,
-        UserSignupComponent
+        UserSignupComponent,
+        DashboardProvaComponent
     ],
     bootstrap: [AppComponent], 
     imports: [BrowserModule,
         FormsModule,
-        AppRoutingModule], 
+        AppRoutingModule,
+        MatGridListModule,
+        MatCardModule,
+        MatMenuModule,
+        MatIconModule,
+        MatButtonModule], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },

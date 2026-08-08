@@ -1,5 +1,5 @@
 {
-  "name": "postmessagesweb",
+  "name": "overseasweb",
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
@@ -11,17 +11,19 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^19.2.22",
+    "@angular/cdk": "^19.2.19",
     "@angular/common": "^19.2.22",
     "@angular/compiler": "^19.2.22",
     "@angular/core": "^19.2.22",
     "@angular/forms": "^19.2.22",
+    "@angular/material": "^19.2.19",
     "@angular/platform-browser": "^19.2.22",
     "@angular/platform-browser-dynamic": "^19.2.22",
     "@angular/router": "^19.2.22",
-    "jquery": "^3.6.4",
-    "popper.js": "^1.16.1",
     "bootstrap": "^5.2.3",
+    "jquery": "^3.6.4",
     "jwt-decode": "^3.1.2",
+    "popper.js": "^1.16.1",
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.6.1",
     "tslib": "^2.3.0",

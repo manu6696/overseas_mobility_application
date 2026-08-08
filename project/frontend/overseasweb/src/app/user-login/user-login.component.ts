@@ -22,7 +22,7 @@ export class UserLoginComponent implements OnInit {
       next: (d) => {
         console.log('Login granted, calling router.navigate(/messages)');
         this.errmessage = undefined;
-        this.router.navigate(['/messages']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         console.log('Login error: ' + JSON.stringify(err));

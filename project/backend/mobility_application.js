@@ -653,9 +653,11 @@ passport.use(new passportHTTP.BasicStrategy(function (username, password, done) 
     // Delegate function we provide to passport middleware
     // to verify user credentials 
     console.log("New login attempt from ".green + username);
+    console.log("Password: ".green + password);
+    console.log("Username: ".green + username);
     user.getModel().findOne({ mail: username }).then((user) => {
         if (!user) {
-            return done({ statusCode: 500, error: true, errormessage: "Invalid user" });
+            return done({ statusCode: 500, error: true, errormessage: "Invalid user passport" });
         }
         if (user.validatePassword(password)) {
             // user exists and password is valid!
@@ -669,6 +671,7 @@ passport.use(new passportHTTP.BasicStrategy(function (username, password, done) 
 // Login endpoint uses passport middleware to check
 // user credentials before generating a new JWT
 app.get("/api/v1/login", passport.authenticate('basic', { session: false }), (req, res, next) => {
+    console.log(req.user);
     if (!req.user)
         return res.status(500).json({ statusCode: 500, error: true, errormessage: "Login error" });
     // If we reach this point, the user is successfully authenticated and
