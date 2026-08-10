@@ -3,15 +3,15 @@ import mongoose = require('mongoose');
 
 
 interface CourseResult {
-  code: string,
-  grade: number
+  code: String,
+  grade: Number
 }
 
 export interface TranscriptRecord {
     records: CourseResult[],
     uploadDate: Date,
-    applicationid: string,
-    matrNumber: string
+    applicationid: String,
+    matrNumber: String
 }
 
 // User defined type guard

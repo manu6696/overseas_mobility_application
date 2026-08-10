@@ -20,9 +20,17 @@ export class UserLoginComponent implements OnInit {
 
     this.us.login(mail, password, remember).subscribe({
       next: (d) => {
-        console.log('Login granted, calling router.navigate(/messages)');
+        console.log('Login granted, calling router.navigate(/dashboard)');
         this.errmessage = undefined;
-        this.router.navigate(['/dashboard']);
+
+        if(this.us.is_admin()) {
+          this.router.navigate(['/dashboard-staff']);
+        } else if(this.us.is_moderator()) {
+          this.router.navigate(['/dashboard-lecturer']);
+        } else {
+          this.router.navigate(['/dashboard-student']);
+        }
+
       },
       error: (err) => {
         console.log('Login error: ' + JSON.stringify(err));

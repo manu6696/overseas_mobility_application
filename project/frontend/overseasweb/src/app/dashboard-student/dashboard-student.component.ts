@@ -3,12 +3,12 @@ import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-dashboard-prova',
-  templateUrl: './dashboard-prova.component.html',
-  styleUrl: './dashboard-prova.component.css',
+  selector: 'app-dashboard-student',
+  templateUrl: './dashboard-student.component.html',
+  styleUrl: './dashboard-student.component.css',
   standalone: false
 })
-export class DashboardProvaComponent {
+export class DashboardStudentComponent {
   private breakpointObserver = inject(BreakpointObserver);
 
   /** Based on the screen size, switch from standard to one column per row */

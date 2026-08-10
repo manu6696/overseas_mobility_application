@@ -15,7 +15,9 @@ import { UserLoginComponent } from './user-login/user-login.component';
 import { AppRoutingModule } from './/app-routing.module';
 import { UserSignupComponent } from './user-signup/user-signup.component';
 import { SocketioService } from './socketio.service';
-import { DashboardProvaComponent } from './dashboard-prova/dashboard-prova.component';
+import { DashboardStudentComponent } from './dashboard-student/dashboard-student.component';
+import { DashboardLecturerComponent } from './dashboard-lecturer/dashboard-lecturer.component';
+import { DashboardStaffComponent } from './dashboard-staff/dashboard-staff.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
@@ -29,7 +31,9 @@ import { MatButtonModule } from '@angular/material/button';
         MessageListComponent,
         UserLoginComponent,
         UserSignupComponent,
-        DashboardProvaComponent
+        DashboardStudentComponent,
+        DashboardLecturerComponent,
+        DashboardStaffComponent
     ],
     bootstrap: [AppComponent], 
     imports: [BrowserModule,

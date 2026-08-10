@@ -5,15 +5,15 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
-import { DashboardProvaComponent } from './dashboard-prova.component';
+import { DashboardLecturerComponent } from './dashboard-lecturer.component';
 
-describe('DashboardProvaComponent', () => {
-  let component: DashboardProvaComponent;
-  let fixture: ComponentFixture<DashboardProvaComponent>;
+describe('DashboardLecturerComponent', () => {
+  let component: DashboardLecturerComponent;
+  let fixture: ComponentFixture<DashboardLecturerComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [DashboardProvaComponent],
+      declarations: [DashboardLecturerComponent],
       imports: [
         MatButtonModule,
         MatCardModule,
@@ -25,7 +25,7 @@ describe('DashboardProvaComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DashboardProvaComponent);
+    fixture = TestBed.createComponent(DashboardLecturerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

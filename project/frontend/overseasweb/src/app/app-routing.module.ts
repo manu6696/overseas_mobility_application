@@ -5,7 +5,9 @@ import { UserLoginComponent } from './user-login/user-login.component';
 import { AppComponent } from './app.component';
 import { MessageListComponent } from './message-list/message-list.component';
 import { UserSignupComponent } from './user-signup/user-signup.component';
-import { DashboardProvaComponent } from './dashboard-prova/dashboard-prova.component';
+import { DashboardStudentComponent } from './dashboard-student/dashboard-student.component';
+import { DashboardLecturerComponent } from './dashboard-lecturer/dashboard-lecturer.component';
+import { DashboardStaffComponent } from './dashboard-staff/dashboard-staff.component';
 
 const routes: Routes = [
   
@@ -13,7 +15,9 @@ const routes: Routes = [
   { path: 'login', component: UserLoginComponent },
   { path: 'signup', component: UserSignupComponent },
   { path: 'messages', component: MessageListComponent },
-  { path: 'dashboard', component: DashboardProvaComponent }
+  { path: 'dashboard-student', component: DashboardStudentComponent },
+  { path: 'dashboard-lecturer', component: DashboardLecturerComponent },
+  { path: 'dashboard-staff', component: DashboardStaffComponent }
 ];
 
 @NgModule({

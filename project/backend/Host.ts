@@ -2,11 +2,12 @@
 import mongoose = require('mongoose');
 
 
+// extends mongoose.Document 
 
-export interface Host extends mongoose.Document {
-    name: string,
-    mail: string,
-    country: string
+export interface Host{
+    name: String,
+    mail: String,
+    country: String
 }
 
 

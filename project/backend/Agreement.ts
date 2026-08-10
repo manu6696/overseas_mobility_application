@@ -8,7 +8,7 @@ export interface Agreement {
     mimetype: String,
     uploadDate: Date,
     applicationid: String,
-    matrNumber: String
+    matrNumber: String,
     approved: Boolean,
     modified: Boolean,
     lecturerReason: String
