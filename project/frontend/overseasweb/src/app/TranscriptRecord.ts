@@ -6,6 +6,7 @@ interface CourseResult {
 }
 
 export interface TranscriptRecord {
+    _id: string;
     records: CourseResult[];
     uploadDate: Date;
     applicationid: string;

@@ -1,5 +1,6 @@
 
 export interface Host {
+    _id: string;
     name: string;
     mail: string;
     country: string;

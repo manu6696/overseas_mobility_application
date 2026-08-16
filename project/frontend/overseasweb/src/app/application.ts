@@ -11,6 +11,7 @@ interface CourseEval {
 }
 
 export interface Application {
+    _id: string;
     id: string;
     status: string;
     uploadDate: Date;

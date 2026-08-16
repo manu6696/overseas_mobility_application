@@ -1,0 +1,14 @@
+
+
+
+<div class="card" style="margin: 5px" *ngIf="application">
+  <div class="card-body">
+    <div *ngFor="let field of application | keyvalue">
+      <strong>{{ field.key }}</strong>: {{ field.value }}
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!application">
+  <p>Non hai ancora presentato domanda.</p>
+</div>

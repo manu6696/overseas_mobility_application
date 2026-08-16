@@ -11,13 +11,12 @@ import { Host } from './host';
 })
 export class HostHttpService {
 
-  constructor( private http: HttpClient, private us: UserHttpService ) { // We require the UserHttpService to provide the JWT when invoking message related endpoints
-
+  constructor( private http: HttpClient, private us: UserHttpService ) {
     console.log('Host service instantiated');
     console.log('User service token: ' + us.get_token() );
-   }
+  }
 
-   private handleError(error: HttpErrorResponse) {
+  private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error.message);
@@ -60,7 +59,7 @@ export class HostHttpService {
 
   put_host( m: Host ): Observable<Host> {
     console.log('Updating ' + JSON.stringify(m) );
-    return this.http.put<Host>( this.us.url + '/hosts' + '/' + m.id, m,  this.create_options() ).pipe(
+    return this.http.put<Host>( this.us.url + '/hosts' + '/' + m._id, m,  this.create_options() ).pipe(
       catchError(this.handleError)
     );
   }

@@ -1,7 +1,8 @@
 
 export interface Agreement {
+    _id: string;
     filename: string;
-    content: Buffer;
+    content: any;
     mimetype: string;
     uploadDate: Date;
     applicationid: string;
