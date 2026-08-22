@@ -16,7 +16,7 @@ interface CourseEval {
 
 export interface Application {
 
-    id: String,
+    _id: String,
     status: String,
     uploadDate: Date,
     academicYear: String,
@@ -44,7 +44,7 @@ export interface Application {
 //
 export function isApplication(arg: any): arg is Application {
     return arg 
-    && arg.id && typeof(arg.id) == 'string' 
+    && arg._id && typeof(arg._id) == 'string' 
     && arg.status && typeof(arg.status) == 'string'
     && arg.uploadDate && arg.uploadDate instanceof Date
     && arg.academicYear && typeof(arg.academicYear) == 'string' 
@@ -111,11 +111,13 @@ const CourseEvalSchema = new mongoose.Schema<CourseEval>({
 
 let ApplicationSchema = new mongoose.Schema<Application>( {
 
-    id: {
+    /*
+    _id: {
         type: mongoose.SchemaTypes.String,
         required: true,
         unique: true
     },
+    */
     status: {
         type: mongoose.SchemaTypes.String,
         required: true

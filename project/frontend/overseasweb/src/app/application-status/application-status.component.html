@@ -1,14 +1,61 @@
 
 
+<div *ngIf="application">
 
-<div class="card" style="margin: 5px" *ngIf="application">
-  <div class="card-body">
-    <div *ngFor="let field of application | keyvalue">
-      <strong>{{ field.key }}</strong>: {{ field.value }}
+
+  <!--------------- BANNER  ------------------>
+  <mat-expansion-panel (opened)="panelOpenState.set(true)" (closed)="panelOpenState.set(false)">
+    <mat-expansion-panel-header>
+      <mat-panel-title class="panel-title"> Application ID: {{application._id}} </mat-panel-title>
+      <mat-panel-description class="panel-description"> State: 
+        <span class="status-badge" [ngClass]="getStatusClass(application.status)">
+          {{ application.status }}
+        </span>
+      </mat-panel-description>
+  </mat-expansion-panel-header>
+  
+  <!--------------- DATA  ------------------>
+
+  <!-------- GENERAL  ---------->
+  <div class="fields-container">
+    <ng-container *ngFor="let field of application | keyvalue: originalOrder">
+      <fieldset class="field-box" *ngIf="isVisibleField(field.key) && isGeneralData(field.key)">
+        <legend>{{ field.key }}</legend>
+        <span>{{ field.value }}</span>
+      </fieldset>
+    </ng-container>
+  </div>
+
+  <!--------------- DIVIDER  ------------------>
+  <mat-divider/>
+
+  
+  <!--------------- COURSES  ------------------>
+  <div *ngIf="application.courses?.length">
+    <h6>Courses</h6>
+
+    <div class="course-pair" *ngFor="let ce of application.courses">
+      <fieldset class="field-box">
+        <legend>Original Course</legend>
+        <p class="course-code">{{ ce.originalCourse.code }}</p>
+        <p class="course-title">{{ ce.originalCourse.title }}</p>
+        <p class="course-credits">CFU: {{ ce.originalCourse.credits }}</p>
+      </fieldset>
+
+      <span class="arrow">→</span>
+
+      <fieldset class="field-box">
+        <legend>Equivalent Course</legend>
+        <p class="course-code">{{ ce.equivalentCourse.code }}</p>
+        <p class="course-title">{{ ce.equivalentCourse.title }}</p>
+        <p class="course-credits">CFU: {{ ce.equivalentCourse.credits }}</p>
+      </fieldset>
     </div>
   </div>
+
+  </mat-expansion-panel>
 </div>
 
 <div *ngIf="!application">
-  <p>Non hai ancora presentato domanda.</p>
+  <p>You didn't present any application.</p>
 </div>

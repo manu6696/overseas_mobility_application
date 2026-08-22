@@ -12,7 +12,7 @@ const mongoose = require("mongoose");
 //
 function isApplication(arg) {
     return arg
-        && arg.id && typeof (arg.id) == 'string'
+        && arg._id && typeof (arg._id) == 'string'
         && arg.status && typeof (arg.status) == 'string'
         && arg.uploadDate && arg.uploadDate instanceof Date
         && arg.academicYear && typeof (arg.academicYear) == 'string'
@@ -64,11 +64,13 @@ const CourseEvalSchema = new mongoose.Schema({
     }
 });
 let ApplicationSchema = new mongoose.Schema({
-    id: {
+    /*
+    _id: {
         type: mongoose.SchemaTypes.String,
         required: true,
         unique: true
     },
+    */
     status: {
         type: mongoose.SchemaTypes.String,
         required: true

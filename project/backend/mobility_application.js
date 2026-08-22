@@ -307,7 +307,7 @@ app.post("/api/v1/applications/:matrNumber", auth, async (req, res, next) => {
                 console.log("socket.io send");
                 ios.emit("broadcast", JSON.stringify(data));
             }
-            return res.status(200).json({ error: false, errormessage: "", id: data._id });
+            return res.status(200).json({ error: false, errormessage: "", _id: data._id });
         }).catch((reason) => {
             return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
         });
@@ -793,7 +793,6 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
         let application1 = application
             .getModel()
             .create({
-            id: "123",
             status: "Pending",
             uploadDate: new Date(),
             academicYear: "2023-2024",

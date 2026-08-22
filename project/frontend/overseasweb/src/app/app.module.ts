@@ -30,6 +30,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule, MatAccordion } from '@angular/material/expansion';
+import {MatDividerModule} from '@angular/material/divider';
 
 
 @NgModule({ declarations: [
@@ -52,7 +54,10 @@ import { MatButtonModule } from '@angular/material/button';
         MatCardModule,
         MatMenuModule,
         MatIconModule,
-        MatButtonModule], 
+        MatButtonModule,
+        MatExpansionModule,
+        MatAccordion,
+        MatDividerModule], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },
