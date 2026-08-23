@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { Application } from '../application';
+import { Application, APPLICATION_FIELD_META, FieldGroupResult, FieldGroup, GroupedField, FIELD_GROUP_LABELS } from '../application';
 import { ApplicationHttpService } from '../application-http.service';
 import { UserHttpService } from '../user-http.service';
 import { Router } from '@angular/router';
@@ -24,7 +24,7 @@ export class ApplicationStatusComponent implements OnInit {
     });
   }
 
-  // Needed to mantain the original order of the 
+  // Needed to mantain the original order of the object
   originalOrder = (): number => 0;
 
   // Needed for the accordion on the expansion panel
@@ -52,7 +52,7 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
   // Needed to organize the fields
-  private generalData = ['uploadDate', 'academicYear', 'semester'];
+  private generalData = ['uploadD0ate', 'academicYear', 'semester'];
   private studentData = ['matrNumber', 'name', 'surname'];
   private sendingInstData = ['departement', 'sendingInst', 'sendingCountry'];
   private hostingInstData = ['hostInst', 'hostCountry'];
@@ -103,10 +103,43 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
 
-  
 
+  getFieldsByCategory(app: Application): FieldGroupResult[] {
+    const applicationKeys = Object.keys(app);
+    let groups : FieldGroupResult[] = [];
 
+    for(const key of applicationKeys) {
+      const metaKey = APPLICATION_FIELD_META[key as keyof Application] ;
+      if(metaKey === undefined) continue;
+      if(!metaKey.hidden) {
+        const groupName = FIELD_GROUP_LABELS[metaKey.group];
+        const groupsFinded = groups.find(elemento => elemento.groupLabel === groupName);
 
+        const options = {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
+
+        const rawValue = app[key as keyof Application];
+        const displayValue = rawValue instanceof Date 
+          ? rawValue.toLocaleDateString("it-IT", options) 
+          : rawValue.toString();
+
+        if(!groupsFinded) {
+          
+          groups.push({groupLabel: groupName, fields: [{label: metaKey.label, value: displayValue}]});
+        } else {
+          groupsFinded.fields.push({label: metaKey.label, value: displayValue});
+        }
+          
+        
+      }
+    }
+
+    return groups;
+  }
 
 
 }

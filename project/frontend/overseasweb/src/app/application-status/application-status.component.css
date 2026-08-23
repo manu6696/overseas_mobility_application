@@ -56,19 +56,24 @@
 }
 
 .field-box {
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
+  border: 1.5px solid rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
   padding: 8px 12px 12px;
   min-width: 160px;
   flex: 1 1 auto;
 }
 
 .field-box legend {
-  padding: 0 6px;
-  font-size: 0.8em;
+  padding: 0 4px;
+  font-size: 1em;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.6);
   text-transform: capitalize;
+  float: none;
+  margin: 0 auto;
+  width: fit-content;
+  margin-inline: -4px;
+  text-align: left;
 }
 
 .field-box span {
@@ -107,4 +112,11 @@
   margin: 0;
   font-size: 0.85em;
   color: rgba(0, 0, 0, 0.6);
+}
+
+
+
+.section-divider{
+  display: block;
+  margin: 24px 0;
 }

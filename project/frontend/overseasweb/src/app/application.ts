@@ -60,3 +60,90 @@ export function isApplication(arg: any): arg is Application {
     && typeof(arg.lecturerReason) == 'string'
 }
 
+
+
+// HTML group visualization
+
+interface FieldMeta {
+  label: string;
+  group: FieldGroup;
+  hidden?: boolean;
+}
+
+
+ export type FieldGroup = 'student'| 'general'| 'sendingInst'| 'hostingInst'| 'lecturer'| 'system' | 'courses';
+
+export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
+
+    // System group
+    _id : {label: 'ID', group: 'system', hidden: true},
+    id : {label: 'ID', group: 'system', hidden: true},
+
+    // General group
+    status : {label: 'Status', group: 'general', hidden: false},
+    uploadDate : {label: 'Upload Date', group: 'general', hidden: false},
+    academicYear : {label: 'Academic Year', group: 'general', hidden: false},
+    semester : {label: 'Semester', group: 'general', hidden: false},
+
+    // Student group
+    matrNumber : {label: 'Matriculation Number', group: 'student', hidden: false},
+    name : {label: 'Name', group: 'student', hidden: false},
+    surname : {label: 'Surname', group: 'student', hidden: false},
+
+    // Sending institution
+    departement : {label: 'Departement', group: 'sendingInst', hidden: false},
+    sendingInst : {label: 'Sending Institution', group: 'sendingInst', hidden: false},
+    sendingCountry : {label: 'Sending Country', group: 'sendingInst', hidden: false},
+
+    // Hosting institution
+    hostInst : {label: 'Hosting Institution', group: 'hostingInst', hidden: false},
+    hostCountry : {label: 'Hosting Country', group: 'hostingInst', hidden: false},
+
+    // Courses
+    courses : {label: 'Courses', group: 'courses', hidden: true},
+
+    // Lecturer
+    referent : {label: 'Referent Name', group: 'lecturer', hidden: false},
+    lecturerReason : {label: 'Lecturer Reason', group: 'lecturer', hidden: false},
+    approved : {label: 'Approved', group: 'lecturer', hidden: true},
+    modified : {label: 'Modified', group: 'lecturer', hidden: true}
+}
+
+
+export interface GroupedField {
+    label: string;
+    value: string;
+}
+
+export interface FieldGroupResult {
+    groupLabel: string;
+    fields: GroupedField[]
+}
+
+export const FIELD_GROUP_LABELS: Record<FieldGroup, string> = { 
+    'student' : 'Student',
+    'general': 'General',
+    'sendingInst': 'Sending Institution',
+    'hostingInst': 'Hosting Institution',
+    'lecturer': 'Lecturer',
+    'system' : 'System',
+    'courses' : 'Courses'
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
