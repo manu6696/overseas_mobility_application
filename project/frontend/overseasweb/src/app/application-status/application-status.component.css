@@ -120,3 +120,55 @@
   display: block;
   margin: 24px 0;
 }
+
+.agreement-button{
+  background-color: rgb(173, 0, 0) !important;
+  color: white !important;
+  margin: 0;
+}
+
+.agreement-button-wrapper{
+  padding: 4px;
+}
+
+
+.transcript-records-button{
+  background-color: rgb(173, 0, 0) !important;
+  color: white !important;
+  margin: 0;
+}
+
+.transcript-records-button-wrapper{
+  padding: 4px;
+}
+
+.edit-button-container{
+  padding: 4px;
+}
+
+.edit-button {
+  background-color: rgb(173, 0, 0) !important;
+  color: white !important;
+  margin: 0;
+  padding: 4px;
+}
+
+.delete-button-container{
+  padding: 4px;
+}
+
+.delete-button {
+  background-color: rgb(173, 0, 0) !important;
+  color: white !important;
+  margin: 0;
+  padding: 4px;
+}
+
+.button-space-1{
+  flex: 1 1 auto;
+}
+
+
+.toolbar-space-1{
+  flex: 1 1 auto;
+}

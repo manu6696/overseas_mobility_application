@@ -4,6 +4,12 @@ import { ApplicationHttpService } from '../application-http.service';
 import { UserHttpService } from '../user-http.service';
 import { Router } from '@angular/router';
 import { SocketioService } from '../socketio.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AgreementViewerDialogComponent } from '../agreement-viewer-dialog/agreement-viewer-dialog.component';
+import { AgreementHttpService } from '../agreement-http.service';
+import { ApplicationEditorComponent } from '../application-editor/application-editor.component';
+
 
 @Component({
   selector: 'app-application-status',
@@ -15,7 +21,7 @@ export class ApplicationStatusComponent implements OnInit {
 
   public application: Application | null = null;
 
-  constructor( private sio: SocketioService , public ap: ApplicationHttpService, public us: UserHttpService, private router: Router ) { }
+  constructor( private sio: SocketioService , public ap: ApplicationHttpService, public us: UserHttpService, private router: Router, private dialog: MatDialog, private sanitizer: DomSanitizer, private ag: AgreementHttpService ) { }
   
   ngOnInit() {
     this.get_application_by_status(this.us.get_username(), 'Pending');
@@ -23,6 +29,7 @@ export class ApplicationStatusComponent implements OnInit {
       this.get_application_by_status(this.us.get_username(), 'Pending');
     });
   }
+
 
   // Needed to mantain the original order of the object
   originalOrder = (): number => 0;
@@ -120,13 +127,19 @@ export class ApplicationStatusComponent implements OnInit {
           year: "numeric",
           month: "long",
           day: "numeric",
-        };
+          hour: "numeric",
+          minute: "numeric",
+          hour12: false
+        } as const ;
 
         const rawValue = app[key as keyof Application];
-        const displayValue = rawValue instanceof Date 
-          ? rawValue.toLocaleDateString("it-IT", options) 
+
+        const displayValue = key === 'uploadDate' 
+          ? new Date(rawValue as string).toLocaleDateString('en-GB', options) 
           : rawValue.toString();
 
+          //rawValue.toLocaleDateString("it-IT", options)
+          // rawValue.toString()
         if(!groupsFinded) {
           
           groups.push({groupLabel: groupName, fields: [{label: metaKey.label, value: displayValue}]});
@@ -139,6 +152,31 @@ export class ApplicationStatusComponent implements OnInit {
     }
 
     return groups;
+  }
+
+
+
+  openPdfViewer(applicationId: string) {
+    this.ag.get_agreement_by_id(applicationId).subscribe({
+      next: (blob: Blob) => {        
+
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(pdfBlob);
+
+        window.open(blobUrl, '_blank');
+      },
+      error: (err) => {
+        console.error("Errore recupero PDF:", err);
+      }
+    });
+  }
+
+
+  openApplicationEditor() {
+    const dialogRef = this.dialog.open(ApplicationEditorComponent, {
+      data: {application: {...this.application}}
+    });
+    
   }
 
 

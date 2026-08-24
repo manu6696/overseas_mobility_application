@@ -523,8 +523,13 @@ app.get("/api/v1/agreements/", auth, (req,res,next) => {
     agreement.getModel().find( {applicationid: req.query.applicationid} ).then( 
     ( q )=> {
 
-      if( q.length > 0)
-        return res.status(200).json( {q} );
+      const selectedAgreement = q[0];
+      if( q.length > 0) {
+        res.setHeader('Content-Type', 'application/pdf');
+        return res.status(200).send(selectedAgreement.content);
+        //return res.status(200).json( {q} );
+      }
+        
       else 
         return res.status(404).json( {error:true, errormessage:"Invalid application id"} );
     }).catch( (reason)=> {
@@ -1046,37 +1051,8 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
         } finally {
           await file.close();
         }
-
-      let agreement1 = agreement
-        .getModel()
-        .create({
-          filename: "learning_agreement.pdf",
-          content:  contents,
-          mimetype:  "application/pdf",
-          uploadDate: new Date(),
-          applicationid: "123",
-          matrNumber: "123456",
-          approved: false,
-          modified: false,
-          lecturerReason: 'No reason provided',
-        });
-      
-
-      let transcriptRecords1 = transcriptRecord
-        .getModel()
-        .create({
-          records: [
-            { code: "CS101", grade: 25 },
-            { code: "CS102", grade: 26 },
-            { code: "CS103", grade: 27 }
-          ],
-          uploadDate: new Date(),
-          applicationid: "123",
-          matrNumber: "123456",
-        });
-
         
-      let application1 = application
+      let application1 = await application
         .getModel()
         .create({
           status: "Pending",
@@ -1103,6 +1079,32 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
           lecturerReason: 'No reason provided',
         });
 
+        let transcriptRecords1 = await transcriptRecord
+        .getModel()
+        .create({
+          records: [
+            { code: "CS101", grade: 25 },
+            { code: "CS102", grade: 26 },
+            { code: "CS103", grade: 27 }
+          ],
+          uploadDate: new Date(),
+          applicationid: application1._id,
+          matrNumber: "123456",
+        });
+
+        let agreement1 = await agreement
+        .getModel()
+        .create({
+          filename: "learning_agreement.pdf",
+          content:  contents,
+          mimetype:  "application/pdf",
+          uploadDate: new Date(),
+          applicationid: application1._id,
+          matrNumber: "123456",
+          approved: false,
+          modified: false,
+          lecturerReason: 'No reason provided',
+        });
         
 
 

@@ -16,38 +16,79 @@
     
     <!--------------- DATA  ------------------>
 
+
+
+    <!--------------- EDIT BANNER ------------>
+    <mat-card appearance="outlined">
+      <mat-card-actions>
+
+        <section>
+          <span class="edit-button-container"
+                    (click)="openApplicationEditor()">
+              <button mat-fab class="edit-button">
+                <mat-icon>edit</mat-icon>
+              </button>
+          </span>
+
+          <span class="button-space-1"></span>
+
+          <span class="delete-button-container">
+            <button mat-fab class="delete-button">
+                <mat-icon>delete</mat-icon>
+              </button>
+          </span>
+              
+          
+        </section>
+
+        <span class="toolbar-space-1"></span>
+
+        <span class="transcript-records-button-wrapper">
+          <button mat-fab extended class="transcript-records-button" 
+                  (click)="openPdfViewer(application._id)">
+            <mat-icon>picture_as_pdf</mat-icon>
+            <span>Transcript of Records</span>
+            <mat-icon iconPositionEnd>open_in_new</mat-icon>
+          </button>
+        </span>
+      
+        <!-- mat-flat-button ---> 
+      <span class="agreement-button-wrapper">
+        <button mat-fab extended class="agreement-button" 
+                (click)="openPdfViewer(application._id)">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>Learning Agreement</span>
+          <mat-icon iconPositionEnd>open_in_new</mat-icon>
+        </button>
+      </span>
+    </mat-card-actions>
+        
+      
+
+    </mat-card>
+    <br>
+
     <!-------- GENERAL  ---------->
 
-    <!---   
-    <div class="fields-container">
-      <ng-container *ngFor="let field of application | keyvalue: originalOrder">
-        <fieldset class="field-box" *ngIf="isVisibleField(field.key) && isGeneralData(field.key)">
-          <legend>{{ field.key }}</legend>S
-          <span>{{ field.value }}</span>
-        </fieldset>
-      </ng-container>
-    </div>
-    -->
     <ng-container *ngFor="let fieldGroupResult of getFieldsByCategory(application); let isLast = last">
       <div class="fields-global-container">
       
-          <h6>{{fieldGroupResult.groupLabel}}</h6>
-          <div class="fields-container">
-            <ng-container *ngFor="let field of fieldGroupResult.fields">
-            <fieldset class="field-box">
-              <legend>{{ field.label }}</legend>
-              <span>{{ field.value }}</span>
-            </fieldset>        
-          </ng-container>
+        <h6>{{fieldGroupResult.groupLabel}}</h6>
+        <div class="fields-container">
+          <ng-container *ngFor="let field of fieldGroupResult.fields">
+          <fieldset class="field-box">
+            <legend>{{ field.label }}</legend>
+            <span>{{ field.value }}</span>
+          </fieldset>        
+        </ng-container>
 
-          </div>
-            
-          
-        
+        </div>
       </div>
+
       <ng-container *ngIf ="!isLast"> 
         <mat-divider class="section-divider"/>
       </ng-container>
+
     </ng-container>
     <!--------------- DIVIDER  ------------------>
     <mat-divider class="section-divider"/>
@@ -74,10 +115,14 @@
           <p class="course-credits">CFU: {{ ce.equivalentCourse.credits }}</p>
         </fieldset>
       </div>
-    </div>
+    </div>    
 
   </mat-expansion-panel>
+
+  
 </div>
+
+
 
 <div *ngIf="!application">
   <p>You didn't present any application.</p>

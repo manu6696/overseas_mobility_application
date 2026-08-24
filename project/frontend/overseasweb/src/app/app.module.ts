@@ -12,6 +12,7 @@ import { DashboardLecturerComponent } from './dashboard-lecturer/dashboard-lectu
 import { DashboardStaffComponent } from './dashboard-staff/dashboard-staff.component';
 import { ApplicationStatusComponent } from './application-status/application-status.component';
 import { ApplicationEditorComponent } from './application-editor/application-editor.component';
+import { AgreementViewerDialogComponent } from './agreement-viewer-dialog/agreement-viewer-dialog.component';
 
 // Services
 import { AgreementHttpService } from './agreement-http.service';
@@ -31,7 +32,15 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule, MatAccordion } from '@angular/material/expansion';
-import {MatDividerModule} from '@angular/material/divider';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import {
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 
 
 @NgModule({ declarations: [
@@ -44,7 +53,8 @@ import {MatDividerModule} from '@angular/material/divider';
         DashboardLecturerComponent,
         DashboardStaffComponent,
         ApplicationStatusComponent,
-        ApplicationEditorComponent
+        ApplicationEditorComponent,
+        AgreementViewerDialogComponent
     ],
     bootstrap: [AppComponent], 
     imports: [BrowserModule,
@@ -57,7 +67,13 @@ import {MatDividerModule} from '@angular/material/divider';
         MatButtonModule,
         MatExpansionModule,
         MatAccordion,
-        MatDividerModule], 
+        MatDividerModule,
+        MatDialogModule,
+        MatTooltipModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogContent,
+        MatDialogTitle], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },

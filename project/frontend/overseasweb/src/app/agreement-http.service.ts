@@ -53,11 +53,24 @@ export class AgreementHttpService {
   }
 
 
+  /*
   get_agreement_by_id( id: string ): Observable<Agreement> {
     return this.http.get<Agreement>( this.us.url + '/agreements' + '/' + id, this.create_options() ).pipe(
         catchError( this.handleError )
       );
   }
+  */
+
+  // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/Blob
+  get_agreement_by_id(applicationId: string): Observable<Blob> {
+    const params = new HttpParams().set('applicationid', applicationId);
+
+    return this.http.get(`${this.us.url}/agreements`, {
+      ...this.create_options({applicationid: applicationId}),
+      responseType: 'blob' // Forza Angular a trattare la risposta come file binario
+    });
+  }
+
 
   delete_agreement( id: string): Observable<Agreement> {
     console.log('Deleting Agreement ' + id );
