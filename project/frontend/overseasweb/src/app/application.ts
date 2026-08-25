@@ -1,11 +1,12 @@
 
-interface Course {
+export interface Course {    
     code: string;
     title: string;
     credits: number;
 }
 
-interface CourseEval {
+export interface CourseEval {
+    _id?: string;
     originalCourse : Course;
     equivalentCourse: Course;
 }
@@ -68,6 +69,9 @@ interface FieldMeta {
   label: string;
   group: FieldGroup;
   hidden?: boolean;
+  editableFromStudent: boolean;
+  editableFromLecturer: boolean;
+  editableFromStaff: boolean;
 }
 
 
@@ -76,37 +80,163 @@ interface FieldMeta {
 export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
 
     // System group
-    _id : {label: 'ID', group: 'system', hidden: true},
-    id : {label: 'ID', group: 'system', hidden: true},
+    _id : {
+        label: 'ID', 
+        group: 'system', 
+        hidden: true,
+        editableFromStudent: false, 
+        editableFromLecturer: false, 
+        editableFromStaff: false},
+
+    id : {
+        label: 'ID', 
+        group: 'system', 
+        hidden: true,
+        editableFromStudent: false, 
+        editableFromLecturer: false, 
+        editableFromStaff: false},
 
     // General group
-    status : {label: 'Status', group: 'general', hidden: false},
-    uploadDate : {label: 'Upload Date', group: 'general', hidden: false},
-    academicYear : {label: 'Academic Year', group: 'general', hidden: false},
-    semester : {label: 'Semester', group: 'general', hidden: false},
+    status : {
+        label: 'Status', 
+        group: 'general', 
+        hidden: true, 
+        editableFromStudent: false, 
+        editableFromLecturer: false, 
+        editableFromStaff: true},
+
+    uploadDate : {
+        label: 'Upload Date', 
+        group: 'general', 
+        hidden: false, 
+        editableFromStudent: false, 
+        editableFromLecturer: false, 
+        editableFromStaff: true},
+    
+    academicYear : {
+        label: 'Academic Year', 
+        group: 'general', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    semester : {
+        label: 'Semester', 
+        group: 'general', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
 
     // Student group
-    matrNumber : {label: 'Matriculation Number', group: 'student', hidden: false},
-    name : {label: 'Name', group: 'student', hidden: false},
-    surname : {label: 'Surname', group: 'student', hidden: false},
+    matrNumber : {
+        label: 'Matriculation Number', 
+        group: 'student', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    name : {
+        label: 'Name', 
+        group: 'student', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    surname : {
+        label: 'Surname', 
+        group: 'student', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
 
     // Sending institution
-    departement : {label: 'Departement', group: 'sendingInst', hidden: false},
-    sendingInst : {label: 'Sending Institution', group: 'sendingInst', hidden: false},
-    sendingCountry : {label: 'Sending Country', group: 'sendingInst', hidden: false},
+    departement : {
+        label: 'Departement', 
+        group: 'sendingInst', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    sendingInst : {
+        label: 'Sending Institution', 
+        group: 'sendingInst', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    sendingCountry : {
+        label: 'Sending Country', 
+        group: 'sendingInst', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
 
     // Hosting institution
-    hostInst : {label: 'Hosting Institution', group: 'hostingInst', hidden: false},
-    hostCountry : {label: 'Hosting Country', group: 'hostingInst', hidden: false},
+    hostInst : {
+        label: 'Hosting Institution', 
+        group: 'hostingInst', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    hostCountry : {
+        label: 'Hosting Country', 
+        group: 'hostingInst', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
 
     // Courses
-    courses : {label: 'Courses', group: 'courses', hidden: true},
+    courses : {
+        label: 'Courses', 
+        group: 'courses', 
+        hidden: true, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
 
     // Lecturer
-    referent : {label: 'Referent Name', group: 'lecturer', hidden: false},
-    lecturerReason : {label: 'Lecturer Reason', group: 'lecturer', hidden: false},
-    approved : {label: 'Approved', group: 'lecturer', hidden: true},
-    modified : {label: 'Modified', group: 'lecturer', hidden: true}
+    referent : {
+        label: 'Referent Name', 
+        group: 'lecturer', 
+        hidden: false, 
+        editableFromStudent: true, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    lecturerReason : {
+        label: 'Lecturer Reason', 
+        group: 'lecturer', 
+        hidden: false, 
+        editableFromStudent: false, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    approved : {
+        label: 'Approved', 
+        group: 'lecturer', 
+        hidden: true, 
+        editableFromStudent: false, 
+        editableFromLecturer: true, 
+        editableFromStaff: true},
+    
+    modified : {
+        label: 'Modified', 
+        group: 'lecturer', 
+        hidden: true, 
+        editableFromStudent: false, 
+        editableFromLecturer: false, 
+        editableFromStaff: false}
 }
 
 
@@ -131,7 +261,27 @@ export const FIELD_GROUP_LABELS: Record<FieldGroup, string> = {
 };
 
 
+export interface GroupedFieldEditor {
+    key: keyof Application;
+    name: string;
+}
 
+
+export interface FieldGroupEditor {
+    groupLabel: string;
+    fields: GroupedFieldEditor[]
+}
+
+
+export const dateOptions = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false
+} as const ;
 
 
 

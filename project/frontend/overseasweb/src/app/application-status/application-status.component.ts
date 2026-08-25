@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { Application, APPLICATION_FIELD_META, FieldGroupResult, FieldGroup, GroupedField, FIELD_GROUP_LABELS } from '../application';
+import { Application, APPLICATION_FIELD_META, FieldGroupResult, FieldGroup, GroupedField, FIELD_GROUP_LABELS, dateOptions, CourseEval } from '../application';
 import { ApplicationHttpService } from '../application-http.service';
 import { UserHttpService } from '../user-http.service';
 import { Router } from '@angular/router';
@@ -21,9 +21,12 @@ export class ApplicationStatusComponent implements OnInit {
 
   public application: Application | null = null;
 
+  clonedCourses: CourseEval[] = [];
+
   constructor( private sio: SocketioService , public ap: ApplicationHttpService, public us: UserHttpService, private router: Router, private dialog: MatDialog, private sanitizer: DomSanitizer, private ag: AgreementHttpService ) { }
   
   ngOnInit() {
+    this.copyOfCourses();
     this.get_application_by_status(this.us.get_username(), 'Pending');
     this.sio.connect().subscribe( (m) => {
       this.get_application_by_status(this.us.get_username(), 'Pending');
@@ -122,24 +125,12 @@ export class ApplicationStatusComponent implements OnInit {
         const groupName = FIELD_GROUP_LABELS[metaKey.group];
         const groupsFinded = groups.find(elemento => elemento.groupLabel === groupName);
 
-        const options = {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-          hour12: false
-        } as const ;
-
         const rawValue = app[key as keyof Application];
 
         const displayValue = key === 'uploadDate' 
-          ? new Date(rawValue as string).toLocaleDateString('en-GB', options) 
+          ? new Date(rawValue as string).toLocaleDateString('en-GB', dateOptions) 
           : rawValue.toString();
 
-          //rawValue.toLocaleDateString("it-IT", options)
-          // rawValue.toString()
         if(!groupsFinded) {
           
           groups.push({groupLabel: groupName, fields: [{label: metaKey.label, value: displayValue}]});
@@ -155,7 +146,7 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
 
-
+  // Open a new windows for the learning agreement pdf
   openPdfViewer(applicationId: string) {
     this.ag.get_agreement_by_id(applicationId).subscribe({
       next: (blob: Blob) => {        
@@ -172,11 +163,34 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
 
+  // Open the editor needed to modify the application data
   openApplicationEditor() {
     const dialogRef = this.dialog.open(ApplicationEditorComponent, {
+      width: '800px',
+      maxWidth: '90vw',
+      maxHeight: '85vh',    
       data: {application: {...this.application}}
     });
     
+    dialogRef.afterClosed().subscribe((updatedApplication: Application) => {
+    if (updatedApplication) {
+      console.log('Dati ricevuti dal dialog:', updatedApplication);
+      
+      this.get_application_by_status(this.us.get_username(), 'Pending');
+      this.clonedCourses = updatedApplication.courses;
+    }
+  });
+  }
+
+
+
+  
+
+
+  copyOfCourses(){
+    if (this.application?.courses) {
+      this.clonedCourses = structuredClone(this.application.courses);
+  }
   }
 
 

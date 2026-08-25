@@ -1,33 +1,104 @@
-
-
 <h2 mat-dialog-title>Application Edit</h2>
 
-<div *ngIf="application"><legend>{{ application.name }}</legend></div>
+<!-------- GENERAL ---------->
+<mat-dialog-content class="custom-dialog-content">
+  <div *ngIf="data.application" class="form-container">
     
+    <!-------- GENERAL GROUPS ---------->
+    <ng-container *ngFor="let fieldGroupResult of fieldGroupEdited">
+      <div *ngIf="fieldGroupResult.groupLabel !== 'Courses'" class="group-section">
+        <h3 class="group-title">{{ fieldGroupResult.groupLabel }}</h3>
+        
+        <div class="fields-grid">
+          <mat-form-field *ngFor="let field of fieldGroupResult.fields" appearance="outline" density="compact">
+            <mat-label>{{ field.name }}</mat-label>
+            <input matInput [(ngModel)]="data.application[field.key]"/>
+          </mat-form-field>
+        </div>
+      </div>
+    </ng-container>
 
+    <div class="group-section courses-section">
+      <h3 class="group-title courses-title">Courses</h3>
 
+      <div *ngFor="let ce of data.application.courses; let isLast = last; let courseIndex = index" class="course-comparison-row">
+        
+        <!-------- ORIGINAL COURSE ---------->
+        <div class="course-column">
+          <div class="course-subtitle">Original Course</div>
+          <div class="course-inputs">
+            <mat-form-field appearance="outline" density="compact" class="field-code">
+              <mat-label>Code</mat-label>
+              <input matInput [(ngModel)]="ce.originalCourse.code"/>
+            </mat-form-field>
 
+            <mat-form-field appearance="outline" density="compact" class="field-title">
+              <mat-label>Course Title</mat-label>
+              <input matInput [(ngModel)]="ce.originalCourse.title"/>
+            </mat-form-field>
 
+            <mat-form-field appearance="outline" density="compact" class="field-cfu">
+              <mat-label>CFU</mat-label>
+              <input matInput [(ngModel)]="ce.originalCourse.credits"/>
+            </mat-form-field>
+          </div>
+        </div>
 
+        <!-------- ARROW ---------->
+        <div class="arrow-wrapper">
+          <span class="arrow">→</span>
+        </div>
 
+        <!-------- EQUIVALENT COURSE ---------->
+        <div class="course-column">
+          <div class="course-subtitle">Equivalent Course</div>
+          <div class="course-inputs">
+            <mat-form-field appearance="outline" density="compact" class="field-code">
+              <mat-label>Code</mat-label>
+              <input matInput [(ngModel)]="ce.equivalentCourse.code"/>
+            </mat-form-field>
 
+            <mat-form-field appearance="outline" density="compact" class="field-title">
+              <mat-label>Course Title</mat-label>
+              <input matInput [(ngModel)]="ce.equivalentCourse.title"/>
+            </mat-form-field>
 
+            <mat-form-field appearance="outline" density="compact" class="field-cfu">
+              <mat-label>CFU</mat-label>
+              <input matInput [(ngModel)]="ce.equivalentCourse.credits"/>
+            </mat-form-field>
+          </div>
+        </div>
 
+        <!-------- DELETE BUTTON ---------->
+        <button type="button" 
+                mat-mini-fab 
+                color="primary" 
+                class="delete-button" 
+                (click)="DeleteCourseSection(data.application, courseIndex)"
+                aria-label="Delete course">                
+          <mat-icon>delete</mat-icon>
+        </button>
 
+        <!-------- PLUS BUTTON ---------->
+        <button *ngIf="isLast" 
+                type="button" 
+                mat-mini-fab 
+                color="primary" 
+                class="add-button" 
+                (click)="AddCourseSection(data.application)"
+                aria-label="Add course">                
+          <mat-icon>add</mat-icon>
+        </button>
 
+      </div>
+    </div>
 
+  </div>
+</mat-dialog-content>
 
-
-
-
-
-
-
-
-
-
-
-
-<mat-dialog-actions>
+<!-------- EDITOR BUTTONS ---------->
+<mat-dialog-actions align="end">
   <button mat-button class="close-button" mat-dialog-close>Close</button>
+  <button mat-flat-button color="primary" class="edit-button" [mat-dialog-close]="data.application" (click)="ApplicationSaveChanges()" cdkFocusInitial>Save Changes</button>
 </mat-dialog-actions>

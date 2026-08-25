@@ -41,7 +41,8 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
-
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -73,7 +74,9 @@ import {
         MatDialogActions,
         MatDialogClose,
         MatDialogContent,
-        MatDialogTitle], 
+        MatDialogTitle,
+        MatFormFieldModule,
+        MatInputModule], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },

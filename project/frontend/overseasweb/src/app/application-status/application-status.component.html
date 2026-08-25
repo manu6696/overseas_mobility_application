@@ -52,7 +52,6 @@
           </button>
         </span>
       
-        <!-- mat-flat-button ---> 
       <span class="agreement-button-wrapper">
         <button mat-fab extended class="agreement-button" 
                 (click)="openPdfViewer(application._id)">
@@ -98,7 +97,7 @@
     <div *ngIf="application.courses?.length">
       <h6>Courses</h6>
 
-      <div class="course-pair" *ngFor="let ce of application.courses">
+      <div class="course-pair" *ngFor="let ce of clonedCourses">
         <fieldset class="field-box">
           <legend>Original Course</legend>
           <p class="course-code">{{ ce.originalCourse.code }}</p>
