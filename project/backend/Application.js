@@ -25,6 +25,7 @@ function isApplication(arg) {
         && arg.sendingCountry && typeof (arg.sendingCountry) == 'string'
         && arg.hostInst && typeof (arg.hostInst) == 'string'
         && arg.hostCountry && typeof (arg.hostCountry) == 'string'
+        && arg.hostCity && typeof (arg.hostCity) == 'string'
         && arg.courses && Array.isArray(arg.courses)
         && arg.referent && typeof (arg.referent) == 'string'
         && typeof (arg.approved) == 'boolean'
@@ -116,6 +117,10 @@ let ApplicationSchema = new mongoose.Schema({
         required: true
     },
     hostCountry: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
+    hostCity: {
         type: mongoose.SchemaTypes.String,
         required: true
     },

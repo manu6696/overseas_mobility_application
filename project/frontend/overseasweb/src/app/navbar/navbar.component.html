@@ -1,0 +1,38 @@
+<mat-toolbar class="cf-toolbar">
+
+  <div class="logo-box">
+    <div class="cf-title">
+      <span>Università</span>
+      <span>Ca'Foscari</span>
+      <span>Venezia</span>
+    </div>
+  </div>
+
+  <nav class="cf-nav">
+    <a routerLink="/home" routerLinkActive="active-link" class="nav-link">Home</a>
+    <a routerLink="/dashboard" routerLinkActive="active-link" class="nav-link">Dashboard</a>
+  </nav>
+
+  <span class="spacer"></span>
+
+  <button mat-icon-button>
+    <mat-icon>notifications</mat-icon>
+  </button>
+
+  <button mat-icon-button>
+    <mat-icon>chat_bubble_outline</mat-icon>
+  </button>
+
+  <button mat-button [matMenuTriggerFor]="userMenu" class="user-chip">
+    <span class="avatar-circle">{{ getInitials() }}</span>
+    <mat-icon>expand_more</mat-icon>
+  </button>
+
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+
+</mat-toolbar>

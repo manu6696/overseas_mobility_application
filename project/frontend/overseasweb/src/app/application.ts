@@ -26,6 +26,7 @@ export interface Application {
     sendingCountry: string;
     hostInst: string;
     hostCountry: string;
+    hostCity: string;
     courses: CourseEval[];
     referent: string;
     approved: Boolean;
@@ -54,6 +55,7 @@ export function isApplication(arg: any): arg is Application {
     && arg.sendingCountry && typeof(arg.sendingCountry) == 'string' 
     && arg.hostInst && typeof(arg.hostInst) == 'string' 
     && arg.hostCountry && typeof(arg.hostCountry) == 'string' 
+    && arg.hostCity && typeof(arg.hostCity) == 'string' 
     && arg.courses && Array.isArray(arg.courses)
     && arg.referent && typeof(arg.referent) == 'string'
     && typeof(arg.approved) == 'boolean'
@@ -69,13 +71,11 @@ interface FieldMeta {
   label: string;
   group: FieldGroup;
   hidden?: boolean;
-  editableFromStudent: boolean;
-  editableFromLecturer: boolean;
-  editableFromStaff: boolean;
+  editableFrom: string[];
 }
 
 
- export type FieldGroup = 'student'| 'general'| 'sendingInst'| 'hostingInst'| 'lecturer'| 'system' | 'courses';
+export type FieldGroup = 'student'| 'general'| 'sendingInst'| 'hostingInst'| 'lecturer'| 'system' | 'courses';
 
 export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
 
@@ -84,159 +84,147 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'ID', 
         group: 'system', 
         hidden: true,
-        editableFromStudent: false, 
-        editableFromLecturer: false, 
-        editableFromStaff: false},
+        editableFrom: []
+    },
 
     id : {
         label: 'ID', 
         group: 'system', 
         hidden: true,
-        editableFromStudent: false, 
-        editableFromLecturer: false, 
-        editableFromStaff: false},
+        editableFrom: []
+    },
 
     // General group
     status : {
         label: 'Status', 
         group: 'general', 
         hidden: true, 
-        editableFromStudent: false, 
-        editableFromLecturer: false, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR']
+    },
 
     uploadDate : {
         label: 'Upload Date', 
         group: 'general', 
         hidden: false, 
-        editableFromStudent: false, 
-        editableFromLecturer: false, 
-        editableFromStaff: true},
+        editableFrom: []
+    },
     
     academicYear : {
         label: 'Academic Year', 
         group: 'general', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
     
     semester : {
         label: 'Semester', 
         group: 'general', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
 
     // Student group
     matrNumber : {
         label: 'Matriculation Number', 
         group: 'student', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR']
+    },
     
     name : {
         label: 'Name', 
         group: 'student', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
     
     surname : {
         label: 'Surname', 
         group: 'student', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
 
     // Sending institution
     departement : {
         label: 'Departement', 
         group: 'sendingInst', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
     
     sendingInst : {
         label: 'Sending Institution', 
         group: 'sendingInst', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
     
     sendingCountry : {
         label: 'Sending Country', 
         group: 'sendingInst', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
 
     // Hosting institution
     hostInst : {
         label: 'Hosting Institution', 
         group: 'hostingInst', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
     
     hostCountry : {
         label: 'Hosting Country', 
         group: 'hostingInst', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR']
+    },
+
+    hostCity : {
+        label: 'Hosting City', 
+        group: 'hostingInst', 
+        hidden: false, 
+        editableFrom: ['ADMIN', 'MODERATOR']
+    },
 
     // Courses
     courses : {
         label: 'Courses', 
         group: 'courses', 
         hidden: true, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
 
     // Lecturer
     referent : {
         label: 'Referent Name', 
         group: 'lecturer', 
         hidden: false, 
-        editableFromStudent: true, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+    },
     
     lecturerReason : {
         label: 'Lecturer Reason', 
         group: 'lecturer', 
         hidden: false, 
-        editableFromStudent: false, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR']
+    },
     
     approved : {
         label: 'Approved', 
         group: 'lecturer', 
         hidden: true, 
-        editableFromStudent: false, 
-        editableFromLecturer: true, 
-        editableFromStaff: true},
+        editableFrom: ['ADMIN', 'MODERATOR']
+    },
     
     modified : {
         label: 'Modified', 
         group: 'lecturer', 
         hidden: true, 
-        editableFromStudent: false, 
-        editableFromLecturer: false, 
-        editableFromStaff: false}
+        editableFrom: []
+    }
 }
 
 
@@ -264,6 +252,7 @@ export const FIELD_GROUP_LABELS: Record<FieldGroup, string> = {
 export interface GroupedFieldEditor {
     key: keyof Application;
     name: string;
+    isEditable: boolean;
 }
 
 

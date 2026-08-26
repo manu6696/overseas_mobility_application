@@ -7,7 +7,8 @@ import mongoose = require('mongoose');
 export interface Host{
     name: String,
     mail: String,
-    country: String
+    country: String,
+    city: string
 }
 
 
@@ -22,6 +23,7 @@ export function isHost(arg: any): arg is Host {
     && arg.name && typeof(arg.name) == 'string' 
     && arg.mail && typeof(arg.mail) == 'string' 
     && arg.country && typeof(arg.country) == 'string'
+    && arg.city && typeof(arg.city) == 'string'
 }
 
 
@@ -46,6 +48,10 @@ let HostSchema = new mongoose.Schema<Host>( {
         unique: true
     },
     country:  {
+        type: mongoose.SchemaTypes.String,
+        required: true 
+    },
+    city:  {
         type: mongoose.SchemaTypes.String,
         required: true 
     }

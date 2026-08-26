@@ -4,6 +4,7 @@ export interface Host {
     name: string;
     mail: string;
     country: string;
+    city: string;
 }
 
 // User defined type guard
@@ -17,5 +18,6 @@ export function isHost(arg: any): arg is Host {
     && arg.name && typeof(arg.name) == 'string' 
     && arg.mail && typeof(arg.mail) == 'string' 
     && arg.country && typeof(arg.country) == 'string'
+    && arg.city && typeof(arg.city) == 'string'
 }
 

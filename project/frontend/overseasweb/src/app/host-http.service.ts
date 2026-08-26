@@ -48,7 +48,7 @@ export class HostHttpService {
     return this.http.get<Host[]>( this.us.url + '/hosts', this.create_options( {limit: '10', skip: '0'} ) ).pipe(
         catchError( this.handleError )
       );
-  }
+  } 
 
   post_host( m: Host ): Observable<Host> {
     console.log('Posting ' + JSON.stringify(m) );

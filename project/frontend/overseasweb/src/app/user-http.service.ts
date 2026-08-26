@@ -117,6 +117,17 @@ export class UserHttpService {
     return (jwt_decode(this.token) as TokenData).id;
   }
 
+  get_roles(): string[] {
+    const roles = (jwt_decode(this.token) as TokenData).roles;
+    const returnedRoles : string[] = [];
+    for ( let idx = 0; idx < roles.length; ++idx ) {
+      returnedRoles.push(roles[idx]);
+    }
+    return returnedRoles;
+
+  }
+
+
   is_admin(): boolean {
     const roles = (jwt_decode(this.token) as TokenData).roles;
     for ( let idx = 0; idx < roles.length; ++idx ) {
@@ -131,6 +142,17 @@ export class UserHttpService {
     const roles = (jwt_decode(this.token) as TokenData).roles;
     for ( let idx = 0; idx < roles.length; ++idx ) {
       if ( roles[idx] === 'MODERATOR' ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  is_student(): boolean {
+    console.log('Payload completo del JWT:', jwt_decode(this.token));
+    const roles = (jwt_decode(this.token) as TokenData).roles;
+    for ( let idx = 0; idx < roles.length; ++idx ) {
+      if ( roles[idx] === 'STUDENT' ) {
         return true;
       }
     }

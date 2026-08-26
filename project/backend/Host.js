@@ -14,7 +14,8 @@ function isHost(arg) {
     return arg
         && arg.name && typeof (arg.name) == 'string'
         && arg.mail && typeof (arg.mail) == 'string'
-        && arg.country && typeof (arg.country) == 'string';
+        && arg.country && typeof (arg.country) == 'string'
+        && arg.city && typeof (arg.city) == 'string';
 }
 // We use Mongoose to perform the ODM between our application and
 // mongodb. To do that we need to create a Schema and an associated
@@ -36,6 +37,10 @@ let HostSchema = new mongoose.Schema({
         unique: true
     },
     country: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
+    city: {
         type: mongoose.SchemaTypes.String,
         required: true
     }

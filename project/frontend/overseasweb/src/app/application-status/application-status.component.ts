@@ -93,7 +93,12 @@ export class ApplicationStatusComponent implements OnInit {
     this.ap.get_application_by_status(matrNumber, applicationStatus).subscribe( {
       next: (application) => {
         console.log("Application successfully received.");
+        
         this.application = application;
+        if (this.application?.courses) {
+          this.clonedCourses = structuredClone(this.application.courses);
+        }
+        
       },
       error: (err) => {
         // Application not found
@@ -103,7 +108,7 @@ export class ApplicationStatusComponent implements OnInit {
           // In other case the system will logout
           // this.logout();
         }
-    }
+      }
     });
   }
 
@@ -182,16 +187,12 @@ export class ApplicationStatusComponent implements OnInit {
   });
   }
 
-
-
-  
-
-
   copyOfCourses(){
     if (this.application?.courses) {
       this.clonedCourses = structuredClone(this.application.courses);
+    }
   }
-  }
+
 
 
 }

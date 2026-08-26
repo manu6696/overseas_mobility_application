@@ -1,11 +1,14 @@
 import { Component, Inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Application, APPLICATION_FIELD_META, FIELD_GROUP_LABELS, FieldGroupEditor, GroupedFieldEditor, dateOptions} from '../application';
 import { ApplicationHttpService } from '../application-http.service';
+import { Host } from '../host';
+import { HostHttpService } from '../host-http.service';
 import { UserHttpService } from '../user-http.service';
 import { Router } from '@angular/router';
 import { SocketioService } from '../socketio.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MatSelectChange } from '@angular/material/select';
 
 @Component({
   selector: 'app-application-editor',
@@ -16,18 +19,28 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 export class ApplicationEditorComponent implements OnInit {
 
   public application: Application | null = null;
-
+  public hosts: Host[] = [];
+  public userRoles : string[] = [];
   public fieldGroupEdited: FieldGroupEditor[] = [];
 
-  constructor( public dialogRef: MatDialogRef<ApplicationEditorComponent>,@Inject(MAT_DIALOG_DATA) public data: { application: Application }, private sio: SocketioService , private ap: ApplicationHttpService, public us: UserHttpService, private router: Router,  private sanitizer: DomSanitizer) { }
+  constructor( 
+    public dialogRef: MatDialogRef<ApplicationEditorComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { application: Application }, 
+    private sio: SocketioService , 
+    private ap: ApplicationHttpService, 
+    public us: UserHttpService, 
+    public ho: HostHttpService, 
+    private router: Router,  
+    private sanitizer: DomSanitizer) { }
 
   @Output() posted = new EventEmitter<Application>();
     
 
   ngOnInit() {
     this.set_empty();
-
+    this.userRoles = this.us.get_roles();
     this.fieldGroupEdited = this.getFieldsByCategoryEditor(this.data.application);
+    this.getHost();
   }
 
   set_empty(): Application {
@@ -46,6 +59,7 @@ export class ApplicationEditorComponent implements OnInit {
       sendingCountry: '',
       hostInst: '',
       hostCountry: '',
+      hostCity: '',
       courses: [],
       referent: '',
       approved: false,
@@ -70,10 +84,19 @@ export class ApplicationEditorComponent implements OnInit {
         const groupName = FIELD_GROUP_LABELS[metaKey.group];
         const groupsFinded = groups.find(elemento => elemento.groupLabel === groupName);
 
+        // Check if the user can edit the field
+        const roles: string[] = this.us.get_roles();
+        let editable: boolean = false;
+        
+        for(const role in roles) {
+          if(metaKey.editableFrom.includes(roles[role])) {
+            editable = true;
+          }
+        }      
         if(!groupsFinded) {
-          groups.push({groupLabel: groupName, fields: [{key: key as keyof Application, name: metaKey.label}]});
+          groups.push({groupLabel: groupName, fields: [{key: key as keyof Application, name: metaKey.label, isEditable: editable}]});
         } else {
-          groupsFinded.fields.push({key: key as keyof Application, name: metaKey.label});
+          groupsFinded.fields.push({key: key as keyof Application, name: metaKey.label, isEditable: editable});
         }
       }
     }
@@ -81,7 +104,7 @@ export class ApplicationEditorComponent implements OnInit {
     return groups;
   }
   
-  ApplicationSaveChanges() {
+  applicationSaveChanges() {
     this.data.application.id = this.data.application._id;
     this.ap.put_application_by_id(this.data.application).subscribe({
       next: () => {
@@ -96,18 +119,41 @@ export class ApplicationEditorComponent implements OnInit {
     });
   }
   
-  AddCourseSection(app: Application){
+  addCourseSection(app: Application){
 
     app.courses.push({
       originalCourse: { code: "", title: "", credits: 0 },
       equivalentCourse: { code: "", title: "", credits: 0 }
     });
+
   }
 
-  DeleteCourseSection(app: Application, courseIndex: number){
+  deleteCourseSection(app: Application, courseIndex: number){
     app.courses = app.courses.filter((elemento, index) => index !== courseIndex);
   }
 
+  getHost() {
+    this.ho.get_host().subscribe({
+      next: (hosts) => {
+        console.log("Hosts successfully received.");
+        this.hosts = hosts;
+      },
+      error: (err) => {
+        // Hosts not found
+        if (err.status === 404) {
+          this.application = null;
+        } else {
+        }
+      }
+    });
+  }
+
+
+  onHostChange(event: MatSelectChange): void {
+    const selectedHost = event.value;
+    this.data.application.hostCountry = this.hosts.find(elemento => elemento.name === selectedHost)?.country as string;
+    this.data.application.hostCity = this.hosts.find(elemento => elemento.name === selectedHost)?.city as string;
+  }
 
 
 }

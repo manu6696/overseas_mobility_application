@@ -737,6 +737,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             username: "123456",
             mail: "123456@stud.unive.it"
         });
+        u.setStudent();
         u.setPassword("123456");
         return u.save();
     }
@@ -755,6 +756,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             name: "University of Edinburgh",
             mail: "test@ed.ac.uk",
             country: "Scotland",
+            city: "Edinburgh",
         });
         const file = await (0, promises_1.open)('./asset/learning_agreement.pdf');
         let contents;
@@ -784,6 +786,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             sendingCountry: "Italy",
             hostInst: "University of Edinburgh",
             hostCountry: "Scotland",
+            hostCity: "Edinburgh",
             courses: [
                 {
                     originalCourse: { code: "CS101", title: "Introduction to Computer Science", credits: 6 },

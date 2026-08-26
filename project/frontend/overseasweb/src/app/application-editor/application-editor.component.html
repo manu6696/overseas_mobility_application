@@ -9,11 +9,50 @@
       <div *ngIf="fieldGroupResult.groupLabel !== 'Courses'" class="group-section">
         <h3 class="group-title">{{ fieldGroupResult.groupLabel }}</h3>
         
+
+
+
         <div class="fields-grid">
+
+          <!--
           <mat-form-field *ngFor="let field of fieldGroupResult.fields" appearance="outline" density="compact">
-            <mat-label>{{ field.name }}</mat-label>
-            <input matInput [(ngModel)]="data.application[field.key]"/>
+              <mat-label>{{ field.name }}</mat-label>
+              <input matInput [disabled] ="!field.isEditable" [(ngModel)]="data.application[field.key]"/>           
           </mat-form-field>
+
+
+        -->
+          <ng-container *ngFor="let field of fieldGroupResult.fields">
+
+            <!-- GENERAL FIELDS -->
+            <mat-form-field *ngIf="field.name !== 'Hosting Institution'; else hostingBlock" 
+                            appearance="outline" 
+                            density="compact">
+              <mat-label>{{ field.name }}</mat-label>
+              <input matInput [disabled]="!field.isEditable" [(ngModel)]="data.application[field.key]"/>
+            </mat-form-field>
+
+            <!-- HOSTING INSTITUTION -->
+            <ng-template #hostingBlock>
+              <mat-form-field appearance="outline" density="compact">
+                <mat-label>{{ field.name }}</mat-label>
+
+                <mat-select (selectionChange)="onHostChange($event)" [disabled]="!field.isEditable" [(ngModel)]="data.application[field.key]">
+                  
+                  <mat-option *ngFor="let host of hosts" [value]="host.name">
+                    {{ host.name }} — {{ host.city }} ({{ host.country }})
+                  </mat-option>
+                  
+                </mat-select>
+              </mat-form-field>
+            </ng-template>
+
+
+
+
+          </ng-container>
+
+
         </div>
       </div>
     </ng-container>
@@ -21,7 +60,7 @@
     <div class="group-section courses-section">
       <h3 class="group-title courses-title">Courses</h3>
 
-      <div *ngFor="let ce of data.application.courses; let isLast = last; let courseIndex = index" class="course-comparison-row">
+      <div *ngFor="let ce of data.application.courses;let itemNumber = count; let isLast = last; let courseIndex = index" class="course-comparison-row">
         
         <!-------- ORIGINAL COURSE ---------->
         <div class="course-column">
@@ -75,23 +114,36 @@
                 mat-mini-fab 
                 color="primary" 
                 class="delete-button" 
-                (click)="DeleteCourseSection(data.application, courseIndex)"
+                (click)="deleteCourseSection(data.application, courseIndex)"
                 aria-label="Delete course">                
           <mat-icon>delete</mat-icon>
         </button>
 
         <!-------- PLUS BUTTON ---------->
-        <button *ngIf="isLast" 
+        <button *ngIf="isLast || itemNumber == 0 " 
                 type="button" 
                 mat-mini-fab 
                 color="primary" 
                 class="add-button" 
-                (click)="AddCourseSection(data.application)"
+                (click)="addCourseSection(data.application)"
                 aria-label="Add course">                
           <mat-icon>add</mat-icon>
         </button>
 
       </div>
+
+
+        <!-------- PLUS BUTTON IF EMPTY LIST ---------->
+        <button *ngIf="data.application.courses.length == 0 " 
+                type="button" 
+                mat-mini-fab 
+                color="primary" 
+                class="add-button-if-empty" 
+                (click)="addCourseSection(data.application)"
+                aria-label="Add course">                
+          <mat-icon>add</mat-icon>
+        </button>
+
     </div>
 
   </div>
@@ -99,6 +151,6 @@
 
 <!-------- EDITOR BUTTONS ---------->
 <mat-dialog-actions align="end">
-  <button mat-button class="close-button" mat-dialog-close>Close</button>
-  <button mat-flat-button color="primary" class="edit-button" [mat-dialog-close]="data.application" (click)="ApplicationSaveChanges()" cdkFocusInitial>Save Changes</button>
+  <button mat-flat-button  class="close-button" mat-dialog-close>Close</button>
+  <button mat-flat-button color="primary" class="edit-button" [mat-dialog-close]="data.application" (click)="applicationSaveChanges()" cdkFocusInitial>Save Changes</button>
 </mat-dialog-actions>

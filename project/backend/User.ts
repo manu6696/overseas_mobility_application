@@ -16,6 +16,7 @@ export interface User extends mongoose.Document {
     setAdmin: ()=>void,
     hasModeratorRole: ()=>boolean,
     setModerator: ()=>void,
+    setStudent: () =>void,
 }
 
 const userSchema = new mongoose.Schema<User>( {
@@ -85,6 +86,11 @@ userSchema.methods.setModerator = function() {
         this.roles.push( "MODERATOR" );
 }
 
+userSchema.methods.setStudent = function() {
+    if( !this.hasStudentRole() )
+        this.roles.push( "STUDENT" );
+}
+
 userSchema.methods.hasAdminRole = function(): boolean {
     return this.roles.includes("ADMIN");
 }
@@ -93,7 +99,9 @@ userSchema.methods.hasModeratorRole = function(): boolean {
     return this.roles.includes("MODERATOR");
 }
 
-
+userSchema.methods.hasStudentRole = function(): boolean {
+    return this.roles.includes("STUDENT");
+}
 
 
 export function getSchema() { return userSchema; }

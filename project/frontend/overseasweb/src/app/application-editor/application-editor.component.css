@@ -1,10 +1,10 @@
 .close-button{
-    background-color: rgb(173, 0, 0) !important;
+    background-color: #AC0033 !important;
     color: white !important;
 }
 
 .edit-button{
-    background-color: rgb(173, 0, 0) !important;
+    background-color: #AC0033 !important;
     color: white !important;
 }
 
@@ -31,7 +31,7 @@
 .group-title {
   font-size: 0.95rem;
   font-weight: 600;
-  color: rgb(173, 0, 0) !important;
+  color: #AC0033 !important;
   margin: 12px 0 4px 0;
   padding-bottom: 4px;
   border-bottom: 1px solid #e0e0e0;
@@ -78,7 +78,7 @@ mat-dialog-actions {
 .course-subtitle {
   font-weight: 600;
   font-size: 0.85rem;
-  color: rgb(173, 0, 0) !important;
+  color: #AC0033 !important;
   margin-bottom: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -110,12 +110,23 @@ mat-dialog-actions {
 
 
 .add-button{
-    background-color: rgb(173, 0, 0) !important;
+    background-color: #AC0033 !important;
     color: white !important;
     position: absolute;
     bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 10;
+    box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2);
+}
+
+.add-button-if-empty{
+    background-color: #AC0033 !important;
+    color: white !important;
+    position: absolute;
+    bottom: 68px;
+    left: 13%;
+    transform: translateX(-50%) scale(0.6);
     z-index: 10;
     box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2);
 }
@@ -134,7 +145,7 @@ mat-dialog-actions {
 
 
 .delete-button{
-    background-color: rgb(173, 0, 0) !important;
+    background-color: #AC0033 !important;
     color: white !important;
     box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2);
 }

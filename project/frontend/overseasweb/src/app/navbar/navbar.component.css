@@ -1,0 +1,81 @@
+.cf-toolbar {
+  position: relative;
+  
+  background-color: #AC0033;
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+  height: auto;
+  border-radius: 0 0 16px 16px; /* top-left top-right bottom-right bottom-left */
+  overflow: hidden;
+  margin: 0px 0px 0;
+}
+
+.logo-box {
+  background-color: AC0033;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.cf-logo {
+  height: 48px;
+}
+
+.cf-title {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  font-size: 1.05em;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+.cf-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-left: 32px;
+  height: 100%;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 10px 2px;
+  border-bottom: 3px solid transparent;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-link.active-link {
+  border-bottom-color: white;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: white;
+}
+
+.avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: white;
+  color: #AC0033;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8em;
+}

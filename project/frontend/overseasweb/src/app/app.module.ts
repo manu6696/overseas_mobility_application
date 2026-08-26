@@ -12,7 +12,9 @@ import { DashboardLecturerComponent } from './dashboard-lecturer/dashboard-lectu
 import { DashboardStaffComponent } from './dashboard-staff/dashboard-staff.component';
 import { ApplicationStatusComponent } from './application-status/application-status.component';
 import { ApplicationEditorComponent } from './application-editor/application-editor.component';
+import { ApplicationCreatorComponent } from './application-creator/application-creator.component';
 import { AgreementViewerDialogComponent } from './agreement-viewer-dialog/agreement-viewer-dialog.component';
+import { NavbarComponents } from './navbar/navbar.component';
 
 // Services
 import { AgreementHttpService } from './agreement-http.service';
@@ -43,6 +45,9 @@ import {
 } from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
+import {MatSelectModule} from '@angular/material/select';
+import { MatToolbarModule } from '@angular/material/toolbar';
+
 
 @NgModule({ declarations: [
         AppComponent,
@@ -55,7 +60,9 @@ import {MatInputModule} from '@angular/material/input';
         DashboardStaffComponent,
         ApplicationStatusComponent,
         ApplicationEditorComponent,
-        AgreementViewerDialogComponent
+        ApplicationCreatorComponent,
+        AgreementViewerDialogComponent,
+        NavbarComponents
     ],
     bootstrap: [AppComponent], 
     imports: [BrowserModule,
@@ -76,7 +83,9 @@ import {MatInputModule} from '@angular/material/input';
         MatDialogContent,
         MatDialogTitle,
         MatFormFieldModule,
-        MatInputModule], 
+        MatInputModule,
+        MatSelectModule,
+        MatToolbarModule], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },

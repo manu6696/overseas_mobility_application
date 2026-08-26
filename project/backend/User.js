@@ -62,11 +62,18 @@ userSchema.methods.setModerator = function () {
     if (!this.hasModeratorRole())
         this.roles.push("MODERATOR");
 };
+userSchema.methods.setStudent = function () {
+    if (!this.hasStudentRole())
+        this.roles.push("STUDENT");
+};
 userSchema.methods.hasAdminRole = function () {
     return this.roles.includes("ADMIN");
 };
 userSchema.methods.hasModeratorRole = function () {
     return this.roles.includes("MODERATOR");
+};
+userSchema.methods.hasStudentRole = function () {
+    return this.roles.includes("STUDENT");
 };
 function getSchema() { return userSchema; }
 // Mongoose Model
