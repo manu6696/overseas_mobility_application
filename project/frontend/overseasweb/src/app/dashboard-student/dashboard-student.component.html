@@ -2,7 +2,10 @@
   <app-navbar></app-navbar>
   <br>
    <ng-container *ngIf="application?._id; else showAddButton">
-    <app-application-status></app-application-status>
+    <app-application-status
+          (applicationDeleted)="onApplicationDeleted($event)"
+          [application]="application">
+    </app-application-status>
    </ng-container>
   
     <ng-template #showAddButton>

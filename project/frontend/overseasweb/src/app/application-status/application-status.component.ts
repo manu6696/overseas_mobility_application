@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, TemplateRef } from '@angular/core';
+import { Component, OnInit, signal, TemplateRef, Input, Output, EventEmitter } from '@angular/core';
 import { Application, APPLICATION_FIELD_META, FieldGroupResult,FieldGroupEditor, FieldGroup, GroupedField, FIELD_GROUP_LABELS, dateOptions, CourseEval } from '../application';
 import { ApplicationHttpService } from '../application-http.service';
 import { UserHttpService } from '../user-http.service';
@@ -9,7 +9,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AgreementViewerDialogComponent } from '../agreement-viewer-dialog/agreement-viewer-dialog.component';
 import { AgreementHttpService } from '../agreement-http.service';
 import { ApplicationEditorComponent } from '../application-editor/application-editor.component';
-import { DashboardStudentComponent } from '../dashboard-student/dashboard-student.component';
 
 @Component({
   selector: 'app-application-status',
@@ -19,7 +18,8 @@ import { DashboardStudentComponent } from '../dashboard-student/dashboard-studen
 })
 export class ApplicationStatusComponent implements OnInit {
 
-  public application: Application | null = null;
+  @Input() application: Application | null = null;
+  @Output() applicationDeleted = new EventEmitter<string>();
   public fieldGroupEdited: FieldGroupEditor[] = [];
   clonedCourses: CourseEval[] = [];
   public openConfirmDialog: boolean = false;
@@ -32,16 +32,18 @@ export class ApplicationStatusComponent implements OnInit {
     private router: Router, 
     private dialog: MatDialog, 
     private sanitizer: DomSanitizer, 
-    private ag: AgreementHttpService,
-    private dash: DashboardStudentComponent) 
+    private ag: AgreementHttpService) 
     { }
   
   ngOnInit() {
     this.copyOfCourses();
-    this.get_application_by_status(this.us.get_username());
-    this.sio.connect().subscribe( (m) => {
-      this.get_application_by_status(this.us.get_username());
+    if(!this.application) {
+      this.get_application_by_matrNumber(this.us.get_username());
+      this.sio.connect().subscribe( (m) => {
+      this.get_application_by_matrNumber(this.us.get_username());
     });
+    }
+    
     this.openConfirmDialog = false;
   }
 
@@ -101,8 +103,8 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
 
-  public get_application_by_status(matrNumber : string) {
-    this.ap.get_application_by_status(matrNumber).subscribe( {
+  public get_application_by_matrNumber(matrNumber : string) {
+    this.ap.get_application_by_matrNumber(matrNumber).subscribe( {
       next: (application) => {
         console.log("Application successfully received.");
         
@@ -212,7 +214,7 @@ export class ApplicationStatusComponent implements OnInit {
       if (updatedApplication) {
         console.log('Dati ricevuti dal dialog:', updatedApplication);
         
-        this.get_application_by_status(this.us.get_username());
+        this.get_application_by_matrNumber(this.us.get_username());
         this.clonedCourses = updatedApplication.courses;
       }
     });
@@ -230,7 +232,7 @@ export class ApplicationStatusComponent implements OnInit {
       if (updatedApplication) {
         console.log('Dati ricevuti dal dialog:', updatedApplication);
         
-        this.get_application_by_status(this.us.get_username());
+        this.get_application_by_matrNumber(this.us.get_username());
         this.clonedCourses = updatedApplication.courses;
       }
     });
@@ -238,16 +240,14 @@ export class ApplicationStatusComponent implements OnInit {
       
   // Delete the application permanentely
   confirmDelete(id: string) {
-      if (!id) {
+    if (!id) {
       console.log("Invalid id");
       return;
     }
 
     this.ap.delete_application_by_id(id).subscribe({
       next: () => {
-        const username = this.us.get_username();
-        this.dash.get_application_by_status(username);
-        
+        this.applicationDeleted.emit(id);
         this.dialogConfirmDeletion.close();
       },
       error: (err) => console.error("Errore durante l'eliminazione:", err)

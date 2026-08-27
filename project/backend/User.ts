@@ -6,6 +6,8 @@ import crypto = require('crypto');
 
 export interface User extends mongoose.Document {
     username: string,
+    name: string,
+    surname: string,
     mail: string,
     roles: string[],
     salt: string,    // salt is a random string that will be mixed with the actual password before hashing
@@ -16,11 +18,24 @@ export interface User extends mongoose.Document {
     setAdmin: ()=>void,
     hasModeratorRole: ()=>boolean,
     setModerator: ()=>void,
+    hasStudentRole: ()=>boolean,
     setStudent: () =>void,
+    hasLecturerRole: ()=>boolean,
+    setLecturer: () =>void,
+    hasStaffRole: ()=>boolean,
+    setStaff: () =>void,
 }
 
 const userSchema = new mongoose.Schema<User>( {
     username: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
+    name: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
+    surname: {
         type: mongoose.SchemaTypes.String,
         required: true
     },
@@ -91,6 +106,16 @@ userSchema.methods.setStudent = function() {
         this.roles.push( "STUDENT" );
 }
 
+userSchema.methods.setLecturer = function() {
+    if( !this.hasLecturerRole() )
+        this.roles.push( "LECTURER" );
+}
+
+userSchema.methods.setStaff = function() {
+    if( !this.hasStaffRole() )
+        this.roles.push( "STAFF" );
+}
+
 userSchema.methods.hasAdminRole = function(): boolean {
     return this.roles.includes("ADMIN");
 }
@@ -103,6 +128,13 @@ userSchema.methods.hasStudentRole = function(): boolean {
     return this.roles.includes("STUDENT");
 }
 
+userSchema.methods.hasLecturerRole = function(): boolean {
+    return this.roles.includes("LECTURER");
+}
+
+userSchema.methods.hasStaffRole = function(): boolean {
+    return this.roles.includes("STAFF");
+}
 
 export function getSchema() { return userSchema; }
 
@@ -117,7 +149,7 @@ export function getModel() : mongoose.Model< User >  { // Return Model as single
     return userModel;
 }
 
-export function newUser( data:{username:string;mail:string} ): User {
+export function newUser( data:{username:string;name:string;surname:string;mail:string} ): User {
     let _usermodel = getModel();
     let user = new _usermodel( data );
     return user;

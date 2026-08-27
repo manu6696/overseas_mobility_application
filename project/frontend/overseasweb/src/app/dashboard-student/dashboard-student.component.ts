@@ -29,21 +29,21 @@ export class DashboardStudentComponent implements OnInit  {
     private router: Router, 
     private dialog: MatDialog, 
     private sanitizer: DomSanitizer, 
-    private ag: AgreementHttpService ) { }
+    private ag: AgreementHttpService ) 
+  { }
     
 
   ngOnInit() {
-    this.get_application_by_status(this.us.get_username());
+    this.get_application_by_matrNumber(this.us.get_username());
     this.sio.connect().subscribe( (m) => {
-      this.get_application_by_status(this.us.get_username());
+      this.get_application_by_matrNumber(this.us.get_username());
     });
   }
 
-  public get_application_by_status(matrNumber : string) {
-    this.ap.get_application_by_status(matrNumber).subscribe( {
+  public get_application_by_matrNumber(matrNumber : string) {
+    this.ap.get_application_by_matrNumber(matrNumber).subscribe( {
       next: (application) => {
         console.log("Application successfully received.");
-        console.log("application");
         this.application = application;
         
       },
@@ -93,9 +93,14 @@ export class DashboardStudentComponent implements OnInit  {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.get_application_by_status(this.us.get_username());
+        this.get_application_by_matrNumber(this.us.get_username());
       }
     });
+  }
+
+
+  onApplicationDeleted(id: string) {
+    this.get_application_by_matrNumber(this.us.get_username());
   }
 
 

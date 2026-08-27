@@ -1,5 +1,7 @@
 .grid-container {
-  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  gap:0px; 
 }
 
 .dashboard-card {
@@ -18,4 +20,9 @@
 
 .dashboard-card-content {
   text-align: center;
+}
+
+app-application-status {
+  display: block;
+  margin-bottom: 10px;
 }

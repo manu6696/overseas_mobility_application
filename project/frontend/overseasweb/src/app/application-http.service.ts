@@ -60,7 +60,7 @@ export class ApplicationHttpService {
     );
   }
 
-  get_application_by_status( matrNumber : string): Observable<Application> {
+  get_application_by_matrNumber( matrNumber : string): Observable<Application> {
     return this.http.get<any>( this.us.url + '/applications' + '/' + matrNumber, this.create_options() ).pipe(
       map((response) => response.q[0]),
       catchError( this.handleError )

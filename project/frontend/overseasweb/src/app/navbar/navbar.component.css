@@ -41,7 +41,18 @@
   height: 100%;
 }
 
-.nav-link {
+.home-link {
+  color: white !important; 
+  text-decoration: none;
+  padding: 10px 2px;
+  border-bottom: 3px solid transparent;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.history-link {
   color: white;
   text-decoration: none;
   padding: 10px 2px;

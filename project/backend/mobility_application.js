@@ -686,6 +686,8 @@ app.get("/api/v1/login", passport.authenticate('basic', { session: false }), (re
     let tokendata = {
         username: req.user.username,
         roles: req.user.roles,
+        name: req.user.name,
+        surname: req.user.surname,
         mail: req.user.mail,
         id: req.user.id
     };
@@ -720,10 +722,13 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
         console.log("Creating admin user");
         let u = user.newUser({
             username: "admin",
-            mail: "admin@cafoscari.it"
+            mail: "admin@cafoscari.it",
+            name: "admin",
+            surname: "admin"
         });
         u.setAdmin();
         u.setModerator();
+        u.setStaff();
         u.setPassword("admin");
         return u.save();
     }
@@ -732,14 +737,16 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
     }
 })
     .then(() => {
-    return user.getModel().findOne({ mail: "123456@stud.unive.it" });
+    return user.getModel().findOne({ mail: "123456@stud.univ.it" });
 })
     .then((doc) => {
     if (!doc) {
         console.log("Creating random user");
         let u = user.newUser({
             username: "123456",
-            mail: "123456@stud.unive.it"
+            name: "Luca",
+            surname: "Bianchi",
+            mail: "123456@stud.univ.it"
         });
         u.setStudent();
         u.setPassword("123456");
@@ -750,6 +757,27 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
     }
 })
     .then(() => {
+    return user.getModel().findOne({ mail: "901111@univ.it" });
+})
+    .then((doc) => {
+    if (!doc) {
+        console.log("Creating lecturer user");
+        let u = user.newUser({
+            username: "901111",
+            name: "Mario",
+            surname: "Rossi",
+            mail: "901111@univ.it"
+        });
+        u.setModerator();
+        u.setLecturer();
+        u.setPassword("901111");
+        return u.save();
+    }
+    else {
+        console.log("Lecturer user already exists");
+    }
+})
+    .then(() => {
     return application.getModel().countDocuments({});
 }).then(async (count) => {
     if (count == 0) {
@@ -757,10 +785,42 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
         let host1 = host
             .getModel()
             .create({
+            name: "Technical University of Munich",
+            mail: "info@tum-fake.de",
+            country: "Germany",
+            city: "Munich",
+        });
+        let host2 = host
+            .getModel()
+            .create({
             name: "University of Edinburgh",
-            mail: "test@ed.ac.uk",
+            mail: "contact@ed-test.ac.uk",
             country: "Scotland",
             city: "Edinburgh",
+        });
+        let host3 = host
+            .getModel()
+            .create({
+            name: "University of Barcelona",
+            mail: "admissions@ub-mock.es",
+            country: "Spain",
+            city: "Barcelona",
+        });
+        let host4 = host
+            .getModel()
+            .create({
+            name: "KU Leuven",
+            mail: "international@kuleuven-demo.be",
+            country: "Belgium",
+            city: "Leuven",
+        });
+        let host5 = host
+            .getModel()
+            .create({
+            name: "Lund University",
+            mail: "exchange@lund-sample.se",
+            country: "Sweden",
+            city: "Lund",
         });
         const file = await (0, promises_1.open)('./asset/learning_agreement.pdf');
         let contents;
@@ -783,8 +843,8 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             academicYear: "2023-2024",
             semester: "Spring",
             matrNumber: "123456",
-            name: "John",
-            surname: "Snow",
+            name: "Luca",
+            surname: "Bianchi",
             departement: "Computer Science",
             sendingInst: "University of Venezia",
             sendingCountry: "Italy",
@@ -793,11 +853,11 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             hostCity: "Edinburgh",
             courses: [
                 {
-                    originalCourse: { code: "CS101", title: "Introduction to Computer Science", credits: 6 },
+                    originalCourse: { code: "CS101", title: "Algoritmi e strutture dati", credits: 12 },
                     equivalentCourse: { code: "CS999", title: "Algorithm and data structures", credits: 12 }
                 }
             ],
-            referent: "Tyrion Lannister",
+            referent: "901111",
             approved: false,
             modified: false,
             lecturerReason: 'No reason provided',
@@ -827,7 +887,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             modified: false,
             lecturerReason: 'No reason provided',
         });
-        return Promise.all([agreement1, application1, transcriptRecords1, host1]);
+        return Promise.all([agreement1, application1, transcriptRecords1, host1, host2, host3, host4, host5]);
     }
 }).then(() => {
     let server = http.createServer(app);
@@ -854,18 +914,4 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
     console.log("Error Occurred during initialization".red);
     console.log(err);
 });
-/*
-
-123456@stud.unive.it
-
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtYWlsIjoiMTIzNDU2QHN0dWQudW5pdmUuaXQiLCJ1c2VybmFtZSI6IjEyMzQ1NiJ9.YXM6JAk34rW3Y0EX2xiNPNsfJLCq5DXDjQ0HAm4E2mY
-
-
-
-admin@cafoscari.it
-
-
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtYWlsIjoiYWRtaW5AY2Fmb3NjYXJpLml0IiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIiwiTU9ERVJBVE9SIl19.LINiAYxZiKprBWVLbLn9La2yPAiISamitJ03jLcbLuY
-
-*/
 //# sourceMappingURL=mobility_application.js.map

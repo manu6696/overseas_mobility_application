@@ -9,6 +9,8 @@ import jwt_decode from "jwt-decode";
 interface TokenData {
   username:string,
   mail:string,
+  name: string,
+  surname: string,
   roles:string[],
   id:string
 }
@@ -22,6 +24,8 @@ export interface User {
   mail:string,
   password:string, 
   username:string,
+  name: string,
+  surname: string,
   roles:string[] 
 };
 
@@ -107,6 +111,14 @@ export class UserHttpService {
 
   get_username() {
     return (jwt_decode(this.token) as TokenData).username;
+  }
+
+  get_name() {
+    return (jwt_decode(this.token) as TokenData).name;
+  }
+
+  get_surname() {
+    return (jwt_decode(this.token) as TokenData).surname;
   }
 
   get_mail() {

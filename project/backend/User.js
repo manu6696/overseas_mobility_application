@@ -10,6 +10,14 @@ const userSchema = new mongoose.Schema({
         type: mongoose.SchemaTypes.String,
         required: true
     },
+    name: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
+    surname: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
     mail: {
         type: mongoose.SchemaTypes.String,
         required: true,
@@ -66,6 +74,14 @@ userSchema.methods.setStudent = function () {
     if (!this.hasStudentRole())
         this.roles.push("STUDENT");
 };
+userSchema.methods.setLecturer = function () {
+    if (!this.hasLecturerRole())
+        this.roles.push("LECTURER");
+};
+userSchema.methods.setStaff = function () {
+    if (!this.hasStaffRole())
+        this.roles.push("STAFF");
+};
 userSchema.methods.hasAdminRole = function () {
     return this.roles.includes("ADMIN");
 };
@@ -74,6 +90,12 @@ userSchema.methods.hasModeratorRole = function () {
 };
 userSchema.methods.hasStudentRole = function () {
     return this.roles.includes("STUDENT");
+};
+userSchema.methods.hasLecturerRole = function () {
+    return this.roles.includes("LECTURER");
+};
+userSchema.methods.hasStaffRole = function () {
+    return this.roles.includes("STAFF");
 };
 function getSchema() { return userSchema; }
 // Mongoose Model
