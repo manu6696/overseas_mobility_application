@@ -12,8 +12,8 @@ export interface CourseEval {
 }
 
 export interface Application {
-    _id: string;
-    id: string;
+    _id?: string;
+    id?: string;
     status: string;
     uploadDate: Date;
     academicYear: string;
@@ -42,7 +42,6 @@ export interface Application {
 //
 export function isApplication(arg: any): arg is Application {
     return arg 
-    && arg.id && typeof(arg.id) == 'string' 
     && arg.status && typeof(arg.status) == 'string'
     && arg.uploadDate && arg.uploadDate instanceof Date
     && arg.academicYear && typeof(arg.academicYear) == 'string' 

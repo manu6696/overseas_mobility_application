@@ -164,6 +164,17 @@
   padding: 4px;
 }
 
+.confirm-delete-button {
+  background-color: #AC0033 !important;
+  color: white !important;
+}
+
+.back-delete-button {
+  background-color: #AC0033 !important;
+  color: white !important;
+}
+
+
 .button-space-1{
   flex: 1 1 auto;
 }
@@ -172,3 +183,11 @@
 .toolbar-space-1{
   flex: 1 1 auto;
 }
+
+.button-section {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Spazio uniforme tra i pulsanti */
+}
+
+

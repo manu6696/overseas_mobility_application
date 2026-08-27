@@ -251,8 +251,8 @@ export interface Application {
     lecturerReason: String
 }
 */
-app.get("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req, res, next) => {
-    application.getModel().find({ matrNumber: req.params.matrNumber, status: req.params.applicationstatus }).then((q) => {
+app.get("/api/v1/applications/:matrNumber", auth, (req, res, next) => {
+    application.getModel().find({ matrNumber: req.params.matrNumber }).then((q) => {
         if (q.length > 0)
             return res.status(200).json({ q });
         else
@@ -296,6 +296,10 @@ app.post("/api/v1/applications/:matrNumber", auth, async (req, res, next) => {
     recvapplications.modified = false;
     recvapplications.lecturerReason = 'No reason provided';
     recvapplications.uploadDate = new Date();
+    // The _id field is generated from mongoDB
+    if (!recvapplications._id) {
+        delete recvapplications._id;
+    }
     if (application.isApplication(recvapplications) && !req.params.matrNumber.includes('matrNumber')) {
         const existingApp = await application.getModel().findOne({ matrNumber: req.params.matrNumber });
         if (existingApp) {
@@ -350,13 +354,13 @@ app.put("/api/v1/applications/:applicationid", auth, (req, res, next) => {
         return next({ statusCode: 404, error: true, errormessage: "Application missing" });
     }
 });
-app.delete("/api/v1/applications/:matrNumber/:applicationstatus", auth, (req, res, next) => {
-    console.log("Delete request for application of matriculation number: " + req.params.matrNumber);
-    application.getModel().deleteOne({ matrNumber: req.params.matrNumber, status: req.params.applicationstatus }).then((q) => {
+app.delete("/api/v1/applications/:applicationid", auth, (req, res, next) => {
+    console.log("Delete request for application with id: " + req.params.applicationid);
+    application.getModel().deleteOne({ _id: req.params.applicationid }).then((q) => {
         if (q.deletedCount > 0)
             return res.status(200).json({ error: false, errormessage: "" });
         else
-            return res.status(404).json({ error: true, errormessage: "Invalid matriculation number or application status" });
+            return res.status(404).json({ error: true, errormessage: "Invalid application id" });
     }).catch((reason) => {
         return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
     });

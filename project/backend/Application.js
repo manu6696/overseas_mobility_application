@@ -12,7 +12,6 @@ const mongoose = require("mongoose");
 //
 function isApplication(arg) {
     return arg
-        && arg._id && typeof (arg._id) == 'string'
         && arg.status && typeof (arg.status) == 'string'
         && arg.uploadDate && arg.uploadDate instanceof Date
         && arg.academicYear && typeof (arg.academicYear) == 'string'

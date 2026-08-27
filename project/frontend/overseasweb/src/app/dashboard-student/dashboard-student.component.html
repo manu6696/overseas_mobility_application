@@ -1,7 +1,7 @@
 <div class="grid-container">
   <app-navbar></app-navbar>
   <br>
-   <ng-container *ngIf="false; else showAddButton">
+   <ng-container *ngIf="application?._id; else showAddButton">
     <app-application-status></app-application-status>
    </ng-container>
   

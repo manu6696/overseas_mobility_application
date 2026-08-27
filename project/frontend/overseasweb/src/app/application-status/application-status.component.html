@@ -6,7 +6,7 @@
   <!--------------- BANNER  ------------------>
   <mat-expansion-panel (opened)="panelOpenState.set(true)" (closed)="panelOpenState.set(false)">
       <mat-expansion-panel-header>
-        <mat-panel-title class="panel-title"> Application ID: {{application._id}} </mat-panel-title>
+        <mat-panel-title class="panel-title"> Application ID: {{application._id!}} </mat-panel-title>
         <mat-panel-description class="panel-description"> State: 
           <span class="status-badge" [ngClass]="getStatusClass(application.status)">
             {{ application.status }}
@@ -22,30 +22,42 @@
     <mat-card appearance="outlined">
       <mat-card-actions>
 
-        <section>
-          <span class="edit-button-container"
-                    (click)="openApplicationEditor()">
-              <button mat-fab class="edit-button">
-                <mat-icon>edit</mat-icon>
-              </button>
-          </span>
-
-          <span class="button-space-1"></span>
-
-          <span class="delete-button-container">
-            <button mat-fab class="delete-button">
-                <mat-icon>delete</mat-icon>
-              </button>
-          </span>
-              
+        <section class="button-section">
           
+          <button mat-fab 
+                  color="primary" 
+                  class="edit-button" 
+                  (click)="openApplicationEditor()"
+                  aria-label="Modifica">
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <button mat-fab 
+                  color="warn" 
+                  class="delete-button" 
+                  (click)="openDeleteDialog(deleteDialogTemplate)"
+                  aria-label="Elimina">
+            <mat-icon>delete</mat-icon>
+          </button>
+
+          <ng-template #deleteDialogTemplate>
+            <h2 mat-dialog-title>Confirm Deletion</h2>
+            <mat-dialog-content>
+              <p>Are you sure you want to delete permanently this application?</p>
+            </mat-dialog-content>
+            <mat-dialog-actions align="end">
+              <button mat-flat-button  class="back-delete-button" mat-dialog-close>Back</button>
+              <button mat-flat-button  class="confirm-delete-button" (click)="confirmDelete(application._id!)">Delete</button>
+            </mat-dialog-actions>
+          </ng-template>
         </section>
+
 
         <span class="toolbar-space-1"></span>
 
         <span class="transcript-records-button-wrapper">
           <button mat-fab extended class="transcript-records-button" 
-                  (click)="openPdfViewer(application._id)">
+                  (click)="openPdfViewer(application._id!)">
             <mat-icon>picture_as_pdf</mat-icon>
             <span>Transcript of Records</span>
             <mat-icon iconPositionEnd>open_in_new</mat-icon>
@@ -54,7 +66,7 @@
       
       <span class="agreement-button-wrapper">
         <button mat-fab extended class="agreement-button" 
-                (click)="openPdfViewer(application._id)">
+                (click)="openPdfViewer(application._id!)">
           <mat-icon>picture_as_pdf</mat-icon>
           <span>Learning Agreement</span>
           <mat-icon iconPositionEnd>open_in_new</mat-icon>

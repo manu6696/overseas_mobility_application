@@ -11,6 +11,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AgreementViewerDialogComponent } from '../agreement-viewer-dialog/agreement-viewer-dialog.component';
 import { AgreementHttpService } from '../agreement-http.service';
 import { ApplicationEditorComponent } from '../application-editor/application-editor.component';
+import { ApplicationCreatorComponent } from '../application-creator/application-creator.component';
 
 @Component({
   selector: 'app-dashboard-student',
@@ -32,14 +33,14 @@ export class DashboardStudentComponent implements OnInit  {
     
 
   ngOnInit() {
-    this.get_application_by_status(this.us.get_username(), 'Pending');
+    this.get_application_by_status(this.us.get_username());
     this.sio.connect().subscribe( (m) => {
-      this.get_application_by_status(this.us.get_username(), 'Pending');
+      this.get_application_by_status(this.us.get_username());
     });
   }
 
-  public get_application_by_status(matrNumber : string, applicationStatus : string) {
-    this.ap.get_application_by_status(matrNumber, applicationStatus).subscribe( {
+  public get_application_by_status(matrNumber : string) {
+    this.ap.get_application_by_status(matrNumber).subscribe( {
       next: (application) => {
         console.log("Application successfully received.");
         console.log("application");
@@ -56,7 +57,7 @@ export class DashboardStudentComponent implements OnInit  {
                 status: 'Created',
                 academicYear: '',
                 semester: '',
-                matrNumber: '',
+                matrNumber: this.us.get_username(),
                 name: '',
                 surname: '',
                 departement: '',
@@ -81,14 +82,21 @@ export class DashboardStudentComponent implements OnInit  {
   }
 
 
+  // Open the creator needed to create the application data
   openApplicationCreator() {
-    const dialogRef = this.dialog.open(ApplicationEditorComponent, {
+    const dialogRef = this.dialog.open(ApplicationCreatorComponent, {
       width: '1000px',
       maxWidth: '90vw',
       maxHeight: '85vh',    
       data: {application: {...this.application}}
     });
 
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.get_application_by_status(this.us.get_username());
+      }
+    });
   }
+
 
 }
