@@ -2,11 +2,11 @@
 
 interface CourseResult {
   code: string;
-  grade: number;
+  grade: string;
 }
 
 export interface TranscriptRecord {
-    _id: string;
+    _id?: string;
     records: CourseResult[];
     uploadDate: Date;
     applicationid: string;

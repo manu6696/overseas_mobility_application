@@ -98,7 +98,7 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'Status', 
         group: 'general', 
         hidden: true, 
-        editableFrom: ['ADMIN', 'MODERATOR']
+        editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
 
     uploadDate : {
@@ -112,14 +112,14 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'Academic Year', 
         group: 'general', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
     
     semester : {
         label: 'Semester', 
         group: 'general', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
 
     // Student group
@@ -127,21 +127,21 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'Matriculation Number', 
         group: 'student', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR']
+        editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
     
     name : {
         label: 'Name', 
         group: 'student', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
     
     surname : {
         label: 'Surname', 
         group: 'student', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
 
     // Sending institution
@@ -149,21 +149,21 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'Departement', 
         group: 'sendingInst', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
     
     sendingInst : {
         label: 'Sending Institution', 
         group: 'sendingInst', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
     
     sendingCountry : {
         label: 'Sending Country', 
         group: 'sendingInst', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
 
     // Hosting institution
@@ -171,21 +171,21 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'Hosting Institution', 
         group: 'hostingInst', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
     
     hostCountry : {
         label: 'Hosting Country', 
         group: 'hostingInst', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR']
+        editableFrom: []
     },
 
     hostCity : {
         label: 'Hosting City', 
         group: 'hostingInst', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR']
+        editableFrom: []
     },
 
     // Courses
@@ -193,7 +193,7 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'Courses', 
         group: 'courses', 
         hidden: true, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
 
     // Lecturer
@@ -201,21 +201,21 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         label: 'Referent Name', 
         group: 'lecturer', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT']
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
     },
     
     lecturerReason : {
         label: 'Lecturer Reason', 
         group: 'lecturer', 
         hidden: false, 
-        editableFrom: ['ADMIN', 'MODERATOR']
+        editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
     
     approved : {
         label: 'Approved', 
         group: 'lecturer', 
         hidden: true, 
-        editableFrom: ['ADMIN', 'MODERATOR']
+        editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
     
     modified : {

@@ -20,14 +20,140 @@
               <mat-label>{{ field.name }}</mat-label>
               <input matInput [disabled] ="!field.isEditable" [(ngModel)]="data.application[field.key]"/>           
           </mat-form-field>
+          -->
 
-
-        -->
           <ng-container *ngFor="let field of fieldGroupResult.fields">
 
-            <ng-container *ngIf="field.name !== 'Upload Date' && field.name !== 'Lecturer Reason'">
+            <ng-container *ngIf="field.name !== 'Upload Date' 
+                            && field.name !== 'Lecturer Reason'">
 
-                <!-- GENERAL FIELDS -->
+            <ng-container [ngSwitch]="field.name" >
+
+
+              <!-- ACADEMIC YEAR -->
+              <mat-form-field *ngSwitchCase="'Academic Year'"
+                                appearance="outline" 
+                                density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+
+                  <mat-select [(ngModel)]="data.application[field.key]">
+                  
+                  <mat-option *ngFor="let academicYear of calculateAcademicYear()" [value]="academicYear">
+                      {{ academicYear }}
+                  </mat-option>
+                  
+                  </mat-select>
+              </mat-form-field>
+
+
+
+
+              <!-- SEMESTER -->
+              <mat-form-field *ngSwitchCase="'Semester'"
+                                appearance="outline" 
+                                density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+
+                  <mat-select [(ngModel)]="data.application[field.key]">
+                  
+                  <mat-option *ngFor="let semester of semesters" [value]="semester">
+                      {{ semester }}
+                  </mat-option>
+                  
+                  </mat-select>
+              </mat-form-field>
+
+
+              
+
+
+              <!-- HOSTING INSTITUTION -->
+              <mat-form-field *ngSwitchCase="'Hosting Institution'"
+                              appearance="outline" 
+                              density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+
+                  <mat-select (selectionChange)="onHostChange($event)" [(ngModel)]="data.application[field.key]">
+                  
+                  <mat-option *ngFor="let host of hosts" [value]="host.name">
+                      {{ host.name }} — {{ host.city }} ({{ host.country }})
+                  </mat-option>
+                  
+                  </mat-select>
+              </mat-form-field>
+
+              <mat-form-field *ngSwitchCase="'Hosting Country'"
+                              appearance="outline" 
+                              density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+                  <input matInput [disabled]="true" [(ngModel)]="data.application[field.key]"/>
+              </mat-form-field>
+
+              <mat-form-field *ngSwitchCase="'Hosting City'"
+                              appearance="outline" 
+                              density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+                  <input matInput [disabled]="true" [(ngModel)]="data.application[field.key]"/>
+              </mat-form-field>
+
+
+
+
+
+              <!-- STUDENT -->
+              <mat-form-field *ngSwitchCase="'Matriculation Number'"
+                                appearance="outline" 
+                                density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+                  <input matInput [disabled]="true" [(ngModel)]="data.application[field.key]"/>
+              </mat-form-field>
+
+              <mat-form-field *ngSwitchCase="'Name'"
+                                appearance="outline" 
+                                density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+                  <input matInput [disabled]="true" [(ngModel)]="data.application[field.key]"/>
+              </mat-form-field>
+
+              <mat-form-field *ngSwitchCase="'Surname'"
+                                appearance="outline" 
+                                density="compact">
+                  <mat-label>{{ field.name }}</mat-label>
+                  <input matInput [disabled]="true" [(ngModel)]="data.application[field.key]"/>
+              </mat-form-field>
+
+
+
+
+
+              <!-- LECTURER -->
+              <mat-form-field *ngSwitchCase="'Referent Name'"
+                                appearance="outline" 
+                                density="compact">
+                    <mat-label>{{ field.name }}</mat-label>
+
+                    <mat-select [(ngModel)]="data.application[field.key]">
+                      <mat-option *ngFor="let prof of lecturers" [value]="prof.username">
+                        {{ prof.name }} {{ prof.surname }}
+                      </mat-option>
+                    </mat-select>
+                </mat-form-field>
+              
+
+
+
+
+              <!-- GENERAL FIELDS -->
+              <mat-form-field  *ngSwitchDefault
+                              appearance="outline" 
+                              density="compact">
+              <mat-label>{{ field.name }}</mat-label>
+              <input matInput [(ngModel)]="data.application[field.key]"/>
+              </mat-form-field>
+
+            </ng-container>
+
+                <!-- GENERAL FIELDS --
                 <mat-form-field *ngIf="field.name !== 'Hosting Institution'; else hostingBlock" 
                                 appearance="outline" 
                                 density="compact">
@@ -35,7 +161,7 @@
                 <input matInput [(ngModel)]="data.application[field.key]"/>
                 </mat-form-field>
 
-                <!-- HOSTING INSTITUTION -->
+                <-- HOSTING INSTITUTION --
                 <ng-template #hostingBlock>
                 <mat-form-field appearance="outline" density="compact">
                     <mat-label>{{ field.name }}</mat-label>
@@ -49,6 +175,9 @@
                     </mat-select>
                 </mat-form-field>
                 </ng-template>
+              -->
+
+
             </ng-container>
             
 

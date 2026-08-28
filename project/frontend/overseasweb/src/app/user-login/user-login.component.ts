@@ -23,9 +23,9 @@ export class UserLoginComponent implements OnInit {
         console.log('Login granted, calling router.navigate(/dashboard)');
         this.errmessage = undefined;
 
-        if(this.us.is_admin()) {
+        if(this.us.is_staff()) {
           this.router.navigate(['/dashboard-staff']);
-        } else if(this.us.is_moderator()) {
+        } else if(this.us.is_lecturer()) {
           this.router.navigate(['/dashboard-lecturer']);
         } else {
           this.router.navigate(['/dashboard-student']);

@@ -15,6 +15,8 @@ import { ApplicationEditorComponent } from './application-editor/application-edi
 import { ApplicationCreatorComponent } from './application-creator/application-creator.component';
 import { AgreementViewerDialogComponent } from './agreement-viewer-dialog/agreement-viewer-dialog.component';
 import { NavbarComponents } from './navbar/navbar.component';
+import { RecordsVisualizerComponent } from './records-visualizer/records-visualizer.component';
+import { AgreementVisualizerComponent } from './agreement-visualizer/agreement-visualizer.component';
 
 // Services
 import { AgreementHttpService } from './agreement-http.service';
@@ -62,7 +64,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
         ApplicationEditorComponent,
         ApplicationCreatorComponent,
         AgreementViewerDialogComponent,
-        NavbarComponents
+        NavbarComponents,
+        RecordsVisualizerComponent,
+        AgreementVisualizerComponent
     ],
     bootstrap: [AppComponent], 
     imports: [BrowserModule,

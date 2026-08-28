@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
 import jwt_decode from "jwt-decode";
 
@@ -29,7 +29,7 @@ export interface User {
   roles:string[] 
 };
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class UserHttpService {
 
   private token: string = '';
@@ -87,6 +87,35 @@ export class UserHttpService {
       }));
   }
 
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error.message);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      console.error(
+        `Backend returned code ${error.status}, ` +
+        'body was: ' + JSON.stringify(error.error));
+    }
+
+    return throwError(() => error);
+    
+  }
+
+  /* Utility method to create the http options object (headers + query parameters) */
+  private create_options( params = {} ) {
+    return  {
+      headers: new HttpHeaders({
+        authorization: 'Bearer ' + this.get_token(),
+        'cache-control': 'no-cache',
+        'Content-Type':  'application/json',
+      }),
+      params: new HttpParams( {fromObject: params} )
+    };
+
+  }
+
   logout() {
     console.log('Logging out');
     this.token = '';
@@ -135,8 +164,22 @@ export class UserHttpService {
     for ( let idx = 0; idx < roles.length; ++idx ) {
       returnedRoles.push(roles[idx]);
     }
+    console.log('Roels from user: ' + roles );
+    console.log('mail: ' + (jwt_decode(this.token) as TokenData).mail );
+    console.log('id: ' + (jwt_decode(this.token) as TokenData).id );
+    console.log('name: ' + (jwt_decode(this.token) as TokenData).name );
+    console.log('surname: ' + (jwt_decode(this.token) as TokenData).surname );
+    console.log('username: ' + (jwt_decode(this.token) as TokenData).username );
+    console.log('is_student: ' + this.is_student() );
     return returnedRoles;
 
+  }
+
+  get_lecturers(): Observable<any[]> {
+    return this.http.get<any>(this.url + '/users/lecturers', this.create_options()).pipe(
+      map(res => res.lecturers),
+      catchError(this.handleError)
+    );
   }
 
 
@@ -165,6 +208,29 @@ export class UserHttpService {
     const roles = (jwt_decode(this.token) as TokenData).roles;
     for ( let idx = 0; idx < roles.length; ++idx ) {
       if ( roles[idx] === 'STUDENT' ) {
+        return true;
+      }
+    }
+    console.log('IS STUDENT');
+    return false;
+  }
+
+  is_lecturer(): boolean {
+    console.log('Payload completo del JWT:', jwt_decode(this.token));
+    const roles = (jwt_decode(this.token) as TokenData).roles;
+    for ( let idx = 0; idx < roles.length; ++idx ) {
+      if ( roles[idx] === 'LECTURER' ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  is_staff(): boolean {
+    console.log('Payload completo del JWT:', jwt_decode(this.token));
+    const roles = (jwt_decode(this.token) as TokenData).roles;
+    for ( let idx = 0; idx < roles.length; ++idx ) {
+      if ( roles[idx] === 'STAFF' ) {
         return true;
       }
     }

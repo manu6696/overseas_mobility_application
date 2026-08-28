@@ -13,6 +13,8 @@ export class UserSignupComponent implements OnInit {
   public errmessage = undefined;
   public user:User = { mail: '', password: '', username: '', name: '', surname: '', roles: [] };
 
+  public isLecturer: boolean = false;
+
   constructor( public us: UserHttpService, public router: Router ) { }
 
   ngOnInit() {

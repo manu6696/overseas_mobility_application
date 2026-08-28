@@ -1,14 +1,18 @@
 import { Component, OnInit, signal, TemplateRef, Input, Output, EventEmitter } from '@angular/core';
 import { Application, APPLICATION_FIELD_META, FieldGroupResult,FieldGroupEditor, FieldGroup, GroupedField, FIELD_GROUP_LABELS, dateOptions, CourseEval } from '../application';
+import { TranscriptRecord } from '../transcriptRecord';
 import { ApplicationHttpService } from '../application-http.service';
 import { UserHttpService } from '../user-http.service';
+import { TranscriptRecordHttpService } from '../transcript-record-http.service';
+import { AgreementHttpService } from '../agreement-http.service';
 import { Router } from '@angular/router';
 import { SocketioService } from '../socketio.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AgreementViewerDialogComponent } from '../agreement-viewer-dialog/agreement-viewer-dialog.component';
-import { AgreementHttpService } from '../agreement-http.service';
 import { ApplicationEditorComponent } from '../application-editor/application-editor.component';
+import { RecordsVisualizerComponent } from '../records-visualizer/records-visualizer.component';
+import { AgreementVisualizerComponent } from '../agreement-visualizer/agreement-visualizer.component';
 
 @Component({
   selector: 'app-application-status',
@@ -24,6 +28,7 @@ export class ApplicationStatusComponent implements OnInit {
   clonedCourses: CourseEval[] = [];
   public openConfirmDialog: boolean = false;
   public dialogConfirmDeletion: any;
+  public transcriptRecords: TranscriptRecord | null = null;
 
   constructor( 
     private sio: SocketioService , 
@@ -32,7 +37,8 @@ export class ApplicationStatusComponent implements OnInit {
     private router: Router, 
     private dialog: MatDialog, 
     private sanitizer: DomSanitizer, 
-    private ag: AgreementHttpService) 
+    private ag: AgreementHttpService,
+    private rec: TranscriptRecordHttpService) 
     { }
   
   ngOnInit() {
@@ -237,6 +243,7 @@ export class ApplicationStatusComponent implements OnInit {
       }
     });
   }
+
       
   // Delete the application permanentely
   confirmDelete(id: string) {
@@ -255,6 +262,60 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
   
+  // Open the editor needed to modify the transcript of records
+  openRecordsDialog() {
+
+    if(this.application?._id) {
+      this.rec.get_transcript_by_id(this.application._id).subscribe({
+        next: (transcriptRecords) => {
+          console.log("Transcript of records successfully received.");
+          this.transcriptRecords = transcriptRecords;
+
+          
+
+          const dialogRef = this.dialog.open(RecordsVisualizerComponent, {
+            width: '800px',
+            maxWidth: '90vw',
+            maxHeight: '85vh',
+            data: {
+              transcriptRecords: {...this.transcriptRecords},
+              application: {...this.application}
+            }
+          });
+
+          dialogRef.afterClosed().subscribe((updatedApplication: Application) => {
+            if (updatedApplication) {
+              console.log('Dati ricevuti dal dialog:', updatedApplication);
+              this.get_application_by_matrNumber(this.us.get_username());
+              this.clonedCourses = updatedApplication.courses;
+            }
+          });
+        },
+        error: (err) => {
+          console.log('Error occurred while getting: ' + err);
+        }
+      });
+    }
+  }
+
+  // Open the editor needed to modify the learning of agreement
+  openAgreementDialog() {
+    const dialogRef = this.dialog.open(AgreementVisualizerComponent, {
+      width: '800px',
+      maxWidth: '90vw',
+      maxHeight: '85vh',    
+      data: {application: {...this.application}}
+    });
+      
+    dialogRef.afterClosed().subscribe((updatedApplication: Application) => {
+      if (updatedApplication) {
+        console.log('Dati ricevuti dal dialog:', updatedApplication);
+        
+        this.get_application_by_matrNumber(this.us.get_username());
+        this.clonedCourses = updatedApplication.courses;
+      }
+    });
+  }
 
   copyOfCourses(){
     if (this.application?.courses) {
@@ -262,7 +323,9 @@ export class ApplicationStatusComponent implements OnInit {
     }
   }
 
-
+  get_transcript_by_id(id: string){
+    
+  }
 
 }
 

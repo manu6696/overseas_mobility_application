@@ -10,9 +10,10 @@
 
   <nav class="cf-nav">
     
-
-    <a routerLink="/dashboard-lecturer" routerLinkActive="active-link" class="home-link">Home</a>
- 
+    
+    <a *ngIf="isLecturer" routerLink="/dashboard-lecturer" routerLinkActive="active-link" class="home-link">Home</a>
+    <a *ngIf="isStudent" routerLink="/dashboard-student" routerLinkActive="active-link" class="home-link">Home</a>
+    <a *ngIf="isStaff" routerLink="/dashboard-staff" routerLinkActive="active-link" class="home-link">Home</a>
     <a routerLink="/application-history" routerLinkActive="active-link" class="history-link">History</a>
 
   </nav>

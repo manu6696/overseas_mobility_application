@@ -4,7 +4,7 @@ import mongoose = require('mongoose');
 
 interface CourseResult {
   code: String,
-  grade: Number
+  grade: String
 }
 
 export interface TranscriptRecord {
@@ -46,7 +46,7 @@ const CourseResultSchema = new mongoose.Schema<CourseResult>({
         required: true 
     },
     grade: { 
-        type: Number, 
+        type: String, 
         required: true 
     }
 }, { _id: false });

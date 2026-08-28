@@ -19,6 +19,10 @@ import { AgreementHttpService } from '../agreement-http.service';
 })
 export class ApplicationCreatorComponent {
 
+  public lecturers: any[] = [];
+  public academicYear: string[] = [];
+  public semesters: string[] = ['Autumn/Fall', 'Spring','Full Academic Year'];
+
   public application: Application = {
       _id: '',
       id: '',
@@ -64,6 +68,11 @@ export class ApplicationCreatorComponent {
     this.userRoles = this.us.get_roles();
     this.fieldGroupEdited = this.getFieldsByCategoryEditor(this.data.application);
     this.getHost();
+
+    this.us.get_lecturers().subscribe({
+      next: (lecturers) => this.lecturers = lecturers,
+      error: (err) => console.error(err)
+    });
   }
 
   // Needed to mantain the original order of the object
@@ -240,6 +249,20 @@ export class ApplicationCreatorComponent {
         }
       }
     });
+  }
+
+  calculateAcademicYear(): string[] {
+    const date: Date = new Date;
+    const actualYear: number = date.getFullYear() - 1;
+    const academicYear: string[] = [];
+    for(let i = 0; i < 3; i++){
+      const actualYearString: string = (actualYear + i).toString();
+      const nextYearString: string = (actualYear + i + 1).toString();
+      academicYear.push(actualYearString + '-' + nextYearString);
+    } 
+
+    return academicYear;
+
   }
 
 }

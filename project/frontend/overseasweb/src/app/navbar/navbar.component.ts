@@ -10,7 +10,12 @@ import { SocketioService } from '../socketio.service';
   styleUrls: ['./navbar.component.css'],
   standalone: false
 })
-export class NavbarComponents {
+export class NavbarComponents implements OnInit  {
+
+  isLecturer: boolean = false;
+  isStudent: boolean = false;
+  isStaff: boolean = false;
+  isAdmin: boolean = false;
 
   constructor( 
     private sio: SocketioService , 
@@ -19,6 +24,10 @@ export class NavbarComponents {
   ) { }
   
   ngOnInit() {
+    this.isStudent =  this.us.is_student();
+    this.isLecturer =  this.us.is_lecturer();
+    this.isStaff =  this.us.is_staff();
+    this.isAdmin = this.us.is_admin();
   }
 
   getInitials(): string {
@@ -33,18 +42,6 @@ export class NavbarComponents {
     this.router.navigate(['/']);
   }
 
-
-  userIsStudent(){
-    return this.us.is_student();
-  }
-
-  userIsModerator(){
-    return this.us.is_moderator();
-  }
-
-  userIsAdmin(){
-    return this.us.is_admin();
-  }
 
 
 }

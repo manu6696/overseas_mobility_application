@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Application, APPLICATION_FIELD_META, FIELD_GROUP_LABELS, FieldGroupEditor, GroupedFieldEditor, dateOptions} from '../application';
-import { ApplicationHttpService } from '../application-http.service';
 import { Host } from '../host';
+import { ApplicationHttpService } from '../application-http.service';
 import { HostHttpService } from '../host-http.service';
 import { UserHttpService } from '../user-http.service';
 import { Router } from '@angular/router';
@@ -22,16 +22,21 @@ export class ApplicationEditorComponent implements OnInit {
   public hosts: Host[] = [];
   public userRoles : string[] = [];
   public fieldGroupEdited: FieldGroupEditor[] = [];
-
+  public semesters: string[] = ['Autumn/Fall', 'Spring','Full Academic Year'];
+  public lecturers: any[] = [];
+  
   constructor( 
     public dialogRef: MatDialogRef<ApplicationEditorComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { application: Application }, 
+    @Inject(MAT_DIALOG_DATA) public data: { 
+      application: Application 
+    }, 
     private sio: SocketioService , 
     private ap: ApplicationHttpService, 
     public us: UserHttpService, 
     public ho: HostHttpService, 
     private router: Router,  
-    private sanitizer: DomSanitizer) { }
+    private sanitizer: DomSanitizer) 
+  { }
 
   @Output() posted = new EventEmitter<Application>();
     
@@ -41,6 +46,10 @@ export class ApplicationEditorComponent implements OnInit {
     this.userRoles = this.us.get_roles();
     this.fieldGroupEdited = this.getFieldsByCategoryEditor(this.data.application);
     this.getHost();
+    this.us.get_lecturers().subscribe({
+      next: (lecturers) => this.lecturers = lecturers,
+      error: (err) => console.error(err)
+    });
   }
 
   set_empty(): Application {
@@ -80,7 +89,7 @@ export class ApplicationEditorComponent implements OnInit {
       
       const metaKey = APPLICATION_FIELD_META[key as keyof Application];
       if(metaKey === undefined) continue;
-      if(!metaKey.hidden || metaKey.label === 'Courses') {
+      if((!metaKey.hidden || metaKey.label === 'Courses') && metaKey.label !== 'Upload Date') {
         const groupName = FIELD_GROUP_LABELS[metaKey.group];
         const groupsFinded = groups.find(elemento => elemento.groupLabel === groupName);
 
@@ -92,7 +101,8 @@ export class ApplicationEditorComponent implements OnInit {
           if(metaKey.editableFrom.includes(roles[role])) {
             editable = true;
           }
-        }      
+        } 
+
         if(!groupsFinded) {
           groups.push({groupLabel: groupName, fields: [{key: key as keyof Application, name: metaKey.label, isEditable: editable}]});
         } else {
@@ -148,12 +158,41 @@ export class ApplicationEditorComponent implements OnInit {
     });
   }
 
+  calculateAcademicYear(): string[] {
+    const date: Date = new Date;
+    const actualYear: number = date.getFullYear() - 1;
+    const academicYear: string[] = [];
+    for(let i = 0; i < 3; i++){
+      const actualYearString: string = (actualYear + i).toString();
+      const nextYearString: string = (actualYear + i + 1).toString();
+      academicYear.push(actualYearString + '-' + nextYearString);
+    } 
+
+    return academicYear;
+
+  }
+
 
   onHostChange(event: MatSelectChange): void {
     const selectedHost = event.value;
     this.data.application.hostCountry = this.hosts.find(elemento => elemento.name === selectedHost)?.country as string;
     this.data.application.hostCity = this.hosts.find(elemento => elemento.name === selectedHost)?.city as string;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

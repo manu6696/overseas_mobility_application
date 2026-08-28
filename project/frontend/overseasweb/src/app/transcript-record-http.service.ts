@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { map, tap, catchError } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { UserHttpService } from './user-http.service';
-import { TranscriptRecord } from './TranscriptRecord';
+import { TranscriptRecord } from './transcriptRecord';
 
 @Injectable({
   providedIn: 'root'
@@ -44,30 +44,31 @@ export class TranscriptRecordHttpService {
 
   }
 
-  post_host( m: TranscriptRecord ): Observable<TranscriptRecord> {
+  post_transcript( m: TranscriptRecord ): Observable<TranscriptRecord> {
     console.log('Posting ' + JSON.stringify(m) );
     return this.http.post<TranscriptRecord>( this.us.url + '/transcriptRecords', m,  this.create_options() ).pipe(
       catchError(this.handleError)
     );
   }
 
-  get_host_by_id( id: string ): Observable<TranscriptRecord> {
+  get_transcript_by_id( id: string ): Observable<TranscriptRecord> {
     console.log('Getting Transcript of Records ' + id );
-    return this.http.get<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + id,  this.create_options() ).pipe(
+    return this.http.get<any>( this.us.url + '/transcriptRecords' + '/' + id,  this.create_options() ).pipe(
+      map((response) => response.q),
       catchError(this.handleError)
     );
   }
 
-  delete_host( id: string): Observable<TranscriptRecord> {
+  delete_transcript( id: string): Observable<TranscriptRecord> {
     console.log('Deleting Transcript of Records ' + id );
     return this.http.delete<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + id,  this.create_options() ).pipe(
       catchError(this.handleError)
     );
   }
 
-  put_host( m: TranscriptRecord ): Observable<TranscriptRecord> {
+  put_transcript(m: TranscriptRecord ): Observable<TranscriptRecord> {
     console.log('Updating ' + JSON.stringify(m) );
-    return this.http.put<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + m._id, m,  this.create_options() ).pipe(
+    return this.http.put<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + m.applicationid, m,  this.create_options() ).pipe(
       catchError(this.handleError)
     );
   }

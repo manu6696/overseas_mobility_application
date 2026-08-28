@@ -153,6 +153,13 @@
   padding: 4px;
 }
 
+.records-button {
+  background-color: #AC0033 !important;
+  color: white !important;
+  margin: 0;
+  padding: 4px;
+}
+
 .delete-button-container{
   padding: 4px;
 }

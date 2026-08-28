@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Transcript of Records Edit</h2>
+
+
+
+<!-------- GENERAL ---------->
+<mat-dialog-content class="custom-dialog-content">
+  <div *ngIf="data.application" class="form-container">
+    
+    
+    <div class="group-section-courses-section">
+
+      <div *ngFor="let ce of data.application.courses;
+                  let itemNumber = count; 
+                  let isLast = last; 
+                  let courseIndex = index" 
+                  class="course-comparison-row">
+        
+        <!-------- EQUIVALENT COURSE ---------->
+        <div class="course-column">
+          <div class="course-subtitle">Equivalent Course</div>
+          <div class="course-inputs">
+            <mat-form-field appearance="outline" density="compact" class="field-code">
+              <mat-label>Code</mat-label>
+              <input matInput [disabled] = "true" [(ngModel)]="ce.equivalentCourse.code"/>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" density="compact" class="field-title">
+              <mat-label>Course Title</mat-label>
+              <input matInput [disabled] = "true" [(ngModel)]="ce.equivalentCourse.title"/>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" density="compact" class="field-cfu">
+              <mat-label>CFU</mat-label>
+              <input matInput [disabled] = "true" [(ngModel)]="ce.equivalentCourse.credits"/>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" density="compact" class="field-grade">
+              <mat-label>Grade</mat-label>
+              <input matInput [(ngModel)]="clonedTranscriptRecords[courseIndex]" name="grade"/>
+            </mat-form-field>
+          </div>
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+</mat-dialog-content>
+
+<!-------- EDITOR BUTTONS ---------->
+<mat-dialog-actions align="end">
+  <button mat-flat-button  class="close-button" mat-dialog-close>Close</button>
+  <button mat-flat-button color="primary" class="edit-button" [mat-dialog-close]="data.application" (click)="recordsSaveChanges()" cdkFocusInitial>Save Changes</button>
+</mat-dialog-actions>

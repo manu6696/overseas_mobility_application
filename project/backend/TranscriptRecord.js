@@ -31,7 +31,7 @@ const CourseResultSchema = new mongoose.Schema({
         required: true
     },
     grade: {
-        type: Number,
+        type: String,
         required: true
     }
 }, { _id: false });

@@ -40,6 +40,7 @@
             <mat-icon>delete</mat-icon>
           </button>
 
+
           <ng-template #deleteDialogTemplate>
             <h2 mat-dialog-title>Confirm Deletion</h2>
             <mat-dialog-content>
@@ -55,10 +56,11 @@
 
         <span class="toolbar-space-1"></span>
 
+
         <span class="transcript-records-button-wrapper">
           <button mat-fab extended class="transcript-records-button" 
-                  (click)="openPdfViewer(application._id!)">
-            <mat-icon>picture_as_pdf</mat-icon>
+                  *ngIf="application.status === 'Approved'"
+                  (click)="openRecordsDialog()">
             <span>Transcript of Records</span>
             <mat-icon iconPositionEnd>open_in_new</mat-icon>
           </button>
@@ -66,15 +68,17 @@
       
       <span class="agreement-button-wrapper">
         <button mat-fab extended class="agreement-button" 
-                (click)="openPdfViewer(application._id!)">
-          <mat-icon>picture_as_pdf</mat-icon>
+                (click)="openAgreementDialog()">          
           <span>Learning Agreement</span>
           <mat-icon iconPositionEnd>open_in_new</mat-icon>
         </button>
       </span>
     </mat-card-actions>
         
-      
+    <!---- 
+    <mat-icon>picture_as_pdf</mat-icon> 
+    (click)="openPdfViewer(application._id!)">       
+    -->
 
     </mat-card>
     <br>

@@ -214,6 +214,8 @@ function adduserMiddlewareFactory( isModerator:boolean ) {
 
     if( isModerator )
       newuser.setModerator();
+    else
+      newuser.setStudent();
 
     console.log(`Creating new user ${newuser.username}, moderator: ${newuser.hasModeratorRole()}`);
 
@@ -674,9 +676,9 @@ app.get("/api/v1/transcriptRecords/:applicationid", auth, (req,res,next) => {
 
   // req.params.applicationid contains the :applicationid URL component
 
-  transcriptRecord.getModel().find( {applicationid: req.params.applicationid } ).then( 
+  transcriptRecord.getModel().findOne( {applicationid: req.params.applicationid } ).then( 
     ( q )=> {
-      if( q.length > 0 )
+      if( q )
         return res.status(200).json( {q} );
       else 
         return res.status(404).json( {error:true, errormessage:"no transcript of records present"} );
@@ -709,9 +711,9 @@ app.delete("/api/v1/transcriptRecords/:applicationid", auth, (req,res,next) => {
 
 
 
-app.put("/api/v1/transcriptRecords/:transcriptid", auth, (req,res,next) => {
+app.put("/api/v1/transcriptRecords/:applicationid", auth, (req,res,next) => {
 
-  console.log("Update request for transcript of records with id: "+req.params.transcriptid)
+  console.log("Update request for transcript of records with id: "+req.params.applicationid)
 
   // req.params.applicationid contains the :applicationid URL component
   let recvtranscriptRecords= req.body;
@@ -719,7 +721,7 @@ app.put("/api/v1/transcriptRecords/:transcriptid", auth, (req,res,next) => {
 
   if(transcriptRecord.isTranscriptRecord(recvtranscriptRecords)) {
 
-    transcriptRecord.getModel().updateOne( {_id: req.params.transcriptid}, recvtranscriptRecords ).then( 
+    transcriptRecord.getModel().updateOne( {applicationid: req.params.applicationid}, recvtranscriptRecords ).then( 
     ( q )=> {
 
       if( q.modifiedCount > 0 )
@@ -854,6 +856,16 @@ app.get('/api/v1/users', auth, ensureModeratorRole, (req,res,next) => {
     return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
   })
 
+});
+
+app.get("/api/v1/users/lecturers", auth, (req, res, next) => {
+  user.getModel().find({ roles: 'LECTURER' }, 'username name surname mail')
+    .then((lecturers) => {
+      return res.status(200).json({ lecturers });
+    })
+    .catch((reason) => {
+      return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
+    });
 });
 
 
@@ -1057,12 +1069,36 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
         surname: "Rossi",
         mail: "901111@univ.it"
       });
-      u.setModerator();
       u.setLecturer();
       u.setPassword("901111");
       return u.save()
     } else {
       console.log("Lecturer user already exists");
+    }
+  }
+)
+.then(
+  () => {
+    return user.getModel().findOne( {mail:"staff@univ.it"} );
+  }
+)
+.then(
+  (doc) => {
+    if (!doc) {
+      console.log("Creating staff user");
+
+      let u = user.newUser({
+        username: "staff",
+        name: "Giulia",
+        surname: "Conti",
+        mail: "staff@univ.it"
+      });
+      u.setModerator();
+      u.setStaff();
+      u.setPassword("staff");
+      return u.save()
+    } else {
+      console.log("Staff user already exists");
     }
   }
 )
@@ -1138,7 +1174,7 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
           status: "Pending",
           uploadDate: new Date(),
           academicYear: "2023-2024",
-          semester: "Spring",
+          semester: "Autumn/Fall",
           matrNumber: "123456",
           name: "Luca",
           surname: "Bianchi",
@@ -1152,6 +1188,10 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
             { 
               originalCourse: { code: "CS101", title: "Algoritmi e strutture dati", credits: 12 }, 
               equivalentCourse: { code: "CS999", title: "Algorithm and data structures", credits: 12 } 
+            },
+            { 
+              originalCourse: { code: "CS102", title: "Tecnologie e Applicazioni Web", credits: 6 }, 
+              equivalentCourse: { code: "CS992", title: "Web Technologies and Applications", credits: 6 } 
             }
           ],
           referent: "901111",
@@ -1164,9 +1204,8 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
         .getModel()
         .create({
           records: [
-            { code: "CS101", grade: 25 },
-            { code: "CS102", grade: 26 },
-            { code: "CS103", grade: 27 }
+            { code: "CS999", grade: "25" },
+            { code: "CS992", grade: "26" }
           ],
           uploadDate: new Date(),
           applicationid: application1._id,
