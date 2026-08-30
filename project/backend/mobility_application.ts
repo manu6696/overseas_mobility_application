@@ -422,7 +422,7 @@ app.put("/api/v1/applications/:applicationid", auth, (req,res,next) => {
       recvapplications.uploadDate = new Date();
       recvapplications.modified = true;
 
-      if(req.query.referent) {
+      if(req.auth.roles.includes('LECTURER') && req.auth.username === recvapplications.referent) {
         recvapplications.status = req.body.status;
         if(req.body.approved === 'true' || req.body.approved === 'True' || req.body.approved === true ) {
           recvapplications.approved = true;
