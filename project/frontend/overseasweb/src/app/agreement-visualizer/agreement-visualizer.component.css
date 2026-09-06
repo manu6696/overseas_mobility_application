@@ -58,4 +58,7 @@
   border-color: #000000;
 }
 
-
+.close-button{
+    background-color: #AC0033 !important;
+    color: white !important;
+}

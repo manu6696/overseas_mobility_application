@@ -39,7 +39,9 @@
         <span *ngIf="ag.lecturerReason"> — {{ ag.lecturerReason }}</span>
       </div>
 
-      <button mat-fab extended color="primary" (click)="viewAgreement(ag._id)">
+        <button mat-fab extended class="agreement-button" 
+                (click)="openPdfViewer(ag!._id!)"
+                *ngIf="ag._id"> 
         <mat-icon>picture_as_pdf</mat-icon>
         PDF
       </button>
@@ -54,6 +56,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Close</button>
+<button mat-flat-button  class="close-button" mat-dialog-close>Close</button>
 </mat-dialog-actions>
 
