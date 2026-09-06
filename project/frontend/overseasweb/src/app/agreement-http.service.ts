@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { UserHttpService } from './user-http.service';
 import { Agreement } from './agreement';
@@ -62,15 +62,20 @@ export class AgreementHttpService {
   */
 
   // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/Blob
-  get_agreement_by_id(applicationId: string): Observable<Blob> {
-    const params = new HttpParams().set('applicationid', applicationId);
-
-    return this.http.get(`${this.us.url}/agreements`, {
-      ...this.create_options({applicationid: applicationId}),
-      responseType: 'blob' // Forza Angular a trattare la risposta come file binario
-    });
+  get_agreement_by_id(agreementId: string): Observable<Blob> {
+    //const params = new HttpParams().set('agreementId', agreementId);
+    return this.http.get(this.us.url + '/agreements' + '/' + agreementId, {
+      ...this.create_options(),
+      responseType: 'blob'
+    } );
   }
 
+  get_agreement_list_no_content_by_query( params = {} ) : Observable<Agreement[]> {
+    return this.http.get<any>( this.us.url + '/agreements', this.create_options( params ) ).pipe(
+      map((response) => response.q),
+      catchError( this.handleError )
+    );
+  }
 
   delete_agreement( id: string): Observable<Agreement> {
     console.log('Deleting Agreement ' + id );

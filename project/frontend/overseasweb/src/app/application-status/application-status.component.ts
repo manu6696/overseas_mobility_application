@@ -24,6 +24,7 @@ export class ApplicationStatusComponent implements OnInit {
 
   @Input() application: Application | null = null;
   @Output() applicationDeleted = new EventEmitter<string>();
+  @Output() applicationModified = new EventEmitter<string>();
   public fieldGroupEdited: FieldGroupEditor[] = [];
   clonedCourses: CourseEval[] = [];
   public openConfirmDialog: boolean = false;
@@ -42,14 +43,7 @@ export class ApplicationStatusComponent implements OnInit {
     { }
   
   ngOnInit() {
-    this.copyOfCourses();
-    if(!this.application) {
-      this.get_application_by_matrNumber(this.us.get_username());
-      this.sio.connect().subscribe( (m) => {
-      this.get_application_by_matrNumber(this.us.get_username());
-    });
-    }
-    
+    this.copyOfCourses();    
     this.openConfirmDialog = false;
   }
 
@@ -61,6 +55,13 @@ export class ApplicationStatusComponent implements OnInit {
   readonly panelOpenState = signal(false);
 
   // Needed for the status color
+  // Created
+  // Awaiting Learning Agreement approval
+  // Pre-departure completed
+  // Mobility in progress
+  // Waiting for exam score approval
+  // Closed
+  // Canceled
   getStatusClass(status: string): string {
     switch (status) {
       case 'Pending':
@@ -82,7 +83,7 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
   // Needed to organize the fields
-  private generalData = ['uploadD0ate', 'academicYear', 'semester'];
+  private generalData = ['uploadDate', 'academicYear', 'semester'];
   private studentData = ['matrNumber', 'name', 'surname'];
   private sendingInstData = ['departement', 'sendingInst', 'sendingCountry'];
   private hostingInstData = ['hostInst', 'hostCountry'];
@@ -106,30 +107,6 @@ export class ApplicationStatusComponent implements OnInit {
 
   isLecturerData(key: string): boolean {
     return !this.lecturerData.includes(key);
-  }
-
-
-  public get_application_by_matrNumber(matrNumber : string) {
-    this.ap.get_application_by_matrNumber(matrNumber).subscribe( {
-      next: (application) => {
-        console.log("Application successfully received.");
-        
-        this.application = application;
-        if (this.application?.courses) {
-          this.clonedCourses = structuredClone(this.application.courses);
-        }
-        
-      },
-      error: (err) => {
-        // Application not found
-        if (err.status === 404) {
-          this.application = null;
-        } else {
-          // In other case the system will logout
-          // this.logout();
-        }
-      }
-    });
   }
 
   public delete_application_by_id(id : string) {
@@ -190,21 +167,6 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
 
-  // Open a new windows for the learning agreement pdf
-  openPdfViewer(applicationId: string) {
-    this.ag.get_agreement_by_id(applicationId).subscribe({
-      next: (blob: Blob) => {        
-
-        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
-        const blobUrl = URL.createObjectURL(pdfBlob);
-
-        window.open(blobUrl, '_blank');
-      },
-      error: (err) => {
-        console.error("Errore recupero PDF:", err);
-      }
-    });
-  }
 
 
   // Open the editor needed to modify the application data
@@ -219,8 +181,8 @@ export class ApplicationStatusComponent implements OnInit {
     dialogRef.afterClosed().subscribe((updatedApplication: Application) => {
       if (updatedApplication) {
         console.log('Dati ricevuti dal dialog:', updatedApplication);
-        
-        this.get_application_by_matrNumber(this.us.get_username());
+       
+        this.applicationModified.emit(updatedApplication._id);
         this.clonedCourses = updatedApplication.courses;
       }
     });
@@ -238,7 +200,7 @@ export class ApplicationStatusComponent implements OnInit {
       if (updatedApplication) {
         console.log('Dati ricevuti dal dialog:', updatedApplication);
         
-        this.get_application_by_matrNumber(this.us.get_username());
+        this.applicationModified.emit(updatedApplication._id);
         this.clonedCourses = updatedApplication.courses;
       }
     });
@@ -286,7 +248,7 @@ export class ApplicationStatusComponent implements OnInit {
           dialogRef.afterClosed().subscribe((updatedApplication: Application) => {
             if (updatedApplication) {
               console.log('Dati ricevuti dal dialog:', updatedApplication);
-              this.get_application_by_matrNumber(this.us.get_username());
+              this.applicationModified.emit(updatedApplication._id);
               this.clonedCourses = updatedApplication.courses;
             }
           });
@@ -311,7 +273,7 @@ export class ApplicationStatusComponent implements OnInit {
       if (updatedApplication) {
         console.log('Dati ricevuti dal dialog:', updatedApplication);
         
-        this.get_application_by_matrNumber(this.us.get_username());
+        this.applicationModified.emit(updatedApplication._id);
         this.clonedCourses = updatedApplication.courses;
       }
     });

@@ -21,7 +21,7 @@ import { ApplicationCreatorComponent } from '../application-creator/application-
 })
 export class DashboardStudentComponent implements OnInit  {
   
-  public application: Application | null = null;
+  public applications: Application[] | null = null;
 
   constructor( private sio: SocketioService , 
     public ap: ApplicationHttpService, 
@@ -44,39 +44,12 @@ export class DashboardStudentComponent implements OnInit  {
     this.ap.get_application_by_matrNumber(matrNumber).subscribe( {
       next: (application) => {
         console.log("Application successfully received.");
-        this.application = application;
+        this.applications = application;
         
       },
       error: (err) => {
         // Application not found
-        if (err.status === 404) {
-          let newApplications : Application = {
-                _id: '',
-                id: '',
-                uploadDate: new Date,
-                status: 'Created',
-                academicYear: '',
-                semester: '',
-                matrNumber: this.us.get_username(),
-                name: this.us.get_name(),
-                surname: this.us.get_surname(),
-                departement: '',
-                sendingInst: '',
-                sendingCountry: '',
-                hostInst: '',
-                hostCountry: '',
-                hostCity: '',
-                courses: [],
-                referent: '',
-                approved: false,
-                modified: false,
-                lecturerReason: 'No reason provided',
-          };
-          this.application = newApplications;
-        } else {
-          // In other case the system will logout
-          // this.logout();
-        }
+          this.applications = [];
       }
     });
   }
@@ -84,11 +57,34 @@ export class DashboardStudentComponent implements OnInit  {
 
   // Open the creator needed to create the application data
   openApplicationCreator() {
+    let newApplications : Application = {
+          _id: '',
+          id: '',
+          uploadDate: new Date,
+          status: 'Created',
+          academicYear: '',
+          semester: '',
+          matrNumber: this.us.get_username(),
+          name: this.us.get_name(),
+          surname: this.us.get_surname(),
+          departement: '',
+          sendingInst: '',
+          sendingCountry: '',
+          hostInst: '',
+          hostCountry: '',
+          hostCity: '',
+          courses: [],
+          referent: '',
+          approved: false,
+          modified: false,
+          lecturerReason: 'No reason provided',
+    };
+
     const dialogRef = this.dialog.open(ApplicationCreatorComponent, {
       width: '1000px',
       maxWidth: '90vw',
       maxHeight: '85vh',    
-      data: {application: {...this.application}}
+      data: {application: {...newApplications}}
     });
 
     dialogRef.afterClosed().subscribe((result) => {

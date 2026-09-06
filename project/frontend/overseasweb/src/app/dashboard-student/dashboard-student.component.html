@@ -1,23 +1,29 @@
 <div class="grid-container">
   <app-navbar></app-navbar>
   <br>
-   <ng-container *ngIf="application?._id; else showAddButton">
-    <app-application-status
-          (applicationDeleted)="onApplicationDeleted($event)"
-          [application]="application">
-    </app-application-status>
-   </ng-container>
-  
-    <ng-template #showAddButton>
-      <button 
-              type="button" 
-              mat-mini-fab 
-              color="primary" 
-              class="add-application-button" 
-              (click)="openApplicationCreator()"
-              aria-label="Add course">                
-        <mat-icon>add</mat-icon>
-      </button>
-    </ng-template>
+  <ng-container *ngFor="let application of applications">
+
+    <ng-container *ngIf="application?._id && application.status != 'Closed' && application.status != 'Canceled'">
+      <app-application-status
+            (applicationDeleted)="onApplicationDeleted($event)"
+            [application]="application">
+      </app-application-status>
+
+      <br>
+    </ng-container>
+
+
+    
+  </ng-container>
+
+    <button 
+            type="button" 
+            mat-mini-fab 
+            color="primary" 
+            class="add-application-button" 
+            (click)="openApplicationCreator()"
+            aria-label="Add course">                
+      <mat-icon>add</mat-icon>
+    </button>
 
 </div>

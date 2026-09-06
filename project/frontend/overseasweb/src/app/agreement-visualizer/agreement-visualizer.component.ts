@@ -4,6 +4,8 @@ import { ApplicationHttpService } from '../application-http.service';
 import { Host } from '../host';
 import { HostHttpService } from '../host-http.service';
 import { UserHttpService } from '../user-http.service';
+import { AgreementHttpService } from '../agreement-http.service';
+import { Agreement } from '../agreement';
 import { Router } from '@angular/router';
 import { SocketioService } from '../socketio.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -19,8 +21,10 @@ import { MatSelectChange } from '@angular/material/select';
 export class AgreementVisualizerComponent implements OnInit {
 
   public application: Application | null = null;
+  public agreements: Agreement[] = [];
   public userRoles : string[] = [];
   public fieldGroupEdited: FieldGroupEditor[] = [];
+  @Output() posted = new EventEmitter<Application>();
 
   constructor( 
     public dialogRef: MatDialogRef<AgreementVisualizerComponent>,
@@ -30,18 +34,37 @@ export class AgreementVisualizerComponent implements OnInit {
     public us: UserHttpService, 
     public ho: HostHttpService, 
     private router: Router,  
+    private ag: AgreementHttpService,
     private sanitizer: DomSanitizer) { }
-
-
-
-  @Output() posted = new EventEmitter<Application>();
 
 
   ngOnInit() {
     this.userRoles = this.us.get_roles();
     this.fieldGroupEdited = this.getFieldsByCategoryEditor(this.data.application);
+    this.get_agreement_list_by_query(this.data.application._id!);
+    this.sio.connect().subscribe((m) => {
+      this.get_agreement_list_by_query(this.data.application._id!);
+    });
 
   }
+
+
+  public get_agreement_list_by_query(applicationid : string){
+
+    this.ag.get_agreement_list_no_content_by_query({applicationid}).subscribe( {
+      next: (agreements) => {
+        console.log("Application successfully received.");
+        this.agreements = agreements;
+        
+      },
+      error: (err) => {
+        // Application not found
+          this.agreements = [];
+      }
+    });
+
+  }
+
 
 
   getFieldsByCategoryEditor(app: Application): FieldGroupEditor[] {
@@ -79,11 +102,51 @@ export class AgreementVisualizerComponent implements OnInit {
   }
 
 
+  // Open a new windows for the learning agreement pdf
+  openPdfViewer(applicationId: string) {
+    console.log("Application id Is: " + applicationId);
+    this.ag.get_agreement_by_id(applicationId).subscribe({
+      next: (blob: Blob) => {        
+
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(pdfBlob);
+
+        window.open(blobUrl, '_blank');
+      },
+      error: (err) => {
+        console.error("Errore recupero PDF:", err);
+      }
+    });
+  }
 
 
 
 
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'Pending':
+        return 'status-pending';
+      case 'Approved':
+        return 'status-approved';
+      case 'Rejected':
+        return 'status-rejected';
+      default:
+        return 'status-default';
+    }
+  }
 
+  viewAgreement(agreementId: string) {
+    this.ag.get_agreement_by_id(agreementId).subscribe({
+      next: (blob: Blob) => {
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        window.open(blobUrl, '_blank');
+      },
+      error: (err) => {
+        console.error("Errore recupero PDF:", err);
+      }
+    });
+  }
 
 
 }

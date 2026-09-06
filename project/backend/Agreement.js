@@ -18,9 +18,7 @@ function isAgreement(arg) {
         && arg.filename && typeof (arg.filename) == 'string'
         && arg.mimetype && typeof (arg.mimetype) == 'string'
         && arg.uploadDate && arg.uploadDate instanceof Date
-        && typeof (arg.approved) == 'boolean'
-        && typeof (arg.modified) == 'boolean'
-        && typeof (arg.lecturerReason) == 'string';
+        && typeof (arg.modified) == 'boolean';
 }
 // We use Mongoose to perform the ODM between our application and
 // mongodb. To do that we need to create a Schema and an associated
@@ -56,16 +54,24 @@ let AgreementSchema = new mongoose.Schema({
         required: false
     },
     approved: {
-        type: mongoose.SchemaTypes.Boolean,
-        required: true
+        type: mongoose.SchemaTypes.String,
+        required: false
     },
     modified: {
         type: mongoose.SchemaTypes.Boolean,
         required: true
     },
+    modifyDescription: {
+        type: mongoose.SchemaTypes.String,
+        required: false
+    },
     lecturerReason: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: false
+    },
+    decisionDate: {
+        type: mongoose.SchemaTypes.Date,
+        required: false
     }
 });
 function getSchema() { return AgreementSchema; }

@@ -1,0 +1,59 @@
+<!-----
+<h2 mat-dialog-title>Learning Agreement Edit</h2>
+
+<ng-container *ngFor="let agreement of agreements">
+
+    <mat-card-actions>
+        <span class="agreement-button-wrapper">
+        <button mat-fab extended class="agreement-button" 
+                (click)="openPdfViewer(agreement!._id!)"
+                *ngIf="agreement._id">          
+            <mat-icon>picture_as_pdf</mat-icon> 
+            <mat-icon iconPositionEnd>open_in_new</mat-icon>
+        </button>
+        </span>
+    </mat-card-actions>
+
+
+</ng-container>
+
+-->
+
+
+<h2 mat-dialog-title>Learning Agreement</h2>
+
+<mat-dialog-content class="custom-dialog-content">
+
+  <div *ngIf="agreements && agreements.length > 0; else noAgreements">
+    <div class="agreement-item" *ngFor="let ag of agreements">
+
+      <div class="agreement-header">
+        <span class="agreement-date">Uploaded on {{ ag.uploadDate | date:'dd/MM/yyyy' }}</span>
+        <span class="status-badge" [ngClass]="getStatusClass(ag.approved)">{{ ag.approved }}</span>
+      </div>
+
+      <p class="agreement-description">{{ ag.modifyDescription }}</p>
+
+      <div class="agreement-decision" *ngIf="ag.decisionDate">
+        <span>Decisione del {{ ag.decisionDate | date:'dd/MM/yyyy' }}</span>
+        <span *ngIf="ag.lecturerReason"> — {{ ag.lecturerReason }}</span>
+      </div>
+
+      <button mat-fab extended color="primary" (click)="viewAgreement(ag._id)">
+        <mat-icon>picture_as_pdf</mat-icon>
+        PDF
+      </button>
+
+    </div>
+  </div>
+
+  <ng-template #noAgreements>
+    <p>No Learning Agreement uploaded for this application.</p>
+  </ng-template>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>
+

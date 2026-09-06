@@ -1,0 +1,61 @@
+
+.agreement-button{
+  background-color: #AC0033 !important;
+  color: white !important;
+  margin: 0;
+}
+
+
+.agreement-item {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.agreement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.agreement-date {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.agreement-description {
+  margin: 8px 0;
+}
+
+.agreement-decision {
+  font-size: 0.9em;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 10px;
+}
+.status-pending {
+  background-color: #fff3cd;
+  color: #000000;
+  border-color: #000000;
+}
+
+.status-approved {
+  background-color: #5b49ff;
+  color: rgb(0, 0, 0) 4f1;
+  border-color: #000000;
+}
+
+.status-rejected {
+  background-color: #b4000f;
+  color: #721c24;
+  border-color: #000000;
+}
+
+.status-default {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border-color: #000000;
+}
+
+

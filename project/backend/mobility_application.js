@@ -303,10 +303,12 @@ app.post("/api/v1/applications/:matrNumber", auth, async (req, res, next) => {
         delete recvapplications._id;
     }
     if (application.isApplication(recvapplications) && !req.params.matrNumber.includes('matrNumber')) {
-        const existingApp = await application.getModel().findOne({ matrNumber: req.params.matrNumber });
-        if (existingApp) {
-            return next({ statusCode: 409, error: true, errormessage: "Data is already present" });
+        //const existingApp = await application.getModel().findOne({matrNumber: req.params.matrNumber});
+        /*
+        if(existingApp) {
+          return next({ statusCode:409, error: true, errormessage: "Data is already present" });
         }
+        */
         const data = await application.getModel().create(recvapplications).then((data) => {
             if (ios) {
                 // Notify all socket.io clients
@@ -329,7 +331,7 @@ app.put("/api/v1/applications/:applicationid", auth, (req, res, next) => {
         let recvapplications = req.body;
         recvapplications.uploadDate = new Date();
         recvapplications.modified = true;
-        if (req.query.referent) {
+        if (req.auth.roles.includes('LECTURER') && req.auth.username === recvapplications.referent) {
             recvapplications.status = req.body.status;
             if (req.body.approved === 'true' || req.body.approved === 'True' || req.body.approved === true) {
                 recvapplications.approved = true;
@@ -389,6 +391,7 @@ app.post("/api/v1/agreements/:applicationid", auth, upload.single('agreement'), 
         recvagreements.matrNumber = req.body.matrNumber;
         recvagreements.approved = false;
         recvagreements.modified = true;
+        recvagreements.modifyDescription = 'Initial Learning Agreement';
         recvagreements.lecturerReason = 'No reason provided';
         if (agreement.isAgreement(recvagreements)) {
             agreement.getModel().create(recvagreements).then((data) => {
@@ -410,13 +413,25 @@ app.post("/api/v1/agreements/:applicationid", auth, upload.single('agreement'), 
         return next({ statusCode: 404, error: true, errormessage: "Learning agreement missing or not a PDF file" });
     }
 });
+app.get("/api/v1/agreements/:agreementid", auth, (req, res, next) => {
+    agreement.getModel().findOne({ _id: req.params.agreementid }).then((q) => {
+        if (q) {
+            res.setHeader('Content-Type', 'application/pdf');
+            return res.status(200).send(q.content);
+        }
+        else
+            return res.status(404).json({ error: true, errormessage: "Invalid application id" });
+    }).catch((reason) => {
+        return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
+    });
+});
 app.get("/api/v1/agreements/", auth, (req, res, next) => {
     if (req.query.applicationid) {
-        agreement.getModel().find({ applicationid: req.query.applicationid }).then((q) => {
-            const selectedAgreement = q[0];
+        agreement.getModel().find({ applicationid: req.query.applicationid }, { content: 0 }).then((q) => {
+            //const selectedAgreement = q[0];
             if (q.length > 0) {
-                res.setHeader('Content-Type', 'application/pdf');
-                return res.status(200).send(selectedAgreement.content);
+                //res.setHeader('Content-Type', 'application/pdf');
+                return res.status(200).send({ q });
                 //return res.status(200).json( {q} );
             }
             else
@@ -463,14 +478,11 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
         recvagreements.uploadDate = new Date();
         recvagreements.applicationid = req.body.applicationid;
         recvagreements.matrNumber = req.body.matrNumber;
-        if (req.body.approved === 'true' || req.body.approved === 'True' || req.body.approved === true) {
-            recvagreements.approved = true;
-        }
-        else {
-            recvagreements.approved = false;
-        }
+        recvagreements.approved = req.body.approved;
         recvagreements.modified = true;
+        recvagreements.modifyDescription = req.body.modifyDescription;
         recvagreements.lecturerReason = req.body.lecturerReason || 'No reason provided';
+        recvagreements.decisionDate = req.body.decisionDate;
         if (agreement.isAgreement(recvagreements)) {
             agreement.getModel().updateOne({ _id: req.params.agreementid }, recvagreements).then((q) => {
                 if (q.modifiedCount > 0)

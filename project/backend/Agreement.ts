@@ -9,9 +9,11 @@ export interface Agreement {
     uploadDate: Date,
     applicationid: String,
     matrNumber: String,
-    approved: Boolean,
+    approved: String,
     modified: Boolean,
-    lecturerReason: String
+    modifyDescription: String,
+    lecturerReason: String,
+    decisionDate: Date,
 }
 
 // User defined type guard
@@ -28,9 +30,7 @@ export function isAgreement(arg: any): arg is Agreement {
     && arg.filename && typeof(arg.filename) == 'string' 
     && arg.mimetype && typeof(arg.mimetype) == 'string'
     && arg.uploadDate && arg.uploadDate instanceof Date
-    && typeof(arg.approved) == 'boolean'
     && typeof(arg.modified) == 'boolean'
-    && typeof(arg.lecturerReason) == 'string'
 }
 
 
@@ -72,16 +72,24 @@ let AgreementSchema = new mongoose.Schema<Agreement>( {
         required: false
     },
     approved: {
-        type: mongoose.SchemaTypes.Boolean,
-        required: true
+        type: mongoose.SchemaTypes.String,
+        required: false
     },
     modified: {
         type: mongoose.SchemaTypes.Boolean,
         required: true
     },
+    modifyDescription: {
+        type: mongoose.SchemaTypes.String,
+        required: false
+    },
     lecturerReason: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: false
+    },
+    decisionDate: {
+        type: mongoose.SchemaTypes.Date,
+        required: false
     }
 })
 

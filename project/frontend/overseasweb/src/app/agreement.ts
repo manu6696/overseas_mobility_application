@@ -2,14 +2,16 @@
 export interface Agreement {
     _id: string;
     filename: string;
-    content: any;
+    content?: any;
     mimetype: string;
     uploadDate: Date;
     applicationid: string;
     matrNumber: string;
-    approved: boolean;
+    approved: string;
     modified: boolean;
+    modifyDescription: string;
     lecturerReason: string;
+    decisionDate: Date;
 }
 
 // User defined type guard
@@ -26,8 +28,9 @@ export function isAgreement(arg: any): arg is Agreement {
     && arg.filename && typeof(arg.filename) == 'string' 
     && arg.mimetype && typeof(arg.mimetype) == 'string'
     && arg.uploadDate && arg.uploadDate instanceof Date
-    && typeof(arg.approved) == 'boolean'
+    && arg.approved && typeof(arg.approved) == 'string'
+    && arg.modifyDescription && typeof(arg.modifyDescription) == 'string'
     && typeof(arg.modified) == 'boolean'
     && typeof(arg.lecturerReason) == 'string'
+    && arg.decisionDate && arg.decisionDate instanceof Date
 }
-
