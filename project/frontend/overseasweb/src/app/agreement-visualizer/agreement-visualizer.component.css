@@ -1,39 +1,49 @@
 
-.agreement-button{
-  background-color: #AC0033 !important;
-  color: white !important;
-  margin: 0;
-}
-
-
 .agreement-item {
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 8px;
-  padding: 14px;
+  padding: 10px 14px;
   margin-bottom: 12px;
 }
 
-.agreement-header {
+.agreement-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-}
-
-.agreement-date {
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.7);
+  gap: 12px;
 }
 
 .agreement-description {
-  margin: 8px 0;
+  flex: 0 0 auto;
+  width: 320px;
+  background-color: #f0f0f0;
+  color: rgba(0, 0, 0, 0.75);
+  padding: 6px 10px;
+  border-radius: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agreement-date {
+  flex: 0 0 auto;
+  width: 65px;
+  font-size: 0.85em;
+  color: rgba(0, 0, 0, 0.6);
+  text-align: left;
 }
 
 .agreement-decision {
   font-size: 0.9em;
   color: rgba(0, 0, 0, 0.6);
-  margin-bottom: 10px;
+  margin-top: 8px;
 }
+
+.agreement-button {
+  background-color: #AC0033 !important;
+  color: white !important;
+  margin: 0 0 0 auto;
+}
+
 .status-pending {
   background-color: #fff3cd;
   color: #000000;
@@ -42,7 +52,7 @@
 
 .status-approved {
   background-color: #5b49ff;
-  color: rgb(0, 0, 0) 4f1;
+  color: #ffffff;
   border-color: #000000;
 }
 
@@ -58,7 +68,28 @@
   border-color: #000000;
 }
 
-.close-button{
-    background-color: #AC0033 !important;
-    color: white !important;
+.close-button {
+  background-color: #AC0033 !important;
+  color: white !important;
+}
+
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 24px;
+}
+
+.dialog-header h2 {
+  margin: 0;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.upload-button {
+  background-color: #AC0033 !important;
+  color: white !important;
 }

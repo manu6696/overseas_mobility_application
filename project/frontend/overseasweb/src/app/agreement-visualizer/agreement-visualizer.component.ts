@@ -148,5 +148,17 @@ export class AgreementVisualizerComponent implements OnInit {
     });
   }
 
+  onFileSelected(evento: Event) {
+    let inputElement = evento.target as HTMLInputElement;
+    let file = inputElement.files?.item(0);
+    console.log("Event: " + evento);
+    console.log("file: " + file?.type);
+    if(file?.type === 'application/pdf') {
+      console.log("TRUEEEEE");
+    } else {
+      console.log("Error: file is not a pdf");
+    }
+  }
+
 
 }

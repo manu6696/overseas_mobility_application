@@ -420,7 +420,7 @@ app.get("/api/v1/agreements/:agreementid", auth, (req, res, next) => {
             return res.status(200).send(q.content);
         }
         else
-            return res.status(404).json({ error: true, errormessage: "Invalid application id" });
+            return res.status(404).json({ error: true, errormessage: "Invalid agreement id" });
     }).catch((reason) => {
         return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
     });
