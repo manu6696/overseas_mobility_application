@@ -1,30 +1,6 @@
-<!-----
-<h2 mat-dialog-title>Learning Agreement Edit</h2>
-
-<ng-container *ngFor="let agreement of agreements">
-
-    <mat-card-actions>
-        <span class="agreement-button-wrapper">
-        <button mat-fab extended class="agreement-button" 
-                (click)="openPdfViewer(agreement!._id!)"
-                *ngIf="agreement._id">          
-            <mat-icon>picture_as_pdf</mat-icon> 
-            <mat-icon iconPositionEnd>open_in_new</mat-icon>
-        </button>
-        </span>
-    </mat-card-actions>
-
-
-</ng-container>
-
--->
-
-
 
 <div class="dialog-header">
   <h2 mat-dialog-title>Learning Agreement</h2>
-
-
 </div>
 
 <mat-dialog-content class="custom-dialog-content">
@@ -32,18 +8,37 @@
   <div *ngIf="agreements && agreements.length > 0; else noAgreements">
     <div class="agreement-item" *ngFor="let ag of agreements">
 
-      <div class="agreement-row">
+      <div class="agreement-content">
 
-        <span class="agreement-description">{{ ag.modifyDescription }}</span>
+        <div class="agreement-info">
 
-        <span class="agreement-date">{{ ag.uploadDate | date:'dd/MM/yy' }}</span>
+          <div class="agreement-top-row">
+            <mat-form-field appearance="outline" class="field-date">
+              <mat-label>Upload Date</mat-label>
+              <input matInput [disabled]="true" [value]="ag.uploadDate | date:'dd/MM/yyyy'" />
+            </mat-form-field>
 
-        <span class="status-badge" [ngClass]="getStatusClass(ag.approved)">{{ ag.approved }}</span>
+            <mat-form-field appearance="outline" class="field-date">
+              <mat-label>State</mat-label>
+              <input matInput [disabled]="true" [value]="ag.approved" />
+            </mat-form-field>
+          </div>
 
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Modify Description</mat-label>
+            <input matInput [disabled]="true" [value]="ag.modifyDescription" />
+          </mat-form-field>
 
-          <button mat-fab extended class="agreement-button" 
-                  (click)="openPdfViewer(ag!._id!)"
-                  *ngIf="ag._id"> 
+          <mat-form-field appearance="outline" class="field-full" *ngIf="ag.lecturerReason">
+            <mat-label>Lecturer Reason</mat-label>
+            <input matInput [disabled]="true" [value]="ag.lecturerReason" />
+          </mat-form-field>
+
+        </div>
+
+        <button mat-fab extended class="agreement-button" 
+                (click)="openPdfViewer(ag!._id!)"
+                *ngIf="ag._id"> 
           <mat-icon>picture_as_pdf</mat-icon>
           PDF
         </button>
@@ -52,45 +47,44 @@
     </div>
   </div>
 
-  <div class="agreement-row">
-    <div *ngIf="agreements && agreements.length > 0; else noAgreements">
-
-        <mat-form-field appearance="outline" 
-                        density="compact">
-            <mat-label> Modify Description </mat-label>
-            <input matInput />
-        </mat-form-field>
-
-    </div>
-
-    <input 
-      type="file" 
-      #fileInput
-      accept="application/pdf" 
-      class="hidden-file-input"
-      (change)="onFileSelected($event)" 
-    />
-
-  <button mat-fab color="primary" class="upload-button" (click)="fileInput.click()">
-    <mat-icon>upload_file</mat-icon>
-  </button>
-
-
-  </div>
-
-
-
-
   <ng-template #noAgreements>
     <p>No Learning Agreement uploaded for this application.</p>
   </ng-template>
 
+  <div class="agreement-item agreement-upload-card">
+    <p>Add new learning agreement</p>
+    <div class="agreement-content">
+
+      
+      <mat-form-field appearance="outline" class="field-full">
+        <mat-label>Modify Description</mat-label>
+        <input matInput [(ngModel)]="newModifyDescription" />
+      </mat-form-field>
+
+
+
+    </div>
+          <input 
+        type="file" 
+        #fileInput
+        accept="application/pdf" 
+        class="hidden-file-input"
+        (change)="onFileSelected($event)" 
+      />
+
+      <button mat-fab color="primary" class="upload-button" (click)="fileInput.click()">
+        <mat-icon>upload_file</mat-icon>
+      </button>
+
+      <button mat-fab color="primary" class="save-button" (click)="fileInput.click()">
+        <mat-icon>save</mat-icon>
+      </button>
+  </div>
+
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-<button mat-flat-button  class="close-button" mat-dialog-close>Close</button>
+  <button mat-flat-button class="close-button" mat-dialog-close>Close</button>
 </mat-dialog-actions>
-
-
 
 

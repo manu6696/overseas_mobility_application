@@ -1,6 +1,6 @@
 
 export interface Agreement {
-    _id: string;
+    _id?: string;
     filename: string;
     content?: any;
     mimetype: string;

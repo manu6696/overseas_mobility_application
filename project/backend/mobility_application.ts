@@ -1244,9 +1244,11 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
           uploadDate: new Date(),
           applicationid: application1._id,
           matrNumber: "123456",
-          approved: false,
+          approved: "Pending",
           modified: false,
           lecturerReason: 'No reason provided',
+          modifyDescription: "Initial Learning Agreement",
+          decisionDate: new Date()
         });
         
 

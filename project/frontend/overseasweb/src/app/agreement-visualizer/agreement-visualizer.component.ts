@@ -24,6 +24,8 @@ export class AgreementVisualizerComponent implements OnInit {
   public agreements: Agreement[] = [];
   public userRoles : string[] = [];
   public fieldGroupEdited: FieldGroupEditor[] = [];
+  public newModifyDescription: string = "";
+  public newAgreement : Agreement | null = null;
   @Output() posted = new EventEmitter<Application>();
 
   constructor( 
@@ -119,22 +121,6 @@ export class AgreementVisualizerComponent implements OnInit {
     });
   }
 
-
-
-
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'Pending':
-        return 'status-pending';
-      case 'Approved':
-        return 'status-approved';
-      case 'Rejected':
-        return 'status-rejected';
-      default:
-        return 'status-default';
-    }
-  }
-
   viewAgreement(agreementId: string) {
     this.ag.get_agreement_by_id(agreementId).subscribe({
       next: (blob: Blob) => {
@@ -153,7 +139,29 @@ export class AgreementVisualizerComponent implements OnInit {
     let file = inputElement.files?.item(0);
     console.log("Event: " + evento);
     console.log("file: " + file?.type);
-    if(file?.type === 'application/pdf') {
+
+    
+
+    if(file && file.type === 'application/pdf') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.newAgreement = {
+          filename: file?.name,
+          content: reader.result,
+          mimetype: file?.type,
+          uploadDate: new Date,
+          applicationid: this.data.application._id!,
+          matrNumber: this.data.application.matrNumber,
+          approved: 'Pending',
+          modified: true,
+          modifyDescription: 'Initial Learning Agreement',
+          lecturerReason: 'No reason provided',
+          decisionDate: new Date
+        }
+      };
+      reader.readAsArrayBuffer(file)
+
+
       console.log("TRUEEEEE");
     } else {
       console.log("Error: file is not a pdf");
