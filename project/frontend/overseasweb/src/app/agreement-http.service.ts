@@ -44,10 +44,20 @@ export class AgreementHttpService {
 
   }
 
+  private create_options_multipart( params = {} ) {
+    return  {
+      headers: new HttpHeaders({
+        authorization: 'Bearer ' + this.us.get_token(),
+        'cache-control': 'no-cache'
+      }),
+      params: new HttpParams( {fromObject: params} )
+    };
 
-  post_agreement( m: Agreement ): Observable<Agreement> {
-    console.log('Posting ' + JSON.stringify(m) );
-    return this.http.post<Agreement>( this.us.url + '/agreements', m,  this.create_options() ).pipe(
+  }
+
+  post_agreement( m: FormData, applicationId: string ): Observable<Agreement> {
+    console.log('Posting ' + m.get );
+    return this.http.post<Agreement>( this.us.url + '/agreements' + '/' + applicationId, m,  this.create_options_multipart() ).pipe(
       catchError(this.handleError)
     );
   }

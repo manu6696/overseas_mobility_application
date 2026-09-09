@@ -389,9 +389,9 @@ app.post("/api/v1/agreements/:applicationid", auth, upload.single('agreement'), 
         recvagreements.uploadDate = new Date();
         recvagreements.applicationid = req.params.applicationid;
         recvagreements.matrNumber = req.body.matrNumber;
-        recvagreements.approved = false;
+        recvagreements.approved = 'Pending';
         recvagreements.modified = true;
-        recvagreements.modifyDescription = 'Initial Learning Agreement';
+        recvagreements.modifyDescription = req.body.modifyDescription;
         recvagreements.lecturerReason = 'No reason provided';
         if (agreement.isAgreement(recvagreements)) {
             agreement.getModel().create(recvagreements).then((data) => {

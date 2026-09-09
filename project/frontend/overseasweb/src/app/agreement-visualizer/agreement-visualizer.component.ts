@@ -26,6 +26,7 @@ export class AgreementVisualizerComponent implements OnInit {
   public fieldGroupEdited: FieldGroupEditor[] = [];
   public newModifyDescription: string = "";
   public newAgreement : Agreement | null = null;
+  public selectedFile : File | null = null;
   @Output() posted = new EventEmitter<Application>();
 
   constructor( 
@@ -121,51 +122,37 @@ export class AgreementVisualizerComponent implements OnInit {
     });
   }
 
-  viewAgreement(agreementId: string) {
-    this.ag.get_agreement_by_id(agreementId).subscribe({
-      next: (blob: Blob) => {
-        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        window.open(blobUrl, '_blank');
-      },
-      error: (err) => {
-        console.error("Errore recupero PDF:", err);
-      }
-    });
-  }
-
+  // Selecting the file
   onFileSelected(evento: Event) {
     let inputElement = evento.target as HTMLInputElement;
     let file = inputElement.files?.item(0);
-    console.log("Event: " + evento);
-    console.log("file: " + file?.type);
-
-    
 
     if(file && file.type === 'application/pdf') {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.newAgreement = {
-          filename: file?.name,
-          content: reader.result,
-          mimetype: file?.type,
-          uploadDate: new Date,
-          applicationid: this.data.application._id!,
-          matrNumber: this.data.application.matrNumber,
-          approved: 'Pending',
-          modified: true,
-          modifyDescription: 'Initial Learning Agreement',
-          lecturerReason: 'No reason provided',
-          decisionDate: new Date
-        }
-      };
-      reader.readAsArrayBuffer(file)
+      this.selectedFile = file;
 
-
-      console.log("TRUEEEEE");
     } else {
       console.log("Error: file is not a pdf");
     }
+  }
+
+  // Saving agreement
+  onAgreementSave() {
+    const formData = new FormData();
+  
+    formData.append('agreement', this.selectedFile!);
+    formData.append('matrNumber', this.data.application.matrNumber);
+    formData.append('modifyDescription', this.newModifyDescription);
+
+    this.ag.post_agreement(formData, this.data.application._id!).subscribe({
+      next: () => {
+        this.get_agreement_list_by_query(this.data.application._id!);
+        this.newModifyDescription = '';
+      },
+      error: (err) => {
+        console.error("Errore salvataggio PDF:", err);
+      }
+    });
+
   }
 
 
