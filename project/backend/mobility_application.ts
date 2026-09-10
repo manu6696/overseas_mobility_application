@@ -507,6 +507,7 @@ app.post("/api/v1/agreements/:applicationid", auth, upload.single('agreement'), 
     recvagreements.modified = true;
     recvagreements.modifyDescription = req.body.modifyDescription;
     recvagreements.lecturerReason = 'No reason provided';
+    recvagreements.decisionDate = new Date();
 
     if(agreement.isAgreement(recvagreements)) {
 
@@ -611,51 +612,42 @@ app.delete("/api/v1/agreements/:applicationid", auth, (req,res,next) => {
 
 
 
-app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (req,res,next) => {
+app.put("/api/v1/agreements/:agreementid", auth, (req,res,next) => {
 
   console.log("Update request for learning agreement with id: "+req.params.agreementid)
-  console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
-  console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
+  console.log("Received: " + JSON.stringify(req.body) );
 
-  if(req.file.buffer.byteLength > 0 && req.file.mimetype === 'application/pdf') {
+  let recvagreements= req.body;
 
-    console.log("Received: " + JSON.stringify(req.body) );
-
-    let recvagreements= req.body;
+  if(req.file) {
+    console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
+    console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
     recvagreements.filename = req.file.originalname;
     recvagreements.content = req.file.buffer;
     recvagreements.mimetype = req.file.mimetype;
     recvagreements.uploadDate = new Date();
-    recvagreements.applicationid = req.body.applicationid;
-    recvagreements.matrNumber = req.body.matrNumber;
-    recvagreements.approved = req.body.approved;
-    recvagreements.modified = true;
-    recvagreements.modifyDescription = req.body.modifyDescription;
-    recvagreements.lecturerReason = req.body.lecturerReason || 'No reason provided';
-    recvagreements.decisionDate = req.body.decisionDate;
-
-      
-    if(agreement.isAgreement(recvagreements)) {
-      agreement.getModel().updateOne( {_id: req.params.agreementid}, recvagreements ).then( 
-      ( q )=> {
-
-        if( q.modifiedCount > 0 )
-          return res.status(200).json( {error:false, errormessage:""} );
-        else
-          return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement"});
-        
-      }).catch( (reason)=> {
-          return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-      })
-
-    } else {
-      return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement" });
-    }
-
-  } else {
-      return next({ statusCode:404, error: true, errormessage: "Learning agreement missing"});
   }
-  
+
+  recvagreements.applicationid = req.body.applicationid;
+  recvagreements.matrNumber = req.body.matrNumber;
+  recvagreements.approved = req.body.approved;
+  recvagreements.modified = true;
+  recvagreements.modifyDescription = req.body.modifyDescription;
+  recvagreements.lecturerReason = req.body.lecturerReason || 'No reason provided';
+  recvagreements.decisionDate = req.body.decisionDate;
+
+    
+  agreement.getModel().updateOne( {_id: req.params.agreementid}, recvagreements ).then( 
+  ( q )=> {
+
+    if( q.matchedCount > 0 )
+      return res.status(200).json( {error:false, errormessage:""} );
+    else
+      return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement"});
+    
+  }).catch( (reason)=> {
+      return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+  })  
 
 });
 

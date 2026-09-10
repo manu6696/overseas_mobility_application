@@ -27,6 +27,7 @@ export class AgreementVisualizerComponent implements OnInit {
   public newModifyDescription: string = "";
   public newAgreement : Agreement | null = null;
   public selectedFile : File | null = null;
+  public approvedState: string[] = ['Pending', 'Approved','Rejected'];
   @Output() posted = new EventEmitter<Application>();
 
   constructor( 
@@ -117,7 +118,7 @@ export class AgreementVisualizerComponent implements OnInit {
         window.open(blobUrl, '_blank');
       },
       error: (err) => {
-        console.error("Errore recupero PDF:", err);
+        console.error("Error retrieving PDF:", err);
       }
     });
   }
@@ -139,6 +140,7 @@ export class AgreementVisualizerComponent implements OnInit {
   onAgreementSave() {
     const formData = new FormData();
   
+    const date = new Date;
     formData.append('agreement', this.selectedFile!);
     formData.append('matrNumber', this.data.application.matrNumber);
     formData.append('modifyDescription', this.newModifyDescription);
@@ -149,10 +151,29 @@ export class AgreementVisualizerComponent implements OnInit {
         this.newModifyDescription = '';
       },
       error: (err) => {
-        console.error("Errore salvataggio PDF:", err);
+        console.error("Error saving PDF:", err);
       }
     });
 
+  }
+
+  // Updating agreement
+  onAgreementUpdate(agreement: Agreement) {
+
+    this.ag.put_agreement(agreement).subscribe({
+      next: () => {
+        this.ag.get_agreement_by_id(agreement._id!);
+      },
+      error: (err) => {
+        console.error("Error updating agreement:", err);
+      }
+    });
+
+
+  }
+
+  userIsLecturer() {
+    return this.us.is_lecturer();
   }
 
 

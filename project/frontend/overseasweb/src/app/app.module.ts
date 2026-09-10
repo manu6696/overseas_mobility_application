@@ -48,8 +48,8 @@ import {
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
-import { MatToolbarModule } from '@angular/material/toolbar';
-
+import {MatToolbarModule } from '@angular/material/toolbar';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -89,7 +89,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
         MatFormFieldModule,
         MatInputModule,
         MatSelectModule,
-        MatToolbarModule], 
+        MatToolbarModule,
+        MatDatepickerModule], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },

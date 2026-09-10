@@ -12,27 +12,103 @@
 
         <div class="agreement-info">
 
+          <!---- UPLOAD DATE ----> 
           <div class="agreement-top-row">
             <mat-form-field appearance="outline" class="field-date">
               <mat-label>Upload Date</mat-label>
               <input matInput [disabled]="true" [value]="ag.uploadDate | date:'dd/MM/yyyy'" />
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="field-date">
+
+          <!---- STATE ----> 
+            <mat-form-field appearance="outline" class="field-date" *ngIf="!userIsLecturer()">
               <mat-label>State</mat-label>
               <input matInput [disabled]="true" [value]="ag.approved" />
             </mat-form-field>
           </div>
 
+
+          <!---- MODIFY DESCRIPTION ----> 
           <mat-form-field appearance="outline" class="field-full">
             <mat-label>Modify Description</mat-label>
             <input matInput [disabled]="true" [value]="ag.modifyDescription" />
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="field-full" *ngIf="ag.lecturerReason">
+          <!---- LECTURER REASON ----> 
+          <mat-form-field appearance="outline" class="field-full" *ngIf="userIsLecturer() || ag.lecturerReason">
             <mat-label>Lecturer Reason</mat-label>
-            <input matInput [disabled]="true" [value]="ag.lecturerReason" />
+            
+            <input matInput 
+                  [(ngModel)]="ag.lecturerReason" 
+                  [disabled]="!userIsLecturer()"/>
           </mat-form-field>
+
+          <!---- APPROVED ----> 
+          <mat-form-field appearance="outline" class="field-full" *ngIf="ag.approved && userIsLecturer()">
+            <mat-label>State</mat-label>
+            <ng-container *ngIf="userIsLecturer() ; else studentApprovedBlock"> 
+              <mat-select [disabled]="!userIsLecturer()" [(ngModel)]="ag.approved">
+                <mat-option *ngFor="let state of approvedState" [value]="state">
+                    {{ state }}
+                </mat-option>
+              </mat-select>
+            </ng-container>
+            
+            <ng-template #studentApprovedBlock> 
+              <input matInput [disabled]="true" [value]="ag.approved" />
+            </ng-template>
+          </mat-form-field>
+
+
+          <!---- DECISION DATE ---
+          <mat-form-field appearance="outline" class="field-full" *ngIf="ag.decisionDate">
+            <mat-label>Decision Date</mat-label>
+            <ng-container *ngIf="userIsLecturer() ; else studentDecisionDateBlock"> 
+
+              <mat-form-field>
+                <mat-label>Decision Date</mat-label>
+                <input matInput [matDatepicker]="picker">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+
+
+            </ng-container>
+            
+            <ng-template #studentDecisionDateBlock> 
+              <input matInput [disabled]="true" [value]="ag.decisionDate | date:'MM/dd/yyyy'" />
+            </ng-template>
+          </mat-form-field>
+          --->
+
+          <!---- DECISION DATE ----> 
+          <ng-container *ngIf="ag.decisionDate">
+            
+            <!-- Lecturer -->
+            <mat-form-field appearance="outline" class="field-full" *ngIf="userIsLecturer(); else studentDecisionDateBlock">
+              <mat-label>Decision Date</mat-label>
+              <input matInput [matDatepicker]="picker" [(ngModel)]="ag.decisionDate">
+              <mat-hint>MM/DD/YYYY</mat-hint>
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <!-- Student -->
+            <ng-template #studentDecisionDateBlock> 
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Decision Date</mat-label>
+                <input matInput [disabled]="true" [ngModel]="ag.decisionDate | date:'MM/dd/yyyy'" />
+              </mat-form-field>
+            </ng-template>
+
+          </ng-container>
+
+
+
+          <button mat-fab color="primary" class="save-button" *ngIf="userIsLecturer()" (click)="onAgreementUpdate(ag)">
+            <mat-icon>save</mat-icon>
+          </button>
 
         </div>
 
@@ -51,7 +127,8 @@
     <p>No Learning Agreement uploaded for this application.</p>
   </ng-template>
 
-  <div class="agreement-item agreement-upload-card">
+  
+  <div class="agreement-item agreement-upload-card" *ngIf="!userIsLecturer()">
     <p>Add new learning agreement</p>
     <div class="agreement-content">
 
