@@ -67,6 +67,12 @@ export class ApplicationHttpService {
     );
   }
 
+  get_all_application(): Observable<Application[]> {
+    return this.http.get<any>( this.us.url + '/applications', this.create_options() ).pipe(
+      map((response) => response.q),
+      catchError( this.handleError )
+    );
+  }
 
   post_application_by_matrNumber( m : Application): Observable<ApiResponse> {
     return this.http.post<ApiResponse>( this.us.url + '/applications' + '/' + m.matrNumber, m, this.create_options() ).pipe(

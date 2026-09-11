@@ -1,7 +1,13 @@
 <div class="grid-container">
   <app-navbar></app-navbar>
   <br>
-    <app-application-status></app-application-status>
+  <ng-container *ngFor="let application of applications">
+     <app-application-status
+        class="application-status"
+        [application]="application">
+    </app-application-status>
+    <br>
+  </ng-container>  
  
 
 

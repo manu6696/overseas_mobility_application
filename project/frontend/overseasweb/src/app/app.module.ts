@@ -50,6 +50,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {MatToolbarModule } from '@angular/material/toolbar';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -90,7 +92,8 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
         MatInputModule,
         MatSelectModule,
         MatToolbarModule,
-        MatDatepickerModule], 
+        MatDatepickerModule,
+        MatNativeDateModule], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },
@@ -98,6 +101,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
         { provide: ApplicationHttpService, useClass: ApplicationHttpService },
         { provide: HostHttpService, useClass: HostHttpService },
         { provide: TranscriptRecordHttpService, useClass: TranscriptRecordHttpService },
+        { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
         provideHttpClient(withInterceptorsFromDi())
     ] })
 export class AppModule { }

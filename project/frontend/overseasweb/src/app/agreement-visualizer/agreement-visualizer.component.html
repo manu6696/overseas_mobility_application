@@ -83,13 +83,12 @@
           --->
 
           <!---- DECISION DATE ----> 
-          <ng-container *ngIf="ag.decisionDate">
+          <ng-container *ngIf="true">
             
             <!-- Lecturer -->
             <mat-form-field appearance="outline" class="field-full" *ngIf="userIsLecturer(); else studentDecisionDateBlock">
               <mat-label>Decision Date</mat-label>
               <input matInput [matDatepicker]="picker" [(ngModel)]="ag.decisionDate">
-              <mat-hint>MM/DD/YYYY</mat-hint>
               <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>

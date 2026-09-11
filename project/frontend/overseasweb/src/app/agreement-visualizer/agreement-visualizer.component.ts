@@ -22,7 +22,7 @@ export class AgreementVisualizerComponent implements OnInit {
 
   public application: Application | null = null;
   public agreements: Agreement[] = [];
-  public userRoles : string[] = [];
+  public isLecturer: boolean = false;
   public fieldGroupEdited: FieldGroupEditor[] = [];
   public newModifyDescription: string = "";
   public newAgreement : Agreement | null = null;
@@ -43,7 +43,7 @@ export class AgreementVisualizerComponent implements OnInit {
 
 
   ngOnInit() {
-    this.userRoles = this.us.get_roles();
+    this.isLecturer = this.us.is_lecturer();
     this.fieldGroupEdited = this.getFieldsByCategoryEditor(this.data.application);
     this.get_agreement_list_by_query(this.data.application._id!);
     this.sio.connect().subscribe((m) => {
@@ -173,7 +173,7 @@ export class AgreementVisualizerComponent implements OnInit {
   }
 
   userIsLecturer() {
-    return this.us.is_lecturer();
+    return this.isLecturer;
   }
 
 

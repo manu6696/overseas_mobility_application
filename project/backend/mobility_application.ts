@@ -341,7 +341,7 @@ app.get("/api/v1/applications/", auth, (req,res,next) => {
 
     console.log(req.query);
 
-    if(req.query.referent) {
+    if(req.auth.roles.includes('LECTURER') && req.query.referent) {
       application.getModel().find( {referent: req.query.referent} ).then( 
         ( q )=> {
 
@@ -352,7 +352,7 @@ app.get("/api/v1/applications/", auth, (req,res,next) => {
       }).catch( (reason)=> {
           return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
       })
-    } else if( req.query.matrNumber ) {
+    } else if(req.auth.roles.includes('STUDENT') &&  req.query.matrNumber ) {
         application.getModel().find( {matrNumber: req.query.matrNumber} ).then( 
         ( q )=> {
 
@@ -363,8 +363,19 @@ app.get("/api/v1/applications/", auth, (req,res,next) => {
       }).catch( (reason)=> {
           return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
       })
-    } else {
-        return res.status(404).json( {error:true, errormessage:"no valid query parameters"} );
+    } else if(req.auth.roles.includes('STAFF')) {
+        application.getModel().find().then( 
+        ( q )=> {
+
+          if( q.length > 0)
+            return res.status(200).json( {q} );
+          else
+            return res.status(404).json( {error:true, errormessage:"no application present"} );
+      }).catch( (reason)=> {
+          return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+      })
+    }else {
+        return res.status(404).json( {error:true, errormessage:"no valid query parameters or not valid authorization"} );
     }
 });
 

@@ -164,13 +164,6 @@ export class UserHttpService {
     for ( let idx = 0; idx < roles.length; ++idx ) {
       returnedRoles.push(roles[idx]);
     }
-    console.log('Roels from user: ' + roles );
-    console.log('mail: ' + (jwt_decode(this.token) as TokenData).mail );
-    console.log('id: ' + (jwt_decode(this.token) as TokenData).id );
-    console.log('name: ' + (jwt_decode(this.token) as TokenData).name );
-    console.log('surname: ' + (jwt_decode(this.token) as TokenData).surname );
-    console.log('username: ' + (jwt_decode(this.token) as TokenData).username );
-    console.log('is_student: ' + this.is_student() );
     return returnedRoles;
 
   }
@@ -211,7 +204,6 @@ export class UserHttpService {
         return true;
       }
     }
-    console.log('IS STUDENT');
     return false;
   }
 
