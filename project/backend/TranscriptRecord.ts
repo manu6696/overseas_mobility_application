@@ -4,7 +4,8 @@ import mongoose = require('mongoose');
 
 interface CourseResult {
   code: String,
-  grade: String
+  grade: String,
+  approved: String
 }
 
 export interface TranscriptRecord {
@@ -25,7 +26,7 @@ export function isTranscriptRecord(arg: any): arg is TranscriptRecord {
     && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.records && Array.isArray(arg.records) 
-    && arg.uploadDate && arg.uploadDate instanceof Date;
+    && arg.uploadDate && arg.uploadDate instanceof Date
 }
 
 
@@ -46,6 +47,10 @@ const CourseResultSchema = new mongoose.Schema<CourseResult>({
         required: true 
     },
     grade: { 
+        type: String, 
+        required: true 
+    },
+    approved: { 
         type: String, 
         required: true 
     }

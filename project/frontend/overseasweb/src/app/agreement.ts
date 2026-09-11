@@ -34,3 +34,6 @@ export function isAgreement(arg: any): arg is Agreement {
     && typeof(arg.lecturerReason) == 'string'
     && arg.decisionDate && arg.decisionDate instanceof Date
 }
+
+
+

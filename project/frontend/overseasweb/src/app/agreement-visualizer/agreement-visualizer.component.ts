@@ -27,7 +27,7 @@ export class AgreementVisualizerComponent implements OnInit {
   public newModifyDescription: string = "";
   public newAgreement : Agreement | null = null;
   public selectedFile : File | null = null;
-  public approvedState: string[] = ['Pending', 'Approved','Rejected'];
+  public agreementState: string[] = ['Pending', 'Approved','Rejected'];
   @Output() posted = new EventEmitter<Application>();
 
   constructor( 

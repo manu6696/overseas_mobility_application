@@ -48,7 +48,7 @@
             <mat-label>State</mat-label>
             <ng-container *ngIf="userIsLecturer() ; else studentApprovedBlock"> 
               <mat-select [disabled]="!userIsLecturer()" [(ngModel)]="ag.approved">
-                <mat-option *ngFor="let state of approvedState" [value]="state">
+                <mat-option *ngFor="let state of agreementState" [value]="state">
                     {{ state }}
                 </mat-option>
               </mat-select>

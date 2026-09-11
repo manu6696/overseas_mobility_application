@@ -3,6 +3,7 @@
 interface CourseResult {
   code: string;
   grade: string;
+  approved: string;
 }
 
 export interface TranscriptRecord {

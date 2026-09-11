@@ -82,7 +82,7 @@ export class ApplicationHttpService {
 
   put_application_by_id( m: Application): Observable<Application> {
     console.log('Updating ' + JSON.stringify(m) );
-    return this.http.put<any>( this.us.url + '/applications' + '/' + m.id, m,  this.create_options() ).pipe(
+    return this.http.put<any>( this.us.url + '/applications' + '/' + m._id, m,  this.create_options() ).pipe(
       catchError(this.handleError)
     );
   }

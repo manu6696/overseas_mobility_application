@@ -24,6 +24,7 @@
 
         <section class="button-section">
           
+          <!----- Editor ---->
           <button mat-fab 
                   color="primary" 
                   class="edit-button" 
@@ -32,6 +33,7 @@
             <mat-icon>edit</mat-icon>
           </button>
 
+          <!----- Delete ---->
           <button mat-fab 
                   color="warn" 
                   class="delete-button" 
@@ -51,21 +53,55 @@
               <button mat-flat-button  class="confirm-delete-button" (click)="confirmDelete(application._id!)">Delete</button>
             </mat-dialog-actions>
           </ng-template>
+
+          <!----- State (Only for staff) ----->
+          <ng-container *ngIf="userIsStaff() && preDepartureVerified()"> 
+            <button mat-fab 
+                    color="warn" 
+                    class="phase-button" 
+                    (click)="openApplicationPhase(phaseDialogTemplate)"
+                    aria-label="Modifica">
+              <mat-icon>assignment_turned_in</mat-icon>
+            </button>
+
+            <ng-template #phaseDialogTemplate>
+              <h2 mat-dialog-title>Phase changing</h2>
+
+              <mat-dialog-content>
+                <mat-form-field appearance="outline" style="width: 100%; margin-top: 8px;">
+                  <mat-label>State</mat-label>
+                  <mat-select [(ngModel)]="applicationStateSelected">
+                    <mat-option *ngFor="let state of applicationState" [value]="state">
+                      {{ state }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </mat-dialog-content>
+
+              <mat-dialog-actions align="end">
+                <button mat-flat-button class="back-delete-button" mat-dialog-close>Back</button>
+                <button mat-flat-button class="confirm-delete-button" (click)="confirmPhaseUpdate(application)">Update</button>
+              </mat-dialog-actions>
+            </ng-template>
+          </ng-container>
+
         </section>
 
 
         <span class="toolbar-space-1"></span>
 
 
+        <!----- Transcript of records ---->
         <span class="transcript-records-button-wrapper">
           <button mat-fab extended class="transcript-records-button" 
-                  *ngIf="application.status === 'Approved'"
+                  *ngIf="application.status === 'Waiting for exam score approval'"
                   (click)="openRecordsDialog()">
             <span>Transcript of Records</span>
             <mat-icon iconPositionEnd>open_in_new</mat-icon>
           </button>
         </span>
       
+      <!----- Agreement ---->
       <span class="agreement-button-wrapper">
         <button mat-fab extended class="agreement-button" 
                 (click)="openAgreementDialog()">          
@@ -84,7 +120,6 @@
     <br>
 
     <!-------- GENERAL  ---------->
-
     <ng-container *ngFor="let fieldGroupResult of getFieldsByCategory(application); let isLast = last">
       <div class="fields-global-container">
       
@@ -105,6 +140,7 @@
       </ng-container>
 
     </ng-container>
+
     <!--------------- DIVIDER  ------------------>
     <mat-divider class="section-divider"/>
 

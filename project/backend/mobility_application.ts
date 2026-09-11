@@ -676,7 +676,7 @@ app.post("/api/v1/transcriptRecords", auth, (req,res,next) => {
   console.log("Received: " + JSON.stringify(req.body) );
   let recvtranscriptRecords= req.body;
   recvtranscriptRecords.uploadDate = new Date();
-
+  
   if(transcriptRecord.isTranscriptRecord(recvtranscriptRecords)) {
 
     transcriptRecord.getModel().create(recvtranscriptRecords).then((data) => {
@@ -1230,8 +1230,8 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
         .getModel()
         .create({
           records: [
-            { code: "CS999", grade: "25" },
-            { code: "CS992", grade: "26" }
+            { code: "CS999", grade: "25", approved: "Pending" },
+            { code: "CS992", grade: "26", approved: "Pending" }
           ],
           uploadDate: new Date(),
           applicationid: application1._id,

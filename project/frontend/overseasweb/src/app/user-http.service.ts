@@ -197,7 +197,6 @@ export class UserHttpService {
   }
 
   is_student(): boolean {
-    console.log('Payload completo del JWT:', jwt_decode(this.token));
     const roles = (jwt_decode(this.token) as TokenData).roles;
     for ( let idx = 0; idx < roles.length; ++idx ) {
       if ( roles[idx] === 'STUDENT' ) {
@@ -208,7 +207,6 @@ export class UserHttpService {
   }
 
   is_lecturer(): boolean {
-    console.log('Payload completo del JWT:', jwt_decode(this.token));
     const roles = (jwt_decode(this.token) as TokenData).roles;
     for ( let idx = 0; idx < roles.length; ++idx ) {
       if ( roles[idx] === 'LECTURER' ) {
@@ -219,7 +217,6 @@ export class UserHttpService {
   }
 
   is_staff(): boolean {
-    console.log('Payload completo del JWT:', jwt_decode(this.token));
     const roles = (jwt_decode(this.token) as TokenData).roles;
     for ( let idx = 0; idx < roles.length; ++idx ) {
       if ( roles[idx] === 'STAFF' ) {

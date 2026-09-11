@@ -29,7 +29,19 @@ export class ApplicationStatusComponent implements OnInit {
   clonedCourses: CourseEval[] = [];
   public openConfirmDialog: boolean = false;
   public dialogConfirmDeletion: any;
+  public dialogApplicationPhase: any;
   public transcriptRecords: TranscriptRecord | null = null;
+  public isLecturer: boolean = false;
+  public isStaff: boolean = false;
+  public applicationState: string[] = [
+    'Created',
+    'Awaiting Agreement approval',
+    'Pre-departure completed',
+    'Mobility in progress',
+    'Waiting for exam score approval',
+    'Closed',
+    'Canceled'];
+  public applicationStateSelected: string = '';
 
   constructor( 
     private sio: SocketioService , 
@@ -43,6 +55,8 @@ export class ApplicationStatusComponent implements OnInit {
     { }
   
   ngOnInit() {
+    this.isLecturer = this.us.is_lecturer();
+    this.isStaff = this.us.is_staff();
     this.copyOfCourses();    
     this.openConfirmDialog = false;
   }
@@ -64,12 +78,20 @@ export class ApplicationStatusComponent implements OnInit {
   // Canceled
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Pending':
-        return 'status-pending';
-      case 'Approved':
-        return 'status-approved';
-      case 'Rejected':
-        return 'status-rejected';
+      case 'Created':
+        return 'status-default';
+      case 'Awaiting Agreement approval':
+        return 'status-agreement-approval';
+      case 'Pre-departure completed':
+        return 'status-predeparture';
+      case 'Mobility in progress':
+        return 'status-mobility';
+      case 'Waiting for exam score approval':
+        return 'status-score-approval';
+      case 'Closed':
+        return 'status-closed';
+      case 'Canceled':
+        return 'status-canceled';
       default:
         return 'status-default';
     }
@@ -134,7 +156,6 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
 
-
   getFieldsByCategory(app: Application): FieldGroupResult[] {
     const applicationKeys = Object.keys(app);
     let groups : FieldGroupResult[] = [];
@@ -158,14 +179,10 @@ export class ApplicationStatusComponent implements OnInit {
         } else {
           groupsFinded.fields.push({label: metaKey.label, value: displayValue});
         }
-          
-        
       }
     }
-
     return groups;
   }
-
 
 
 
@@ -286,6 +303,57 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
   get_transcript_by_id(id: string){
+    
+  }
+
+
+  // Open application phase windows
+  openApplicationPhase(templateRef: TemplateRef<any>) {
+    this.dialogApplicationPhase = this.dialog.open(templateRef,{
+      width: '800px',
+      maxWidth: '90vw',
+      maxHeight: '85vh'
+    });
+
+    this.dialogApplicationPhase .afterClosed().subscribe((updatedApplication: Application) => {
+      if (updatedApplication) {
+        console.log('Dati ricevuti dal dialog:', updatedApplication);
+        
+        this.applicationModified.emit(updatedApplication._id);
+        this.clonedCourses = updatedApplication.courses;
+      }
+    });
+  }
+
+
+  userIsLecturer() {
+    return this.isLecturer;
+  }
+
+  userIsStaff() {
+    return this.isStaff;
+  }
+
+  confirmPhaseUpdate(application: Application) {
+
+    console.log(application);
+    application.status = this.applicationStateSelected;
+    this.ap.put_application_by_id(application).subscribe({
+      next: () => {
+        console.log("Application successfully modified.");
+        //this.posted.emit(this.data.application);
+        this.dialogApplicationPhase.close();
+      },
+      error:(err) => {
+        console.log('Error occurred while putting: ' + err);
+      }
+
+    });
+
+  }
+
+
+  preDepartureVerified() {
     
   }
 
