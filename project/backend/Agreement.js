@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAgreement = isAgreement;
+exports.isPartialAgreement = isPartialAgreement;
 exports.getSchema = getSchema;
 exports.getModel = getModel;
 const mongoose = require("mongoose");
@@ -18,7 +19,21 @@ function isAgreement(arg) {
         && arg.filename && typeof (arg.filename) == 'string'
         && arg.mimetype && typeof (arg.mimetype) == 'string'
         && arg.uploadDate && arg.uploadDate instanceof Date
+        && arg.courses && Array.isArray(arg.courses)
         && typeof (arg.modified) == 'boolean';
+}
+function isPartialAgreement(arg) {
+    const hasValidData = arg
+        && arg.applicationid && typeof (arg.applicationid) == 'string'
+        && arg.matrNumber && typeof (arg.matrNumber) == 'string'
+        && arg.uploadDate && arg.uploadDate instanceof Date
+        && arg.courses && Array.isArray(arg.courses)
+        && typeof (arg.modified) == 'boolean';
+    const hasFile = !!arg.content;
+    const hasValidFile = !hasFile || (arg.content.byteLength > 0
+        && arg.filename && typeof (arg.filename) == 'string'
+        && arg.mimetype && typeof (arg.mimetype) == 'string');
+    return hasValidData && hasValidFile;
 }
 // We use Mongoose to perform the ODM between our application and
 // mongodb. To do that we need to create a Schema and an associated
@@ -28,6 +43,30 @@ function isAgreement(arg) {
 // of correctly matching the Agreement interface with the Agreementchema 
 //
 // Mongoose Schema.
+const CourseSchema = new mongoose.Schema({
+    code: {
+        type: String,
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    credits: {
+        type: Number,
+        required: true
+    }
+}, { _id: false });
+const CourseEvalSchema = new mongoose.Schema({
+    originalCourse: {
+        type: CourseSchema,
+        required: true
+    },
+    equivalentCourse: {
+        type: CourseSchema,
+        required: true
+    }
+});
 let AgreementSchema = new mongoose.Schema({
     filename: {
         type: mongoose.SchemaTypes.String,
@@ -72,6 +111,10 @@ let AgreementSchema = new mongoose.Schema({
     decisionDate: {
         type: mongoose.SchemaTypes.Date,
         required: false
+    },
+    courses: {
+        type: [CourseEvalSchema],
+        required: true
     }
 });
 function getSchema() { return AgreementSchema; }

@@ -57,12 +57,12 @@ export class AgreementVisualizerComponent implements OnInit {
 
     this.ag.get_agreement_list_no_content_by_query({applicationid}).subscribe( {
       next: (agreements) => {
-        console.log("Application successfully received.");
+        console.log("Agreement successfully received.");
         this.agreements = agreements;
         
       },
       error: (err) => {
-        // Application not found
+        // Agreement not found
           this.agreements = [];
       }
     });
@@ -107,9 +107,9 @@ export class AgreementVisualizerComponent implements OnInit {
 
 
   // Open a new windows for the learning agreement pdf
-  openPdfViewer(applicationId: string) {
-    console.log("Application id Is: " + applicationId);
-    this.ag.get_agreement_by_id(applicationId).subscribe({
+  openPdfViewer(agreementId: string) {
+    console.log("Agreement id Is: " + agreementId);
+    this.ag.get_agreement_by_id(agreementId).subscribe({
       next: (blob: Blob) => {        
 
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
@@ -136,12 +136,15 @@ export class AgreementVisualizerComponent implements OnInit {
     }
   }
 
-  // Saving agreement
+  // Saving agreement (needed by student)
   onAgreementSave() {
     const formData = new FormData();
   
     const date = new Date;
-    formData.append('agreement', this.selectedFile!);
+
+    if (this.selectedFile) {
+      formData.append('agreement', this.selectedFile);
+    }
     formData.append('matrNumber', this.data.application.matrNumber);
     formData.append('modifyDescription', this.newModifyDescription);
 
@@ -155,14 +158,16 @@ export class AgreementVisualizerComponent implements OnInit {
       }
     });
 
+    this.posted.emit(this.data.application);
   }
 
-  // Updating agreement
+  // Updating agreement (needed by lecturers)
   onAgreementUpdate(agreement: Agreement) {
 
     this.ag.put_agreement(agreement).subscribe({
       next: () => {
         this.ag.get_agreement_by_id(agreement._id!);
+        this.ap.get_application_by_matrNumber(this.us.get_username());
       },
       error: (err) => {
         console.error("Error updating agreement:", err);

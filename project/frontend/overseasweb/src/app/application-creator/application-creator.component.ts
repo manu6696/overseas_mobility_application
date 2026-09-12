@@ -41,7 +41,7 @@ export class ApplicationCreatorComponent {
       hostCity: '',
       courses: [],
       referent: '',
-      approved: false,
+      agreementApproved: false,
       modified: false,
       lecturerReason: ''
     };
@@ -163,7 +163,7 @@ export class ApplicationCreatorComponent {
       hostCity: '',
       courses: [],
       referent: '',
-      approved: false,
+      agreementApproved: false,
       modified: false,
       lecturerReason: ''
     };

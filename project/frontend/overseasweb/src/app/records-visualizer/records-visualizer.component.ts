@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Application, APPLICATION_FIELD_META, FIELD_GROUP_LABELS, FieldGroupEditor, GroupedFieldEditor, dateOptions} from '../application';
-import { TranscriptRecord } from '../transcriptRecord';
+import { TranscriptRecord, CourseResult } from '../transcriptRecord';
 import { Host } from '../host';
 import { HostHttpService } from '../host-http.service';
 import { UserHttpService } from '../user-http.service';
@@ -24,6 +24,15 @@ export class RecordsVisualizerComponent implements OnInit{
   public clonedTranscriptRecords: string[] = []
   public userRoles : string[] = [];
   public fieldGroupEdited: FieldGroupEditor[] = [];
+  public examDate : Date[] = [];
+  public isLecturer: boolean = false;
+  public selectedFile : File | null = null;
+  public recordState: string[] = [
+    'Pending',
+    'Approved',
+    'Rejected'];
+  public recordStateSelected: string[] = [];
+  @Output() posted = new EventEmitter<Application>();
 
   constructor( 
     public dialogRef: MatDialogRef<RecordsVisualizerComponent>,
@@ -40,47 +49,97 @@ export class RecordsVisualizerComponent implements OnInit{
     private rec: TranscriptRecordHttpService) 
   { }
 
-  @Output() posted = new EventEmitter<Application>();
-
-
-
   ngOnInit() {
     this.userRoles = this.us.get_roles();
-    
+    this.isLecturer = this.us.is_lecturer();
     //this.clonedTranscriptRecords = this.data.application.courses.map(() => 0);
     this.clonedTranscriptRecords = this.data.transcriptRecords.records.map((elemento) => {
       return elemento.grade;
     })
+
+    this.examDate = this.data.transcriptRecords.records.map((elemento) => {
+      return elemento.examDate;
+    })
+
+    this.recordStateSelected = this.data.transcriptRecords.records.map((elemento) => {
+      return elemento.approved;
+    })
   }
 
-  recordsSaveChanges() {
-    
-    this.data.transcriptRecords.applicationid = this.data.application._id ?? '';
-    this.data.transcriptRecords.matrNumber = this.data.application?.matrNumber;   
-    this.data.transcriptRecords.records = this.data.application.courses.map((elemento, index) => {
+  buildRecordsPayload() {
+    return this.data.application.courses.map((elemento, index) => {
       return {
         code: elemento.equivalentCourse.code,
-        grade: this.clonedTranscriptRecords[index]
+        grade: this.clonedTranscriptRecords[index],
+        examDate: this.examDate[index],
+        approved: this.recordStateSelected[index] ?? 'Pending'
       }
     });
 
-    this.rec.put_transcript(this.data.transcriptRecords).subscribe({
-      next: () => {
-        console.log("Transcript of records succesfully modified");
-        this.dialogRef.close();
-      },
-      error: (err) => {
-        console.log('Error occurred while putting: ' + err);
-      }
-    });
 
   }
+
+  userIsLecturer() {
+    return this.isLecturer;
+  }
+
+  // Selecting the file
+  onFileSelected(evento: Event) {
+    let inputElement = evento.target as HTMLInputElement;
+    let file = inputElement.files?.item(0);
+
+    if(file && file.type === 'application/pdf') {
+      this.selectedFile = file;
+
+    } else {
+      console.log("Error: file is not a pdf");
+    }
+  }
+
+  // Saving transcript
+  onTranscriptSave() {
+    const formData = new FormData();
+    formData.append('applicationid', this.data.application._id!);
+    formData.append('matrNumber', this.data.application.matrNumber);
+    formData.append('records', JSON.stringify(this.buildRecordsPayload()));
+
+    if (this.selectedFile) {
+      formData.append('transcriptRecords', this.selectedFile);
+    }
+
+    const isUpdate = !!this.data.transcriptRecords?._id;
+
+    const request$ = isUpdate
+      ? this.rec.put_transcript(formData, this.data.application._id!)
+      : this.rec.post_transcript(formData);
+
+    request$.subscribe({
+      next: () => {
+        this.rec.get_transcript_by_id(this.data.application._id!).subscribe({
+          next: (tr) => this.data.transcriptRecords = tr,
+          error: (err) => console.error(err)
+        });
+      },
+      error: (err) => console.error("Errore salvataggio transcript:", err)
+    });
+  }
   
-  
 
+  // Open a new windows for the learning agreement pdf
+  openPdfViewer(applicationId: string) {
+    console.log("Application id Is: " + applicationId);
+    this.rec.get_transcript_file_by_id(applicationId).subscribe({
+      next: (blob: Blob) => {        
 
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(pdfBlob);
 
-
-
+        window.open(blobUrl, '_blank');
+      },
+      error: (err) => {
+        console.error("Error retrieving PDF:", err);
+      }
+    });
+  }
 
 }

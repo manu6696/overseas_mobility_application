@@ -27,7 +27,7 @@ function isApplication(arg) {
         && arg.hostCity && typeof (arg.hostCity) == 'string'
         && arg.courses && Array.isArray(arg.courses)
         && arg.referent && typeof (arg.referent) == 'string'
-        && typeof (arg.approved) == 'boolean'
+        && typeof (arg.agreementApproved) == 'boolean'
         && typeof (arg.modified) == 'boolean'
         && typeof (arg.lecturerReason) == 'string';
 }
@@ -131,7 +131,7 @@ let ApplicationSchema = new mongoose.Schema({
         type: mongoose.SchemaTypes.String,
         required: true
     },
-    approved: {
+    agreementApproved: {
         type: mongoose.SchemaTypes.Boolean,
         required: true
     },
@@ -141,6 +141,18 @@ let ApplicationSchema = new mongoose.Schema({
     },
     lecturerReason: {
         type: mongoose.SchemaTypes.String,
+        required: false
+    },
+    preDepartureCompleted: {
+        type: mongoose.SchemaTypes.Boolean,
+        required: false
+    },
+    arrivalDate: {
+        type: mongoose.SchemaTypes.Date,
+        required: false
+    },
+    departureDate: {
+        type: mongoose.SchemaTypes.Date,
         required: false
     }
 });

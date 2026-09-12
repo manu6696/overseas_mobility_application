@@ -29,9 +29,12 @@ export interface Application {
     hostCity: string;
     courses: CourseEval[];
     referent: string;
-    approved: Boolean;
+    agreementApproved: Boolean;
     modified: Boolean;
     lecturerReason: string;
+    preDepartureCompleted?: Boolean;
+    arrivalDate?: Date;
+    departureDate?: Date;
 }
 
 // User defined type guard
@@ -57,7 +60,7 @@ export function isApplication(arg: any): arg is Application {
     && arg.hostCity && typeof(arg.hostCity) == 'string' 
     && arg.courses && Array.isArray(arg.courses)
     && arg.referent && typeof(arg.referent) == 'string'
-    && typeof(arg.approved) == 'boolean'
+    && typeof(arg.agreementApproved) == 'boolean'
     && typeof(arg.modified) == 'boolean'
     && typeof(arg.lecturerReason) == 'string'
 }
@@ -74,7 +77,8 @@ interface FieldMeta {
 }
 
 
-export type FieldGroup = 'student'| 'general'| 'sendingInst'| 'hostingInst'| 'lecturer'| 'system' | 'courses';
+export type FieldGroup = 'student'| 'general'| 'sendingInst'| 'hostingInst'| 'lecturer'| 'system' | 'courses' | 'mobilityDate';
+export const GROUP_ORDER: FieldGroup[] = ['general', 'mobilityDate', 'student', 'sendingInst', 'hostingInst', 'lecturer', 'courses', 'system'];
 
 export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
 
@@ -144,6 +148,20 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
 
+    arrivalDate : {
+        label: 'Arrival Date', 
+        group: 'mobilityDate', 
+        hidden: false, 
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
+    },
+
+    departureDate : {
+        label: 'Departure Date', 
+        group: 'mobilityDate', 
+        hidden: false, 
+        editableFrom: ['ADMIN', 'MODERATOR', 'STUDENT', 'LECTURER', 'STAFF']
+    },
+
     // Sending institution
     departement : {
         label: 'Departement', 
@@ -211,8 +229,8 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
     },
     
-    approved : {
-        label: 'Approved', 
+    agreementApproved : {
+        label: 'Agreement approved', 
         group: 'lecturer', 
         hidden: true, 
         editableFrom: ['ADMIN', 'MODERATOR', 'LECTURER', 'STAFF']
@@ -223,6 +241,13 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
         group: 'lecturer', 
         hidden: true, 
         editableFrom: []
+    },
+
+    preDepartureCompleted : {
+        label: 'Pre-departure Completed', 
+        group: 'general', 
+        hidden: false, 
+        editableFrom: ['ADMIN', 'MODERATOR', 'STAFF']
     }
 }
 
@@ -240,6 +265,7 @@ export interface FieldGroupResult {
 export const FIELD_GROUP_LABELS: Record<FieldGroup, string> = { 
     'student' : 'Student',
     'general': 'General',
+    'mobilityDate': 'Mobility Date',
     'sendingInst': 'Sending Institution',
     'hostingInst': 'Hosting Institution',
     'lecturer': 'Lecturer',

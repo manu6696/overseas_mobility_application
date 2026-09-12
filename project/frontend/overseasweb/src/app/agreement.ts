@@ -1,4 +1,18 @@
 
+export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
+
+export interface Course {    
+    code: string;
+    title: string;
+    credits: number;
+}
+
+export interface CourseEval {
+    _id?: string;
+    originalCourse : Course;
+    equivalentCourse: Course;
+}
+
 export interface Agreement {
     _id?: string;
     filename: string;
@@ -7,11 +21,12 @@ export interface Agreement {
     uploadDate: Date;
     applicationid: string;
     matrNumber: string;
-    approved: string;
+    approved: ApprovalStatus;
     modified: boolean;
     modifyDescription: string;
     lecturerReason: string;
     decisionDate: Date;
+    courses: CourseEval[];
 }
 
 // User defined type guard
@@ -22,18 +37,13 @@ export interface Agreement {
 //
 export function isAgreement(arg: any): arg is Agreement {
     return arg 
-    && arg.content.byteLength > 0
+    && !!arg.content && arg.content.byteLength > 0
     && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.filename && typeof(arg.filename) == 'string' 
     && arg.mimetype && typeof(arg.mimetype) == 'string'
     && arg.uploadDate && arg.uploadDate instanceof Date
-    && arg.approved && typeof(arg.approved) == 'string'
     && arg.modifyDescription && typeof(arg.modifyDescription) == 'string'
+    && arg.courses && Array.isArray(arg.courses)
     && typeof(arg.modified) == 'boolean'
-    && typeof(arg.lecturerReason) == 'string'
-    && arg.decisionDate && arg.decisionDate instanceof Date
 }
-
-
-

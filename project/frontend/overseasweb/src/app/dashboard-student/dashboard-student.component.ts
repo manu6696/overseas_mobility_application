@@ -75,7 +75,7 @@ export class DashboardStudentComponent implements OnInit  {
           hostCity: '',
           courses: [],
           referent: '',
-          approved: false,
+          agreementApproved: false,
           modified: false,
           lecturerReason: 'No reason provided',
     };

@@ -1,13 +1,18 @@
 
+import { ApprovalStatus } from "./agreement";
 
-interface CourseResult {
+export interface CourseResult {
   code: string;
   grade: string;
-  approved: string;
+  examDate: Date;
+  approved: ApprovalStatus;
 }
 
 export interface TranscriptRecord {
     _id?: string;
+    filename: string;
+    content?: any;
+    mimetype: string;
     records: CourseResult[];
     uploadDate: Date;
     applicationid: string;
@@ -22,10 +27,11 @@ export interface TranscriptRecord {
 //
 export function isTranscriptRecord(arg: any): arg is TranscriptRecord {
     return arg 
+    && arg.content && arg.content.byteLength > 0
+    && arg.filename && typeof(arg.filename) == 'string'
+    && arg.mimetype && typeof(arg.mimetype) == 'string'
     && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.records && Array.isArray(arg.records) 
     && arg.uploadDate && arg.uploadDate instanceof Date;
 }
-
-

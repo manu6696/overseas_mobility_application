@@ -54,8 +54,47 @@
             </mat-dialog-actions>
           </ng-template>
 
+          <!----- Arrival and departure date (Only if in progress) ---->
+          <ng-container *ngIf="application.status === 'Mobility in progress'"> 
+            <button mat-fab 
+                    color="warn" 
+                    class="delete-button" 
+                    (click)="openDateDialog(dateDialogTemplate)"
+                    *ngIf="userIsStudent()"
+                    aria-label="Elimina">
+              <mat-icon>calendar_today</mat-icon>
+            </button>
+
+
+            <ng-template #dateDialogTemplate>
+              <h2 mat-dialog-title class="date-title">Enter dates of arrival and departure</h2>
+
+              <mat-dialog-content class="dialog-form-container">
+                <mat-form-field appearance="outline" class="field-date">
+                  <mat-label>Arrival Date</mat-label>      
+                  <input matInput [matDatepicker]="pickerArrival" [(ngModel)]="arrivalDateSelected">
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerArrival"></mat-datepicker-toggle>
+                  <mat-datepicker #pickerArrival></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-date">
+                  <mat-label>Departure Date</mat-label>      
+                  <input matInput [matDatepicker]="pickerDeparture" [(ngModel)]="departureDateSelected">
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerDeparture"></mat-datepicker-toggle>
+                  <mat-datepicker #pickerDeparture></mat-datepicker>
+                </mat-form-field>
+
+                <mat-dialog-actions align="end">
+                  <button mat-flat-button  class="back-delete-button" mat-dialog-close>Back</button>
+                  <button mat-flat-button  class="confirm-delete-button" (click)="confirmUpdateDate(application)">Update</button>
+                </mat-dialog-actions>
+              </mat-dialog-content>
+            </ng-template>
+          </ng-container>
+
+
           <!----- State (Only for staff) ----->
-          <ng-container *ngIf="userIsStaff() && preDepartureVerified()"> 
+          <ng-container *ngIf="userIsStaff() && application.agreementApproved"> 
             <button mat-fab 
                     color="warn" 
                     class="phase-button" 

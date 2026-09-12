@@ -44,31 +44,50 @@ export class TranscriptRecordHttpService {
 
   }
 
-  post_transcript( m: TranscriptRecord ): Observable<TranscriptRecord> {
-    console.log('Posting ' + JSON.stringify(m) );
-    return this.http.post<TranscriptRecord>( this.us.url + '/transcriptRecords', m,  this.create_options() ).pipe(
+  private create_options_multipart( params = {} ) {
+    return  {
+      headers: new HttpHeaders({
+        authorization: 'Bearer ' + this.us.get_token(),
+        'cache-control': 'no-cache'
+      }),
+      params: new HttpParams( {fromObject: params} )
+    };
+
+  }
+
+  post_transcript( m: FormData ): Observable<TranscriptRecord> {
+    console.log('Posting ' +  m.get );
+    return this.http.post<TranscriptRecord>( this.us.url + '/transcriptRecords', m,  this.create_options_multipart() ).pipe(
       catchError(this.handleError)
     );
   }
 
-  get_transcript_by_id( id: string ): Observable<TranscriptRecord> {
-    console.log('Getting Transcript of Records ' + id );
-    return this.http.get<any>( this.us.url + '/transcriptRecords' + '/' + id,  this.create_options() ).pipe(
+  get_transcript_by_id( applicationid: string ): Observable<TranscriptRecord> {
+    console.log('Getting Transcript of Records ' + applicationid );
+    return this.http.get<any>( this.us.url + '/transcriptRecords' + '/' + applicationid,  this.create_options() ).pipe(
       map((response) => response.q),
       catchError(this.handleError)
     );
   }
 
-  delete_transcript( id: string): Observable<TranscriptRecord> {
-    console.log('Deleting Transcript of Records ' + id );
-    return this.http.delete<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + id,  this.create_options() ).pipe(
+  get_transcript_file_by_id( applicationid: string ): Observable<Blob> {
+    console.log('Getting Transcript of Records ' + applicationid );
+    return this.http.get(this.us.url + '/transcriptRecords' + '/' + applicationid + '/file', {
+      ...this.create_options(),
+      responseType: 'blob'
+    } );
+  }
+
+  delete_transcript( applicationid: string): Observable<TranscriptRecord> {
+    console.log('Deleting Transcript of Records ' + applicationid );
+    return this.http.delete<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + applicationid,  this.create_options() ).pipe(
       catchError(this.handleError)
     );
   }
 
-  put_transcript(m: TranscriptRecord ): Observable<TranscriptRecord> {
-    console.log('Updating ' + JSON.stringify(m) );
-    return this.http.put<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + m.applicationid, m,  this.create_options() ).pipe(
+  put_transcript( m: FormData, applicationId: string ): Observable<TranscriptRecord> {
+    console.log('Updating ' +  m.get );
+    return this.http.put<TranscriptRecord>( this.us.url + '/transcriptRecords' + '/' + applicationId, m,  this.create_options_multipart() ).pipe(
       catchError(this.handleError)
     );
   }

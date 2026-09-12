@@ -24,7 +24,8 @@ export class ApplicationEditorComponent implements OnInit {
   public fieldGroupEdited: FieldGroupEditor[] = [];
   public semesters: string[] = ['Autumn/Fall', 'Spring','Full Academic Year'];
   public lecturers: any[] = [];
-  
+  @Output() posted = new EventEmitter<Application>();
+
   constructor( 
     public dialogRef: MatDialogRef<ApplicationEditorComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { 
@@ -37,8 +38,6 @@ export class ApplicationEditorComponent implements OnInit {
     private router: Router,  
     private sanitizer: DomSanitizer) 
   { }
-
-  @Output() posted = new EventEmitter<Application>();
     
 
   ngOnInit() {
@@ -71,7 +70,7 @@ export class ApplicationEditorComponent implements OnInit {
       hostCity: '',
       courses: [],
       referent: '',
-      approved: false,
+      agreementApproved: false,
       modified: false,
       lecturerReason: ''
     };

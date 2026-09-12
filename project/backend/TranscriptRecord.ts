@@ -1,14 +1,18 @@
 
 import mongoose = require('mongoose');
-
+import { ApprovalStatus } from './Agreement';
 
 interface CourseResult {
   code: String,
   grade: String,
-  approved: String
+  examDate: Date,
+  approved: ApprovalStatus
 }
 
 export interface TranscriptRecord {
+    filename: String,
+    content: Buffer,
+    mimetype: String,
     records: CourseResult[],
     uploadDate: Date,
     applicationid: String,
@@ -23,13 +27,30 @@ export interface TranscriptRecord {
 //
 export function isTranscriptRecord(arg: any): arg is TranscriptRecord {
     return arg 
+    && !!arg.content && arg.content.byteLength > 0
+    && arg.filename && typeof(arg.filename) == 'string'
+    && arg.mimetype && typeof(arg.mimetype) == 'string'
     && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.records && Array.isArray(arg.records) 
     && arg.uploadDate && arg.uploadDate instanceof Date
 }
 
+export function isPartialTranscriptRecord(arg: any): arg is TranscriptRecord {
+    const hasValidData = arg 
+        && arg.applicationid && typeof(arg.applicationid) == 'string'
+        && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
+        && arg.records && Array.isArray(arg.records);
 
+    const hasFile = !!arg.content;
+    const hasValidFile = !hasFile || (
+        arg.content.byteLength > 0
+        && arg.filename && typeof(arg.filename) == 'string'
+        && arg.mimetype && typeof(arg.mimetype) == 'string'
+    );
+
+    return hasValidData && hasValidFile;
+}
 
 
 // We use Mongoose to perform the ODM between our application and
@@ -50,13 +71,29 @@ const CourseResultSchema = new mongoose.Schema<CourseResult>({
         type: String, 
         required: true 
     },
+    examDate: {
+        type: mongoose.SchemaTypes.Date,
+        required: false
+    },
     approved: { 
         type: String, 
-        required: true 
+        required: false 
     }
 }, { _id: false });
 
 let TranscriptRecordSchema = new mongoose.Schema<TranscriptRecord>( {
+    filename: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
+    content: {
+        type: Buffer,
+        required: true
+    },
+    mimetype: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
     records: {
         type: [CourseResultSchema],
         required: true

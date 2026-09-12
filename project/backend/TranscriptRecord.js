@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isTranscriptRecord = isTranscriptRecord;
+exports.isPartialTranscriptRecord = isPartialTranscriptRecord;
 exports.getSchema = getSchema;
 exports.getModel = getModel;
 const mongoose = require("mongoose");
@@ -12,10 +13,24 @@ const mongoose = require("mongoose");
 //
 function isTranscriptRecord(arg) {
     return arg
+        && !!arg.content && arg.content.byteLength > 0
+        && arg.filename && typeof (arg.filename) == 'string'
+        && arg.mimetype && typeof (arg.mimetype) == 'string'
         && arg.applicationid && typeof (arg.applicationid) == 'string'
         && arg.matrNumber && typeof (arg.matrNumber) == 'string'
         && arg.records && Array.isArray(arg.records)
         && arg.uploadDate && arg.uploadDate instanceof Date;
+}
+function isPartialTranscriptRecord(arg) {
+    const hasValidData = arg
+        && arg.applicationid && typeof (arg.applicationid) == 'string'
+        && arg.matrNumber && typeof (arg.matrNumber) == 'string'
+        && arg.records && Array.isArray(arg.records);
+    const hasFile = !!arg.content;
+    const hasValidFile = !hasFile || (arg.content.byteLength > 0
+        && arg.filename && typeof (arg.filename) == 'string'
+        && arg.mimetype && typeof (arg.mimetype) == 'string');
+    return hasValidData && hasValidFile;
 }
 // We use Mongoose to perform the ODM between our application and
 // mongodb. To do that we need to create a Schema and an associated
@@ -33,9 +48,29 @@ const CourseResultSchema = new mongoose.Schema({
     grade: {
         type: String,
         required: true
+    },
+    examDate: {
+        type: mongoose.SchemaTypes.Date,
+        required: false
+    },
+    approved: {
+        type: String,
+        required: false
     }
 }, { _id: false });
 let TranscriptRecordSchema = new mongoose.Schema({
+    filename: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
+    content: {
+        type: Buffer,
+        required: true
+    },
+    mimetype: {
+        type: mongoose.SchemaTypes.String,
+        required: true
+    },
     records: {
         type: [CourseResultSchema],
         required: true

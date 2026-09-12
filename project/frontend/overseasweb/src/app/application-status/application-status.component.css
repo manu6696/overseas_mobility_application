@@ -224,4 +224,29 @@
   padding: 4px;
 }
 
+.date-title {
+  text-align: center;
+  margin: 0 0 10px 0; /* Un po' di margine sotto al titolo ci sta sempre bene */
+}
+
+.dialog-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* !important serve a sovrascrivere il padding di default rigido di Angular Material */
+  padding-top: 15px !important; 
+  /* Se il padding non basta, questo impedisce ad Angular di tagliare i bordi */
+  overflow: visible !important; 
+}
+
+.field-date {
+  min-width: 120px;
+  width: 100%;
+  max-width: 400px;
+  /* Applichiamo un piccolo margine superiore direttamente al campo per abbassarlo rispetto al bordo fatale */
+  margin-top: 6px; 
+}
+
+
+
 

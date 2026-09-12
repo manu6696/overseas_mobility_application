@@ -2,13 +2,13 @@
 import mongoose = require('mongoose');
 
 
-interface Course {
+export interface Course {
     code: String,
     title: String,
     credits: Number,
 }
 
-interface CourseEval {
+export interface CourseEval {
     originalCourse : Course,
     equivalentCourse: Course,
 }
@@ -32,9 +32,12 @@ export interface Application {
     hostCity: String,
     courses: CourseEval[],
     referent: String,
-    approved: Boolean,
+    agreementApproved: Boolean,
     modified: Boolean,
-    lecturerReason: String
+    lecturerReason: String,
+    preDepartureCompleted?: Boolean,
+    arrivalDate?: Date,
+    departureDate?: Date
 }
 
 // User defined type guard
@@ -60,7 +63,7 @@ export function isApplication(arg: any): arg is Application {
     && arg.hostCity && typeof(arg.hostCity) == 'string' 
     && arg.courses && Array.isArray(arg.courses)
     && arg.referent && typeof(arg.referent) == 'string'
-    && typeof(arg.approved) == 'boolean'
+    && typeof(arg.agreementApproved) == 'boolean'
     && typeof(arg.modified) == 'boolean'
     && typeof(arg.lecturerReason) == 'string'
 }
@@ -179,7 +182,7 @@ let ApplicationSchema = new mongoose.Schema<Application>( {
         type: mongoose.SchemaTypes.String,
         required: true
     },    
-    approved: {
+    agreementApproved: {
         type: mongoose.SchemaTypes.Boolean,
         required: true
     },
@@ -189,6 +192,18 @@ let ApplicationSchema = new mongoose.Schema<Application>( {
     },
     lecturerReason: {
         type: mongoose.SchemaTypes.String,
+        required: false
+    },
+    preDepartureCompleted: {
+        type: mongoose.SchemaTypes.Boolean,
+        required: false
+    },
+    arrivalDate: {
+        type: mongoose.SchemaTypes.Date,
+        required: false
+    },
+    departureDate: {
+        type: mongoose.SchemaTypes.Date,
         required: false
     }
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, TemplateRef, Input, Output, EventEmitter } from '@angular/core';
-import { Application, APPLICATION_FIELD_META, FieldGroupResult,FieldGroupEditor, FieldGroup, GroupedField, FIELD_GROUP_LABELS, dateOptions, CourseEval } from '../application';
+import { Application, APPLICATION_FIELD_META, FieldGroupResult,GROUP_ORDER,FieldGroupEditor, FieldGroup, GroupedField, FIELD_GROUP_LABELS, dateOptions, CourseEval, isApplication } from '../application';
 import { TranscriptRecord } from '../transcriptRecord';
 import { ApplicationHttpService } from '../application-http.service';
 import { UserHttpService } from '../user-http.service';
@@ -33,6 +33,7 @@ export class ApplicationStatusComponent implements OnInit {
   public transcriptRecords: TranscriptRecord | null = null;
   public isLecturer: boolean = false;
   public isStaff: boolean = false;
+  public isStudent: boolean = false;
   public applicationState: string[] = [
     'Created',
     'Awaiting Agreement approval',
@@ -42,6 +43,8 @@ export class ApplicationStatusComponent implements OnInit {
     'Closed',
     'Canceled'];
   public applicationStateSelected: string = '';
+  public arrivalDateSelected: Date = new Date;
+  public departureDateSelected: Date = new Date;
 
   constructor( 
     private sio: SocketioService , 
@@ -57,10 +60,12 @@ export class ApplicationStatusComponent implements OnInit {
   ngOnInit() {
     this.isLecturer = this.us.is_lecturer();
     this.isStaff = this.us.is_staff();
+    this.isStudent = this.us.is_student();
     this.copyOfCourses();    
     this.openConfirmDialog = false;
+    this.arrivalDateSelected = this.application?.arrivalDate? new Date(this.application.arrivalDate): new Date();
+    this.departureDateSelected = this.application?.departureDate? new Date(this.application.departureDate): new Date();
   }
-
 
   // Needed to mantain the original order of the object
   originalOrder = (): number => 0;
@@ -169,7 +174,7 @@ export class ApplicationStatusComponent implements OnInit {
 
         const rawValue = app[key as keyof Application];
 
-        const displayValue = key === 'uploadDate' 
+        const displayValue = (key === 'uploadDate') ||  (key === 'arrivalDate') || (key === 'departureDate')
           ? new Date(rawValue as string).toLocaleDateString('en-GB', dateOptions) 
           : (rawValue !== undefined ? rawValue.toString() : '');
 
@@ -181,6 +186,11 @@ export class ApplicationStatusComponent implements OnInit {
         }
       }
     }
+    groups.sort((a, b) => {
+      const labelOrder = GROUP_ORDER.map(g => FIELD_GROUP_LABELS[g]);
+      return labelOrder.indexOf(a.groupLabel) - labelOrder.indexOf(b.groupLabel);
+    });
+
     return groups;
   }
 
@@ -205,7 +215,7 @@ export class ApplicationStatusComponent implements OnInit {
     });
   }
 
-  // Delete the application permanentely
+  // Open the delete dialog
   openDeleteDialog(templateRef: TemplateRef<any>) {
     this.dialogConfirmDeletion = this.dialog.open(templateRef,{
       width: '600px',
@@ -334,6 +344,10 @@ export class ApplicationStatusComponent implements OnInit {
     return this.isStaff;
   }
 
+  userIsStudent() {
+    return this.isStudent;
+  }
+
   confirmPhaseUpdate(application: Application) {
 
     console.log(application);
@@ -352,11 +366,41 @@ export class ApplicationStatusComponent implements OnInit {
 
   }
 
+  // Open the dates dialog editor
+  openDateDialog(templateRef: TemplateRef<any>) {
+    this.dialogConfirmDeletion = this.dialog.open(templateRef,{
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '85vh'
+    });
 
-  preDepartureVerified() {
-    
+    this.dialogConfirmDeletion .afterClosed().subscribe((updatedApplication: Application) => {
+      if (updatedApplication) {
+        console.log('Dati ricevuti dal dialog:', updatedApplication);
+        
+        this.applicationModified.emit(updatedApplication._id);
+        this.clonedCourses = updatedApplication.courses;
+      }
+    });
   }
 
+  // Update arrival and departure date
+  confirmUpdateDate(application: Application) {
+    console.log(application);
+    application.arrivalDate = this.arrivalDateSelected;
+    application.departureDate = this.departureDateSelected;
+    this.ap.put_application_by_id(application).subscribe({
+      next: () => {
+        console.log("Application successfully modified.");
+        //this.posted.emit(this.data.application);
+        this.dialogApplicationPhase.close();
+      },
+      error:(err) => {
+        console.log('Error occurred while putting: ' + err);
+      }
+
+    });
+  }
 }
 
 

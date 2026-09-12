@@ -18,31 +18,92 @@
         <!-------- EQUIVALENT COURSE ---------->
         <div class="course-column">
           <div class="course-subtitle">Equivalent Course</div>
+
+            <!---- 1st row ----> 
           <div class="course-inputs">
+
+            <!---- Code ----> 
             <mat-form-field appearance="outline" density="compact" class="field-code">
               <mat-label>Code</mat-label>
               <input matInput [disabled] = "true" [(ngModel)]="ce.equivalentCourse.code"/>
             </mat-form-field>
 
+            <!---- Course title ----> 
             <mat-form-field appearance="outline" density="compact" class="field-title">
               <mat-label>Course Title</mat-label>
               <input matInput [disabled] = "true" [(ngModel)]="ce.equivalentCourse.title"/>
             </mat-form-field>
 
+            <!---- CFU ----> 
             <mat-form-field appearance="outline" density="compact" class="field-cfu">
               <mat-label>CFU</mat-label>
               <input matInput [disabled] = "true" [(ngModel)]="ce.equivalentCourse.credits"/>
             </mat-form-field>
 
+
+          </div>
+
+            <!---- 2st row ----> 
+          <div class="course-inputs">
+            <!---- Grade ----> 
             <mat-form-field appearance="outline" density="compact" class="field-grade">
               <mat-label>Grade</mat-label>
               <input matInput [(ngModel)]="clonedTranscriptRecords[courseIndex]" name="grade"/>
             </mat-form-field>
+
+
+            <!---- Exam date ---->
+            <mat-form-field appearance="outline" class="field-date">
+              <mat-label>Exam Date</mat-label>
+              <input matInput [matDatepicker]="picker" [(ngModel)]="examDate[courseIndex]">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <ng-container *ngIf="userIsLecturer()"> 
+                <mat-form-field appearance="outline" class="field-approved">
+                  <mat-label>Approved</mat-label>
+                  <mat-select [(ngModel)]="recordStateSelected[courseIndex]">
+                    <mat-option *ngFor="let state of recordState" [value]="state">
+                      {{ state }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+            </ng-container>
+
+
+
+
           </div>
+
         </div>
+
+        
 
       </div>
 
+      <div class="transcript-item transcript-upload-card" *ngIf="!userIsLecturer() && this.data.application.status === 'Waiting for exam score approval'">
+        <p>Add new transcript of records</p>
+
+              <input 
+            type="file" 
+            #fileInput
+            accept="application/pdf" 
+            class="hidden-file-input"
+            (change)="onFileSelected($event)" 
+          />
+
+          <button mat-fab color="primary" class="upload-button" (click)="fileInput.click()">
+            <mat-icon>upload_file</mat-icon>
+          </button>
+
+          <button mat-fab extended class="trnascript-button" 
+            (click)="openPdfViewer(this.data.application._id!)"
+            *ngIf="this.data.application._id! && this.data.transcriptRecords.filename != ''"> 
+          <mat-icon>picture_as_pdf</mat-icon>
+            PDF
+          </button>
+      </div>
 
     </div>
 
@@ -52,5 +113,5 @@
 <!-------- EDITOR BUTTONS ---------->
 <mat-dialog-actions align="end">
   <button mat-flat-button  class="close-button" mat-dialog-close>Close</button>
-  <button mat-flat-button color="primary" class="edit-button" [mat-dialog-close]="data.application" (click)="recordsSaveChanges()" cdkFocusInitial>Save Changes</button>
+  <button mat-flat-button color="primary" class="edit-button" [mat-dialog-close]="data.application" (click)="onTranscriptSave()" cdkFocusInitial>Save Changes</button>
 </mat-dialog-actions>

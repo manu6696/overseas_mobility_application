@@ -1,6 +1,8 @@
 
 import mongoose = require('mongoose');
+import { Course, CourseEval } from './Application';
 
+export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface Agreement {
     filename: String,
@@ -9,11 +11,12 @@ export interface Agreement {
     uploadDate: Date,
     applicationid: String,
     matrNumber: String,
-    approved: String,
+    approved: ApprovalStatus,
     modified: Boolean,
     modifyDescription: String,
     lecturerReason: String,
     decisionDate: Date,
+    courses: CourseEval[],
 }
 
 // User defined type guard
@@ -30,10 +33,27 @@ export function isAgreement(arg: any): arg is Agreement {
     && arg.filename && typeof(arg.filename) == 'string' 
     && arg.mimetype && typeof(arg.mimetype) == 'string'
     && arg.uploadDate && arg.uploadDate instanceof Date
+    && arg.courses && Array.isArray(arg.courses)
     && typeof(arg.modified) == 'boolean'
 }
 
 
+export function isPartialAgreement(arg: any): arg is Agreement {
+    const hasValidData = arg
+        && arg.applicationid && typeof(arg.applicationid) == 'string'
+        && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
+        && arg.uploadDate && arg.uploadDate instanceof Date
+        && arg.courses && Array.isArray(arg.courses)
+        && typeof(arg.modified) == 'boolean';
+
+    const hasFile = !!arg.content;
+    const hasValidFile = !hasFile || (
+        arg.content.byteLength > 0
+        && arg.filename && typeof(arg.filename) == 'string' 
+        && arg.mimetype && typeof(arg.mimetype) == 'string'
+    );   
+    return hasValidData && hasValidFile;
+}
 
 
 // We use Mongoose to perform the ODM between our application and
@@ -44,6 +64,39 @@ export function isAgreement(arg: any): arg is Agreement {
 // of correctly matching the Agreement interface with the Agreementchema 
 //
 // Mongoose Schema.
+
+const CourseSchema = new mongoose.Schema<Course>({
+
+    code: {
+        type: String, 
+        required: true
+    },
+
+    title: {
+        type: String, 
+        required: true
+    },
+
+    credits: {
+        type: Number, 
+        required: true
+    }
+
+
+}, { _id: false });
+
+const CourseEvalSchema = new mongoose.Schema<CourseEval>({
+
+    originalCourse: {
+        type: CourseSchema,
+        required: true
+    },
+
+    equivalentCourse: {
+        type: CourseSchema,
+        required: true
+    }
+})
 
 let AgreementSchema = new mongoose.Schema<Agreement>( {
 
@@ -90,6 +143,10 @@ let AgreementSchema = new mongoose.Schema<Agreement>( {
     decisionDate: {
         type: mongoose.SchemaTypes.Date,
         required: false
+    },
+    courses: {
+        type: [CourseEvalSchema],
+        required: true
     }
 })
 
