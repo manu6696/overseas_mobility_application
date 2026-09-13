@@ -2,11 +2,14 @@
   <app-navbar></app-navbar>
   <br>
   <ng-container *ngFor="let application of applications">
+    <ng-container *ngIf="application?._id && application.status !== 'Closed' && application.status !== 'Canceled'">
      <app-application-status
         class="application-status"
         [application]="application">
-    </app-application-status>
-    <br>
+      </app-application-status>
+      <br>
+    </ng-container>
+
   </ng-container>  
  
 

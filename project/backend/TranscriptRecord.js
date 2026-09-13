@@ -47,7 +47,7 @@ const CourseResultSchema = new mongoose.Schema({
     },
     grade: {
         type: String,
-        required: true
+        required: false
     },
     examDate: {
         type: mongoose.SchemaTypes.Date,
@@ -61,15 +61,15 @@ const CourseResultSchema = new mongoose.Schema({
 let TranscriptRecordSchema = new mongoose.Schema({
     filename: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: false
     },
     content: {
         type: Buffer,
-        required: true
+        required: false
     },
     mimetype: {
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: false
     },
     records: {
         type: [CourseResultSchema],

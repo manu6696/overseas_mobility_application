@@ -48,14 +48,14 @@
             <!---- Grade ----> 
             <mat-form-field appearance="outline" density="compact" class="field-grade">
               <mat-label>Grade</mat-label>
-              <input matInput [(ngModel)]="clonedTranscriptRecords[courseIndex]" name="grade"/>
+              <input matInput [disabled] = "data.application.status === 'Closed' || data.application.status === 'Canceled'" [(ngModel)]="clonedTranscriptRecords[courseIndex]" name="grade"/>
             </mat-form-field>
 
 
             <!---- Exam date ---->
             <mat-form-field appearance="outline" class="field-date">
               <mat-label>Exam Date</mat-label>
-              <input matInput [matDatepicker]="picker" [(ngModel)]="examDate[courseIndex]">
+              <input matInput [disabled] = "data.application.status === 'Closed' || data.application.status === 'Canceled'" [matDatepicker]="picker" [(ngModel)]="examDate[courseIndex]">
               <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
@@ -63,7 +63,7 @@
             <ng-container *ngIf="userIsLecturer()"> 
                 <mat-form-field appearance="outline" class="field-approved">
                   <mat-label>Approved</mat-label>
-                  <mat-select [(ngModel)]="recordStateSelected[courseIndex]">
+                  <mat-select [disabled] = "data.application.status === 'Closed' || data.application.status === 'Canceled'" [(ngModel)]="recordStateSelected[courseIndex]">
                     <mat-option *ngFor="let state of recordState" [value]="state">
                       {{ state }}
                     </mat-option>
@@ -82,7 +82,7 @@
 
       </div>
 
-      <div class="transcript-item transcript-upload-card" *ngIf="!userIsLecturer() && this.data.application.status === 'Waiting for exam score approval'">
+      <div class="transcript-item transcript-upload-card" *ngIf="!userIsLecturer() && (this.data.application.status === 'Mobility in progress' || this.data.application.status === 'Waiting for exam score approval')">
         <p>Add new transcript of records</p>
 
               <input 
@@ -113,5 +113,5 @@
 <!-------- EDITOR BUTTONS ---------->
 <mat-dialog-actions align="end">
   <button mat-flat-button  class="close-button" mat-dialog-close>Close</button>
-  <button mat-flat-button color="primary" class="edit-button" [mat-dialog-close]="data.application" (click)="onTranscriptSave()" cdkFocusInitial>Save Changes</button>
+  <button mat-flat-button color="primary" class="edit-button" *ngIf= "data.application.status !== 'Closed' && data.application.status !== 'Canceled'" [mat-dialog-close]="data.application" (click)="onTranscriptSave()" cdkFocusInitial>Save Changes</button>
 </mat-dialog-actions>

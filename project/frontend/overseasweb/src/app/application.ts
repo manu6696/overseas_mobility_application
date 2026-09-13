@@ -47,7 +47,7 @@ export interface Application {
 export function isApplication(arg: any): arg is Application {
     return arg 
     && arg.status && typeof(arg.status) == 'string'
-    && arg.uploadDate && arg.uploadDate instanceof Date
+    && arg.uploadDate && typeof(arg.uploadDate) == 'string' 
     && arg.academicYear && typeof(arg.academicYear) == 'string' 
     && arg.semester && typeof(arg.semester) == 'string' 
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
@@ -64,6 +64,7 @@ export function isApplication(arg: any): arg is Application {
     && typeof(arg.agreementApproved) == 'boolean'
     && typeof(arg.modified) == 'boolean'
     && typeof(arg.lecturerReason) == 'string'
+    
 }
 
 
@@ -247,7 +248,7 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
     preDepartureCompleted : {
         label: 'Pre-departure Completed', 
         group: 'general', 
-        hidden: false, 
+        hidden: true, 
         editableFrom: ['ADMIN', 'MODERATOR', 'STAFF']
     },
     recordsUploaded : {

@@ -3,7 +3,7 @@
   <div class="logo-box">
     <div class="cf-title">
       <span>Università</span>
-      <span>Ca'Foscari</span>
+      <span>di</span>
       <span>Venezia</span>
     </div>
   </div>
@@ -14,19 +14,11 @@
     <a *ngIf="isLecturer" routerLink="/dashboard-lecturer" routerLinkActive="active-link" class="home-link">Home</a>
     <a *ngIf="isStudent" routerLink="/dashboard-student" routerLinkActive="active-link" class="home-link">Home</a>
     <a *ngIf="isStaff" routerLink="/dashboard-staff" routerLinkActive="active-link" class="home-link">Home</a>
-    <a routerLink="/application-history" routerLinkActive="active-link" class="history-link">History</a>
+    <a routerLink="/history-tab" routerLinkActive="active-link" class="history-link">History</a>
 
   </nav>
 
   <span class="spacer"></span>
-
-  <button mat-icon-button>
-    <mat-icon>notifications</mat-icon>
-  </button>
-
-  <button mat-icon-button>
-    <mat-icon>chat_bubble_outline</mat-icon>
-  </button>
 
   <button mat-button [matMenuTriggerFor]="userMenu" class="user-chip">
     <span class="avatar-circle">{{ getInitials() }}</span>

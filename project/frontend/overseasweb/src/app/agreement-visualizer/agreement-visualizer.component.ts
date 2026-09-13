@@ -147,7 +147,9 @@ export class AgreementVisualizerComponent implements OnInit {
     }
     formData.append('matrNumber', this.data.application.matrNumber);
     formData.append('modifyDescription', this.newModifyDescription);
-
+    formData.append('applicationid', this.data.application._id!);
+    formData.append('courses', JSON.stringify(this.data.application.courses));
+    
     this.ag.post_agreement(formData, this.data.application._id!).subscribe({
       next: () => {
         this.get_agreement_list_by_query(this.data.application._id!);

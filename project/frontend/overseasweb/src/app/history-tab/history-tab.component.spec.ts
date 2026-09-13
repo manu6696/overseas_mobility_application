@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BannerUniComponent } from './banner-uni.component';
+import { HistoryTabComponent } from './history-tab.component';
 
-describe('BannerUniComponent', () => {
-  let component: BannerUniComponent;
-  let fixture: ComponentFixture<BannerUniComponent>;
+describe('HistoryTabComponent', () => {
+  let component: HistoryTabComponent;
+  let fixture: ComponentFixture<HistoryTabComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BannerUniComponent]
+      imports: [HistoryTabComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BannerUniComponent);
+    fixture = TestBed.createComponent(HistoryTabComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

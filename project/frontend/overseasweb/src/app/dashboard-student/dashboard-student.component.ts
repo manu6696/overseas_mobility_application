@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
 import { SocketioService } from '../socketio.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { AgreementViewerDialogComponent } from '../agreement-viewer-dialog/agreement-viewer-dialog.component';
 import { AgreementHttpService } from '../agreement-http.service';
 import { ApplicationEditorComponent } from '../application-editor/application-editor.component';
 import { ApplicationCreatorComponent } from '../application-creator/application-creator.component';

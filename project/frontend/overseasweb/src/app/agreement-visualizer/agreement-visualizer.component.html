@@ -126,8 +126,8 @@
     <p>No Learning Agreement uploaded for this application.</p>
   </ng-template>
 
-  
-  <div class="agreement-item agreement-upload-card" *ngIf="!userIsLecturer()">
+
+  <div class="agreement-item agreement-upload-card" *ngIf="!userIsLecturer() && data.application.status !== 'Closed' && data.application.status !== 'Canceled'">
     <p>Add new learning agreement</p>
     <div class="agreement-content">
 

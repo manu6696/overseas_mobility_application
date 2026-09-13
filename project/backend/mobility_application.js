@@ -347,13 +347,17 @@ app.put("/api/v1/applications/:applicationid", auth, (req, res, next) => {
         const isOwner = req.auth.username === existingApp.matrNumber;
         const isReferentLecturer = req.auth.roles.includes('LECTURER') && req.auth.username === existingApp.referent;
         const isStaff = req.auth.roles.includes('STAFF');
-        if (recvapplications.preDepartureCompleted === true) {
+        if (recvapplications.preDepartureCompleted === true && existingApp.status !== 'Waiting for exam score approval') {
             if (!isStaff) {
                 return next({ statusCode: 403, error: true, errormessage: "Not authorized" });
             }
             if (!existingApp.agreementApproved) {
                 return next({ statusCode: 400, error: true, errormessage: "Learning Agreement not approved yet" });
             }
+            if (existingApp.status !== 'Awaiting Agreement approval') {
+                return next({ statusCode: 400, error: true, errormessage: "Application is not in the correct phase" });
+            }
+            recvapplications.status = 'Mobility in progress';
         }
         if (isReferentLecturer || isStaff) {
             recvapplications.agreementApproved = (recvapplications.agreementApproved === true || recvapplications.agreementApproved === 'true');
@@ -366,10 +370,38 @@ app.put("/api/v1/applications/:applicationid", auth, (req, res, next) => {
             return next({ statusCode: 400, error: true, errormessage: "Data is not a valid application" });
         }
         application.getModel().updateOne({ _id: req.params.applicationid }, recvapplications).then((q) => {
-            if (q.matchedCount > 0)
-                return res.status(200).json({ error: false, errormessage: "" });
-            else
+            if (q.matchedCount > 0) {
+                if (recvapplications.status === 'Mobility in progress') {
+                    const records = recvapplications.courses?.map((elemento) => ({
+                        code: elemento.equivalentCourse.code,
+                        grade: '',
+                        examDate: null,
+                        approved: 'Pending'
+                    }));
+                    const newTranscriptRecords = {
+                        records: records,
+                        uploadDate: new Date(),
+                        applicationid: req.params.applicationid,
+                        matrNumber: recvapplications.matrNumber
+                    };
+                    transcriptRecord.getModel().create(newTranscriptRecords).then((data) => {
+                        if (ios) {
+                            // Notify all socket.io clients
+                            console.log("socket.io send");
+                            ios.emit("broadcast", JSON.stringify(data));
+                        }
+                        return res.status(200).json({ error: false, errormessage: "", id: data._id });
+                    }).catch((reason) => {
+                        return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
+                    });
+                }
+                else {
+                    return res.status(200).json({ error: false, errormessage: "" });
+                }
+            }
+            else {
                 return next({ statusCode: 404, error: true, errormessage: "Application not found" });
+            }
         }).catch((reason) => next({ statusCode: 500, error: true, errormessage: "DB error: " + reason }));
     }).catch((reason) => next({ statusCode: 500, error: true, errormessage: "DB error: " + reason }));
 });
@@ -414,12 +446,19 @@ app.post("/api/v1/agreements/:applicationid", auth, upload.single('agreement'), 
         }
         if (agreement.isAgreement(recvagreements)) {
             agreement.getModel().create(recvagreements).then((data) => {
-                if (ios) {
-                    // Notify all socket.io clients
-                    console.log("socket.io send");
-                    ios.emit("broadcast", JSON.stringify(data));
-                }
-                return res.status(200).json({ error: false, errormessage: "", id: data._id });
+                application.getModel().updateOne({ _id: recvagreements.applicationid }, { status: 'Awaiting Agreement approval' }).then((q) => {
+                    if (ios) {
+                        // Notify all socket.io clients
+                        console.log("socket.io send");
+                        ios.emit("broadcast", JSON.stringify(data));
+                    }
+                    if (q.matchedCount > 0)
+                        return res.status(200).json({ error: false, errormessage: "", id: data._id });
+                    else
+                        return next({ statusCode: 404, error: true, errormessage: "Data is not a valid application" });
+                }).catch((reason) => {
+                    return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
+                });
             }).catch((reason) => {
                 return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
             });
@@ -553,12 +592,19 @@ app.post("/api/v1/transcriptRecords", auth, upload.single('transcriptRecords'), 
         recvtranscriptRecords.records = JSON.parse(req.body.records);
         if (transcriptRecord.isTranscriptRecord(recvtranscriptRecords)) {
             transcriptRecord.getModel().create(recvtranscriptRecords).then((data) => {
-                if (ios) {
-                    // Notify all socket.io clients
-                    console.log("socket.io send");
-                    ios.emit("broadcast", JSON.stringify(data));
-                }
-                return res.status(200).json({ error: false, errormessage: "", id: data._id });
+                application.getModel().updateOne({ _id: recvtranscriptRecords.applicationid }, { status: 'Waiting for exam score approval' }).then((q) => {
+                    if (ios) {
+                        // Notify all socket.io clients
+                        console.log("socket.io send");
+                        ios.emit("broadcast", JSON.stringify(data));
+                    }
+                    if (q.matchedCount > 0)
+                        return res.status(200).json({ error: false, errormessage: "" });
+                    else
+                        return next({ statusCode: 404, error: true, errormessage: "Data is not a valid application" });
+                }).catch((reason) => {
+                    return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
+                });
             }).catch((reason) => {
                 return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
             });
@@ -629,8 +675,28 @@ app.put("/api/v1/transcriptRecords/:applicationid", auth, upload.single('transcr
     }
     if (transcriptRecord.isPartialTranscriptRecord(recvtranscriptRecords)) {
         transcriptRecord.getModel().updateOne({ applicationid: req.params.applicationid }, recvtranscriptRecords).then((q) => {
-            if (q.matchedCount > 0)
+            if (req.file) {
+                application.getModel().updateOne({ _id: req.params.applicationid }, { status: 'Waiting for exam score approval' }).then((q) => {
+                    if (q.matchedCount > 0)
+                        return res.status(200).json({ error: false, errormessage: "" });
+                    else
+                        return next({ statusCode: 404, error: true, errormessage: "Data is not a valid application" });
+                }).catch((reason) => {
+                    return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
+                });
+            }
+            else if (q.matchedCount > 0) {
+                const allApproved = recvtranscriptRecords.records.every(r => r.approved === 'Approved');
+                application.getModel().updateOne({ _id: req.params.applicationid }, { recordsUploaded: allApproved }).then((q) => {
+                    if (q.matchedCount > 0)
+                        return res.status(200).json({ error: false, errormessage: "" });
+                    else
+                        return next({ statusCode: 404, error: true, errormessage: "Data is not a valid application" });
+                }).catch((reason) => {
+                    return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
+                });
                 return res.status(200).json({ error: false, errormessage: "" });
+            }
             else
                 return next({ statusCode: 404, error: true, errormessage: "Application not found" });
         }).catch((reason) => {
@@ -829,7 +895,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
         console.log("Creating admin user");
         let u = user.newUser({
             username: "admin",
-            mail: "admin@cafoscari.it",
+            mail: "admin@admin.it",
             name: "admin",
             surname: "admin"
         });
@@ -853,7 +919,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             username: "123456",
             name: "Giulia",
             surname: "Conti",
-            mail: "123456@stud.univ.it"
+            mail: "student@student.it"
         });
         u.setStudent();
         u.setPassword("123456");
@@ -873,7 +939,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             username: "919191",
             name: "Mario",
             surname: "Rossi",
-            mail: "919191@univ.it"
+            mail: "lecturer@lecturer.it"
         });
         u.setLecturer();
         u.setPassword("919191");
@@ -893,7 +959,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             username: "staff",
             name: "Luca",
             surname: "Bianchi",
-            mail: "staff@univ.it"
+            mail: "staff@staff.it"
         });
         u.setModerator();
         u.setStaff();
@@ -1002,8 +1068,12 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
                 }
             ],
             referent: "919191",
-            agreementApproved: false,
+            agreementApproved: true,
             modified: false,
+            preDepartureCompleted: true,
+            recordsUploaded: true,
+            arrivalDate: new Date(),
+            departureDate: new Date(),
             lecturerReason: 'No reason provided',
         });
         let transcriptRecords1 = await transcriptRecord
@@ -1029,7 +1099,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             uploadDate: new Date(),
             applicationid: application1._id,
             matrNumber: "123456",
-            approved: "Pending",
+            approved: "Approved",
             modified: false,
             lecturerReason: 'No reason provided',
             modifyDescription: "Initial Learning Agreement",

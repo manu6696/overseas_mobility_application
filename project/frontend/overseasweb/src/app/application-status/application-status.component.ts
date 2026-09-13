@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 import { SocketioService } from '../socketio.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { AgreementViewerDialogComponent } from '../agreement-viewer-dialog/agreement-viewer-dialog.component';
 import { ApplicationEditorComponent } from '../application-editor/application-editor.component';
 import { RecordsVisualizerComponent } from '../records-visualizer/records-visualizer.component';
 import { AgreementVisualizerComponent } from '../agreement-visualizer/agreement-visualizer.component';
@@ -352,7 +351,8 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     if(this.preDepartureCompleted || this.applicationClosed ) {
 
       if(this.preDepartureCompleted) {
-        application.status = 'Pre-departure completed';
+        application.preDepartureCompleted = this.preDepartureCompleted;
+        application.status = 'Mobility in progress';
       } else if(this.applicationClosed) {
         application.status = 'Closed';
       }
@@ -410,7 +410,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     if(this.application?.status === 'Awaiting Agreement approval') {
       return this.canVerifyPreDeparture;
     } else if (this.application?.status === 'Waiting for exam score approval') {
-      return  this.recordsUploaded;
+      return this.recordsUploaded;
     } else {
       return false;
     }

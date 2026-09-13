@@ -28,6 +28,7 @@
           <button mat-fab 
                   color="primary" 
                   class="edit-button" 
+                  *ngIf="application.status !== 'Closed' && application.status !== 'Canceled'"
                   (click)="openApplicationEditor()"
                   aria-label="Modifica">
             <mat-icon>edit</mat-icon>
@@ -37,6 +38,7 @@
           <button mat-fab 
                   color="warn" 
                   class="delete-button" 
+                  *ngIf="application.status !== 'Closed' && application.status !== 'Canceled'"
                   (click)="openDeleteDialog(deleteDialogTemplate)"
                   aria-label="Elimina">
             <mat-icon>delete</mat-icon>
@@ -105,13 +107,13 @@
             <ng-template #phaseDialogTemplate>
               <h2 mat-dialog-title>Phase changing</h2>
 
-              <ng-container class="checkbox-center" *ngIf="application?.status === 'Awaiting Agreement approval'">
+              <div class="checkbox-center" *ngIf="application?.status === 'Awaiting Agreement approval'">
                 <mat-checkbox [(ngModel)]="preDepartureCompleted">Pre-departure phase completed</mat-checkbox>
-              </ng-container>
+              </div>
 
-              <ng-container class="checkbox-center" *ngIf="application?.status === 'Waiting for exam score approval'">
+              <div class="checkbox-center" *ngIf="application?.status === 'Waiting for exam score approval'">
                 <mat-checkbox [(ngModel)]="applicationClosed">Close application</mat-checkbox>
-              </ng-container>
+              </div>
 
               <mat-dialog-actions align="end">
                 <button mat-flat-button class="back-delete-button" mat-dialog-close>Back</button>
@@ -129,7 +131,7 @@
         <!----- Transcript of records ---->
         <span class="transcript-records-button-wrapper">
           <button mat-fab extended class="transcript-records-button" 
-                  *ngIf="application.status === 'Waiting for exam score approval'"
+                  *ngIf="application.status === 'Mobility in progress' || application.status === 'Waiting for exam score approval' || application.status === 'Closed' || application.status === 'Canceled'"
                   (click)="openRecordsDialog()">
             <span>Transcript of Records</span>
             <mat-icon iconPositionEnd>open_in_new</mat-icon>

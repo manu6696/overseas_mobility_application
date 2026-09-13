@@ -5,15 +5,13 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 
 import { AppComponent } from './app.component';
-import { MessageEditorComponent } from './message-editor/message-editor.component';
-import { MessageListComponent } from './message-list/message-list.component';
 import { DashboardStudentComponent } from './dashboard-student/dashboard-student.component';
 import { DashboardLecturerComponent } from './dashboard-lecturer/dashboard-lecturer.component';
 import { DashboardStaffComponent } from './dashboard-staff/dashboard-staff.component';
+import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ApplicationStatusComponent } from './application-status/application-status.component';
 import { ApplicationEditorComponent } from './application-editor/application-editor.component';
 import { ApplicationCreatorComponent } from './application-creator/application-creator.component';
-import { AgreementViewerDialogComponent } from './agreement-viewer-dialog/agreement-viewer-dialog.component';
 import { NavbarComponents } from './navbar/navbar.component';
 import { RecordsVisualizerComponent } from './records-visualizer/records-visualizer.component';
 import { AgreementVisualizerComponent } from './agreement-visualizer/agreement-visualizer.component';
@@ -58,17 +56,15 @@ import {MatRadioModule} from '@angular/material/radio';
 
 @NgModule({ declarations: [
         AppComponent,
-        MessageEditorComponent,
-        MessageListComponent,
         UserLoginComponent,
         UserSignupComponent,
         DashboardStudentComponent,
         DashboardLecturerComponent,
         DashboardStaffComponent,
+        HistoryTabComponent,
         ApplicationStatusComponent,
         ApplicationEditorComponent,
         ApplicationCreatorComponent,
-        AgreementViewerDialogComponent,
         NavbarComponents,
         RecordsVisualizerComponent,
         AgreementVisualizerComponent
