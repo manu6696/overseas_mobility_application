@@ -36,6 +36,7 @@ export interface Application {
     modified: Boolean,
     lecturerReason: String,
     preDepartureCompleted?: Boolean,
+    recordsUploaded?: Boolean,
     arrivalDate?: Date,
     departureDate?: Date
 }
@@ -68,6 +69,24 @@ export function isApplication(arg: any): arg is Application {
     && typeof(arg.lecturerReason) == 'string'
 }
 
+
+export function isPartialApplication(arg: any): arg is Partial<Application> {
+    const hasValidData = arg
+        && arg.matrNumber && typeof(arg.matrNumber) == 'string'
+        && arg.referent && typeof(arg.referent) == 'string';
+
+    const stringFieldsIfPresent = ['status', 'academicYear', 'semester', 'name', 'surname',
+        'departement', 'sendingInst', 'sendingCountry', 'hostInst', 'hostCountry', 'hostCity',
+        'lecturerReason'].every(field => arg[field] === undefined || typeof(arg[field]) == 'string');
+
+    const coursesOk = arg.courses === undefined || Array.isArray(arg.courses);
+    const approvedOk = arg.approved === undefined || typeof(arg.approved) == 'boolean';
+    const agreementApprovedOk = arg.agreementApproved === undefined || typeof(arg.agreementApproved) == 'boolean';
+    const modifiedOk = arg.modified === undefined || typeof(arg.modified) == 'boolean';
+    const preDepartureOk = arg.preDepartureCompleted === undefined || typeof(arg.preDepartureCompleted) == 'boolean';
+
+    return hasValidData && stringFieldsIfPresent && coursesOk && approvedOk && agreementApprovedOk && modifiedOk && preDepartureOk;
+}
 
 
 // We use Mongoose to perform the ODM between our application and
@@ -195,6 +214,10 @@ let ApplicationSchema = new mongoose.Schema<Application>( {
         required: false
     },
     preDepartureCompleted: {
+        type: mongoose.SchemaTypes.Boolean,
+        required: false
+    },
+    recordsUploaded: {
         type: mongoose.SchemaTypes.Boolean,
         required: false
     },

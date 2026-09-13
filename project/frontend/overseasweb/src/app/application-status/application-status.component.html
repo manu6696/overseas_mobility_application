@@ -92,9 +92,8 @@
             </ng-template>
           </ng-container>
 
-
           <!----- State (Only for staff) ----->
-          <ng-container *ngIf="userIsStaff() && application.agreementApproved"> 
+          <ng-container *ngIf="userIsStaff() && verifyStateApplicationRequirement()"> 
             <button mat-fab 
                     color="warn" 
                     class="phase-button" 
@@ -106,16 +105,13 @@
             <ng-template #phaseDialogTemplate>
               <h2 mat-dialog-title>Phase changing</h2>
 
-              <mat-dialog-content>
-                <mat-form-field appearance="outline" style="width: 100%; margin-top: 8px;">
-                  <mat-label>State</mat-label>
-                  <mat-select [(ngModel)]="applicationStateSelected">
-                    <mat-option *ngFor="let state of applicationState" [value]="state">
-                      {{ state }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </mat-dialog-content>
+              <ng-container class="checkbox-center" *ngIf="application?.status === 'Awaiting Agreement approval'">
+                <mat-checkbox [(ngModel)]="preDepartureCompleted">Pre-departure phase completed</mat-checkbox>
+              </ng-container>
+
+              <ng-container class="checkbox-center" *ngIf="application?.status === 'Waiting for exam score approval'">
+                <mat-checkbox [(ngModel)]="applicationClosed">Close application</mat-checkbox>
+              </ng-container>
 
               <mat-dialog-actions align="end">
                 <button mat-flat-button class="back-delete-button" mat-dialog-close>Back</button>

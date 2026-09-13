@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, TemplateRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, signal, TemplateRef, Input, Output, EventEmitter, model, OnChanges, SimpleChanges } from '@angular/core';
 import { Application, APPLICATION_FIELD_META, FieldGroupResult,GROUP_ORDER,FieldGroupEditor, FieldGroup, GroupedField, FIELD_GROUP_LABELS, dateOptions, CourseEval, isApplication } from '../application';
 import { TranscriptRecord } from '../transcriptRecord';
 import { ApplicationHttpService } from '../application-http.service';
@@ -20,7 +20,7 @@ import { AgreementVisualizerComponent } from '../agreement-visualizer/agreement-
   styleUrls: ['./application-status.component.css'],
   standalone: false
 })
-export class ApplicationStatusComponent implements OnInit {
+export class ApplicationStatusComponent implements OnInit, OnChanges {
 
   @Input() application: Application | null = null;
   @Output() applicationDeleted = new EventEmitter<string>();
@@ -34,17 +34,12 @@ export class ApplicationStatusComponent implements OnInit {
   public isLecturer: boolean = false;
   public isStaff: boolean = false;
   public isStudent: boolean = false;
-  public applicationState: string[] = [
-    'Created',
-    'Awaiting Agreement approval',
-    'Pre-departure completed',
-    'Mobility in progress',
-    'Waiting for exam score approval',
-    'Closed',
-    'Canceled'];
-  public applicationStateSelected: string = '';
   public arrivalDateSelected: Date = new Date;
   public departureDateSelected: Date = new Date;
+  public preDepartureCompleted: boolean = false;
+  public applicationClosed: boolean = false;
+  public canVerifyPreDeparture: boolean = false;
+  public recordsUploaded: boolean = false;
 
   constructor( 
     private sio: SocketioService , 
@@ -65,6 +60,13 @@ export class ApplicationStatusComponent implements OnInit {
     this.openConfirmDialog = false;
     this.arrivalDateSelected = this.application?.arrivalDate? new Date(this.application.arrivalDate): new Date();
     this.departureDateSelected = this.application?.departureDate? new Date(this.application.departureDate): new Date();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['application']) {
+      this.canVerifyPreDeparture = !!this.application?.agreementApproved && isApplication(this.application);
+      this.recordsUploaded = !!this.application?.recordsUploaded;
+    }
   }
 
   // Needed to mantain the original order of the object
@@ -253,14 +255,11 @@ export class ApplicationStatusComponent implements OnInit {
   
   // Open the editor needed to modify the transcript of records
   openRecordsDialog() {
-
     if(this.application?._id) {
       this.rec.get_transcript_by_id(this.application._id).subscribe({
         next: (transcriptRecords) => {
           console.log("Transcript of records successfully received.");
           this.transcriptRecords = transcriptRecords;
-
-          
 
           const dialogRef = this.dialog.open(RecordsVisualizerComponent, {
             width: '800px',
@@ -320,7 +319,7 @@ export class ApplicationStatusComponent implements OnInit {
   // Open application phase windows
   openApplicationPhase(templateRef: TemplateRef<any>) {
     this.dialogApplicationPhase = this.dialog.open(templateRef,{
-      width: '800px',
+      width: '400px',
       maxWidth: '90vw',
       maxHeight: '85vh'
     });
@@ -349,21 +348,26 @@ export class ApplicationStatusComponent implements OnInit {
   }
 
   confirmPhaseUpdate(application: Application) {
-
     console.log(application);
-    application.status = this.applicationStateSelected;
-    this.ap.put_application_by_id(application).subscribe({
-      next: () => {
-        console.log("Application successfully modified.");
-        //this.posted.emit(this.data.application);
-        this.dialogApplicationPhase.close();
-      },
-      error:(err) => {
-        console.log('Error occurred while putting: ' + err);
+    if(this.preDepartureCompleted || this.applicationClosed ) {
+
+      if(this.preDepartureCompleted) {
+        application.status = 'Pre-departure completed';
+      } else if(this.applicationClosed) {
+        application.status = 'Closed';
       }
 
-    });
-
+      this.ap.put_application_by_id(application).subscribe({
+        next: () => {
+          console.log("Application successfully modified.");
+          //this.posted.emit(this.data.application);
+          this.dialogApplicationPhase.close();
+        },
+        error:(err) => {
+          console.log('Error occurred while putting: ' + err);
+        }
+      });
+    }
   }
 
   // Open the dates dialog editor
@@ -401,6 +405,18 @@ export class ApplicationStatusComponent implements OnInit {
 
     });
   }
+
+  verifyStateApplicationRequirement() {
+    if(this.application?.status === 'Awaiting Agreement approval') {
+      return this.canVerifyPreDeparture;
+    } else if (this.application?.status === 'Waiting for exam score approval') {
+      return  this.recordsUploaded;
+    } else {
+      return false;
+    }
+
+  }
+
 }
 
 

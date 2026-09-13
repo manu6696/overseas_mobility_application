@@ -33,6 +33,7 @@ export interface Application {
     modified: Boolean;
     lecturerReason: string;
     preDepartureCompleted?: Boolean;
+    recordsUploaded?: Boolean;
     arrivalDate?: Date;
     departureDate?: Date;
 }
@@ -245,6 +246,12 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
 
     preDepartureCompleted : {
         label: 'Pre-departure Completed', 
+        group: 'general', 
+        hidden: false, 
+        editableFrom: ['ADMIN', 'MODERATOR', 'STAFF']
+    },
+    recordsUploaded : {
+        label: 'Transcript of Records uploaded', 
         group: 'general', 
         hidden: false, 
         editableFrom: ['ADMIN', 'MODERATOR', 'STAFF']

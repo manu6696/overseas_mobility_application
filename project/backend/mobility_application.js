@@ -334,40 +334,44 @@ app.post("/api/v1/applications/:matrNumber", auth, async (req, res, next) => {
     }
 });
 app.put("/api/v1/applications/:applicationid", auth, (req, res, next) => {
-    console.log("Update request for application with id: " + req.params.applicationid);
-    console.log(req.query);
-    if (req.body && Object.keys(req.body).length > 0) {
-        let recvapplications = req.body;
-        recvapplications.uploadDate = new Date();
-        recvapplications.modified = true;
-        if ((req.auth.roles.includes('LECTURER') && req.auth.username === recvapplications.referent) || req.auth.roles.includes('STAFF')) {
-            recvapplications.status = req.body.status;
-            if (req.body.agreementApproved === 'true' || req.body.agreementApproved === 'True' || req.body.agreementApproved === true) {
-                recvapplications.agreementApproved = true;
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return next({ statusCode: 400, error: true, errormessage: "Application missing" });
+    }
+    let recvapplications = req.body;
+    recvapplications.uploadDate = new Date();
+    recvapplications.modified = true;
+    application.getModel().findOne({ _id: req.params.applicationid }).then((existingApp) => {
+        if (!existingApp) {
+            return next({ statusCode: 404, error: true, errormessage: "Application not found" });
+        }
+        const isOwner = req.auth.username === existingApp.matrNumber;
+        const isReferentLecturer = req.auth.roles.includes('LECTURER') && req.auth.username === existingApp.referent;
+        const isStaff = req.auth.roles.includes('STAFF');
+        if (recvapplications.preDepartureCompleted === true) {
+            if (!isStaff) {
+                return next({ statusCode: 403, error: true, errormessage: "Not authorized" });
             }
-            else {
-                recvapplications.agreementApproved = false;
+            if (!existingApp.agreementApproved) {
+                return next({ statusCode: 400, error: true, errormessage: "Learning Agreement not approved yet" });
             }
+        }
+        if (isReferentLecturer || isStaff) {
+            recvapplications.agreementApproved = (recvapplications.agreementApproved === true || recvapplications.agreementApproved === 'true');
             recvapplications.lecturerReason = req.body.lecturerReason || 'No reason provided';
         }
-        else {
-            recvapplications.agreementApproved = false;
-            recvapplications.lecturerReason = 'No reason provided';
+        else if (!isOwner) {
+            return next({ statusCode: 403, error: true, errormessage: "Not authorized" });
         }
-        if (req.auth.username === recvapplications.referent || req.auth.username === recvapplications.matrNumber || req.auth.roles.includes('STAFF')) {
-            application.getModel().updateOne({ _id: req.params.applicationid }, recvapplications).then((q) => {
-                if (q.matchedCount > 0)
-                    return res.status(200).json({ error: false, errormessage: "" });
-                else
-                    return next({ statusCode: 404, error: true, errormessage: "Data is not a valid application" });
-            }).catch((reason) => {
-                return next({ statusCode: 404, error: true, errormessage: "DB error: " + reason });
-            });
+        if (!application.isPartialApplication(recvapplications)) {
+            return next({ statusCode: 400, error: true, errormessage: "Data is not a valid application" });
         }
-    }
-    else {
-        return next({ statusCode: 404, error: true, errormessage: "Application missing" });
-    }
+        application.getModel().updateOne({ _id: req.params.applicationid }, recvapplications).then((q) => {
+            if (q.matchedCount > 0)
+                return res.status(200).json({ error: false, errormessage: "" });
+            else
+                return next({ statusCode: 404, error: true, errormessage: "Application not found" });
+        }).catch((reason) => next({ statusCode: 500, error: true, errormessage: "DB error: " + reason }));
+    }).catch((reason) => next({ statusCode: 500, error: true, errormessage: "DB error: " + reason }));
 });
 app.delete("/api/v1/applications/:applicationid", auth, (req, res, next) => {
     console.log("Delete request for application with id: " + req.params.applicationid);

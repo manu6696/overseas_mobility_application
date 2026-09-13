@@ -52,6 +52,9 @@ import {MatToolbarModule } from '@angular/material/toolbar';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatRadioModule} from '@angular/material/radio';
+
 
 @NgModule({ declarations: [
         AppComponent,
@@ -93,7 +96,9 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
         MatSelectModule,
         MatToolbarModule,
         MatDatepickerModule,
-        MatNativeDateModule], 
+        MatNativeDateModule,
+        MatCheckboxModule,
+        MatRadioModule], 
     providers: [
         { provide: UserHttpService, useClass: UserHttpService },
         { provide: SocketioService, useClass: SocketioService },
