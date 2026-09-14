@@ -171,17 +171,17 @@
           <div class="course-inputs">
             <mat-form-field appearance="outline" density="compact" class="field-code">
               <mat-label>Code</mat-label>
-              <input matInput [(ngModel)]="ce.originalCourse.code"/>
+              <input matInput [disabled] = "canEditCourses()" [(ngModel)]="ce.originalCourse.code"/>
             </mat-form-field>
 
             <mat-form-field appearance="outline" density="compact" class="field-title">
               <mat-label>Course Title</mat-label>
-              <input matInput [(ngModel)]="ce.originalCourse.title"/>
+              <input matInput [disabled] = "canEditCourses()" [(ngModel)]="ce.originalCourse.title"/>
             </mat-form-field>
 
             <mat-form-field appearance="outline" density="compact" class="field-cfu">
               <mat-label>CFU</mat-label>
-              <input matInput [(ngModel)]="ce.originalCourse.credits"/>
+              <input matInput [disabled] = "canEditCourses()" [(ngModel)]="ce.originalCourse.credits"/>
             </mat-form-field>
           </div>
         </div>
@@ -197,17 +197,17 @@
           <div class="course-inputs">
             <mat-form-field appearance="outline" density="compact" class="field-code">
               <mat-label>Code</mat-label>
-              <input matInput [(ngModel)]="ce.equivalentCourse.code"/>
+              <input matInput [disabled] = "canEditCourses()" [(ngModel)]="ce.equivalentCourse.code"/>
             </mat-form-field>
 
             <mat-form-field appearance="outline" density="compact" class="field-title">
               <mat-label>Course Title</mat-label>
-              <input matInput [(ngModel)]="ce.equivalentCourse.title"/>
+              <input matInput [disabled] = "canEditCourses()" [(ngModel)]="ce.equivalentCourse.title"/>
             </mat-form-field>
 
             <mat-form-field appearance="outline" density="compact" class="field-cfu">
               <mat-label>CFU</mat-label>
-              <input matInput [(ngModel)]="ce.equivalentCourse.credits"/>
+              <input matInput [disabled] = "canEditCourses()" [(ngModel)]="ce.equivalentCourse.credits"/>
             </mat-form-field>
           </div>
         </div>
@@ -218,6 +218,8 @@
                 color="primary" 
                 class="delete-button" 
                 (click)="deleteCourseSection(data.application, courseIndex)"
+                *ngIf="itemNumber != 1";
+                [hidden] = "canEditCourses()"
                 aria-label="Delete course">                
           <mat-icon>delete</mat-icon>
         </button>
@@ -229,6 +231,7 @@
                 color="primary" 
                 class="add-button" 
                 (click)="addCourseSection(data.application)"
+                [hidden] = "canEditCourses()"
                 aria-label="Add course">                
           <mat-icon>add</mat-icon>
         </button>

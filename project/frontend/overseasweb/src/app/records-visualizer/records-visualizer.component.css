@@ -111,3 +111,22 @@
   margin-left: 10px;
 }
 
+.transcript-button {
+  flex: 0 0 auto;
+  background-color: #AC0033 !important;
+  color: white !important;
+  margin-top: 4px;
+  margin-left: auto;
+}
+
+
+
+.field-file{
+flex: 0 0 auto;
+  justify-content: center;
+  padding: 0 4px;
+  margin-left: 20px;
+  width: 40%;
+  margin-top: -6px;
+  transform: translateY(-5px);
+}

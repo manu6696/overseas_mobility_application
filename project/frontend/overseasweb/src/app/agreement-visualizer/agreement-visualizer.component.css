@@ -194,3 +194,14 @@
     color: white !important;
     box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2);
 }
+
+
+.field-file{
+flex: 0 0 auto;
+  justify-content: center;
+  padding: 0 4px;
+  margin-left: 20px;
+  width: 40%;
+  margin-top: -6px;
+  transform: translateY(-5px);
+}

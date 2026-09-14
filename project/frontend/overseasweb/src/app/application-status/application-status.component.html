@@ -11,7 +11,13 @@
           <span class="status-badge" [ngClass]="getStatusClass(application.status)">
             {{ application.status }}
           </span>
+
+
+          
         </mat-panel-description>
+        <div class="hint-banner" *ngIf="getHintMessage()">
+          <span class="hint-text">Next step: {{ getHintMessage() }}</span>
+        </div>
     </mat-expansion-panel-header>
     
     <!--------------- DATA  ------------------>

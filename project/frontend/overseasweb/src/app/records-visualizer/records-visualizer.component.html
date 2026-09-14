@@ -71,7 +71,13 @@
                 </mat-form-field>
             </ng-container>
 
+            <button mat-fab extended class="transcript-button" 
+                    (click)="openPdfViewer(this.data.application._id!)"
 
+                    *ngIf="this.data.application._id! && this.data.transcriptRecords.filename != ''"> 
+              <mat-icon>picture_as_pdf</mat-icon>
+              PDF
+            </button>
 
 
           </div>
@@ -103,6 +109,15 @@
           <mat-icon>picture_as_pdf</mat-icon>
             PDF
           </button>
+
+          <!-------- FILE UPLOADED VISUALIZATION ---------->
+          <ng-container *ngIf="selectedFile">
+            <mat-form-field appearance="outline" class="field-file">
+              <mat-label>Uploaded File</mat-label>
+              <mat-icon matPrefix class="file-prefix-icon">insert_drive_file</mat-icon>
+              <input matInput readonly [value]="selectedFile.name" />
+            </mat-form-field>
+          </ng-container>
       </div>
 
     </div>
@@ -113,5 +128,5 @@
 <!-------- EDITOR BUTTONS ---------->
 <mat-dialog-actions align="end">
   <button mat-flat-button  class="close-button" mat-dialog-close>Close</button>
-  <button mat-flat-button color="primary" class="edit-button" *ngIf= "data.application.status !== 'Closed' && data.application.status !== 'Canceled'" [mat-dialog-close]="data.application" (click)="onTranscriptSave()" cdkFocusInitial>Save Changes</button>
+  <button mat-flat-button color="primary" class="edit-button" *ngIf= "data.application.status !== 'Closed' && data.application.status !== 'Canceled'" (click)="onTranscriptSave()" cdkFocusInitial>Save Changes</button>
 </mat-dialog-actions>

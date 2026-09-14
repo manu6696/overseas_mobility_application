@@ -103,6 +103,32 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     }
   }
 
+  // Used to help the process
+ getHintMessage(): string{
+    switch(this.application?.status) {
+      case 'Created':
+        return 'Waiting for Learning Agreement';
+      case 'Awaiting Agreement approval':
+        if(!this.application.agreementApproved)
+          return 'Waiting for lecturer approval';
+        else
+          return 'Waiting for staff approval';
+      case 'Pre-departure completed':
+        return 'Automatic changing phase';
+      case 'Mobility in progress':
+        return 'Waiting for exam score';
+      case 'Waiting for exam score approval':
+        if(!this.application.recordsUploaded)
+          return 'Waiting for lecturer approval';
+        else 
+          return 'Waiting for application closing by staff';
+      default:
+        return '';
+    }
+  }
+
+
+
   // Needed to hide some fields
   private hiddenFields = ['_id', '__v', 'modified', 'status', 'approved', 'courses'];
 
@@ -137,6 +163,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     return !this.lecturerData.includes(key);
   }
 
+  // Deleting application
   public delete_application_by_id(id : string) {
     this.ap.delete_application_by_id(id).subscribe( {
       next: () => {
@@ -162,6 +189,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
   }
 
 
+  // Needed to manage the group of each field of the application (principally used for visualization)
   getFieldsByCategory(app: Application): FieldGroupResult[] {
     const applicationKeys = Object.keys(app);
     let groups : FieldGroupResult[] = [];
@@ -273,6 +301,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
           dialogRef.afterClosed().subscribe((updatedApplication: Application) => {
             if (updatedApplication) {
               console.log('Dati ricevuti dal dialog:', updatedApplication);
+              this.application = updatedApplication;
               this.applicationModified.emit(updatedApplication._id);
               this.clonedCourses = updatedApplication.courses;
             }
@@ -297,13 +326,14 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe((updatedApplication: Application) => {
       if (updatedApplication) {
         console.log('Dati ricevuti dal dialog:', updatedApplication);
-        
+        this.application = updatedApplication;
         this.applicationModified.emit(updatedApplication._id);
         this.clonedCourses = updatedApplication.courses;
       }
     });
   }
 
+  // Copy of courses
   copyOfCourses(){
     if (this.application?.courses) {
       this.clonedCourses = structuredClone(this.application.courses);
@@ -326,7 +356,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     this.dialogApplicationPhase .afterClosed().subscribe((updatedApplication: Application) => {
       if (updatedApplication) {
         console.log('Dati ricevuti dal dialog:', updatedApplication);
-        
+        this.application = updatedApplication;
         this.applicationModified.emit(updatedApplication._id);
         this.clonedCourses = updatedApplication.courses;
       }
@@ -346,6 +376,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     return this.isStudent;
   }
 
+  // Needed to change phase status
   confirmPhaseUpdate(application: Application) {
     console.log(application);
     if(this.preDepartureCompleted || this.applicationClosed ) {
@@ -406,6 +437,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     });
   }
 
+  // Needed for visualization
   verifyStateApplicationRequirement() {
     if(this.application?.status === 'Awaiting Agreement approval') {
       return this.canVerifyPreDeparture;

@@ -347,7 +347,8 @@ app.put("/api/v1/applications/:applicationid", auth, (req, res, next) => {
         const isOwner = req.auth.username === existingApp.matrNumber;
         const isReferentLecturer = req.auth.roles.includes('LECTURER') && req.auth.username === existingApp.referent;
         const isStaff = req.auth.roles.includes('STAFF');
-        if (recvapplications.preDepartureCompleted === true && existingApp.status !== 'Waiting for exam score approval') {
+        const isStudent = req.auth.roles.includes('STUDENT');
+        if (recvapplications.preDepartureCompleted === true && existingApp.status !== 'Waiting for exam score approval' && !isStudent) {
             if (!isStaff) {
                 return next({ statusCode: 403, error: true, errormessage: "Not authorized" });
             }
@@ -706,7 +707,6 @@ app.put("/api/v1/transcriptRecords/:applicationid", auth, upload.single('transcr
                 }).catch((reason) => {
                     return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
                 });
-                return res.status(200).json({ error: false, errormessage: "" });
             }
             else
                 return next({ statusCode: 404, error: true, errormessage: "Application not found" });

@@ -10,6 +10,7 @@
 .panel-description {
   flex: 0 0 auto;
   justify-content: flex-start;
+  align-items: center; 
 }
 
 
@@ -24,6 +25,21 @@
    border: 1px solid transparent;
 }
 
+.status-container {
+  display: flex;
+  align-items: center;
+}
+
+.hint-banner {
+  margin-left: auto; 
+  margin-right: 16px;
+  color: #757575;
+}
+
+.hint-text {
+  font-style: italic;
+  font-size: 12px;
+}
 .status-default,
 .status-created {
   background-color: #f1f3f5;

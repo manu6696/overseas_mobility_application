@@ -29,11 +29,11 @@ export interface Application {
     hostCity: string;
     courses: CourseEval[];
     referent: string;
-    agreementApproved: Boolean;
-    modified: Boolean;
+    agreementApproved: boolean;
+    modified: boolean;
     lecturerReason: string;
-    preDepartureCompleted?: Boolean;
-    recordsUploaded?: Boolean;
+    preDepartureCompleted?: boolean;
+    recordsUploaded?: boolean;
     arrivalDate?: Date;
     departureDate?: Date;
 }

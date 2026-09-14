@@ -116,11 +116,30 @@ export class RecordsVisualizerComponent implements OnInit{
     request$.subscribe({
       next: () => {
         this.rec.get_transcript_by_id(this.data.application._id!).subscribe({
-          next: (tr) => this.data.transcriptRecords = tr,
-          error: (err) => console.error(err)
+          next: (tr) => {
+            this.data.transcriptRecords = tr;
+            if(this.us.is_student()) {
+              this.ap.get_application_by_matrNumber(this.us.get_username()).subscribe({
+                next: (application) => {
+                  this.data.application = application.find((elemento) => elemento._id === this.data.application._id!)!;
+                  this.dialogRef.close(this.data.application);
+                }, 
+                error: (err) => {
+                  console.log("Error getting application", err);
+                }
+              });
+            } else {
+              this.dialogRef.close(this.data.application);
+            }
+            
+
+          },
+          error: (err) => {
+            console.error(err);
+          }
         });
       },
-      error: (err) => console.error("Errore salvataggio transcript:", err)
+      error: (err) => console.error("Error saving transcript:", err)
     });
   }
   

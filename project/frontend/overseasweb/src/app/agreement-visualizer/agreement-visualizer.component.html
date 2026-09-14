@@ -6,7 +6,7 @@
 <mat-dialog-content class="custom-dialog-content">
 
   <div *ngIf="agreements && agreements.length > 0; else noAgreements">
-    <div class="agreement-item" *ngFor="let ag of agreements">
+    <div class="agreement-item" *ngFor="let ag of agreements; let agIndex = index">
 
       <div class="agreement-content">
 
@@ -23,7 +23,7 @@
           <!---- STATE ----> 
             <mat-form-field appearance="outline" class="field-date" *ngIf="!userIsLecturer()">
               <mat-label>State</mat-label>
-              <input matInput [disabled]="true" [value]="ag.approved" />
+              <input matInput [disabled]="true" [value]="this.agreementsApproved[agIndex]" />
             </mat-form-field>
           </div>
 
@@ -40,14 +40,14 @@
             
             <input matInput 
                   [(ngModel)]="ag.lecturerReason" 
-                  [disabled]="!userIsLecturer()"/>
+                  [disabled]="!userIsLecturer() || this.agreementsApproved[agIndex]"/>
           </mat-form-field>
 
-          <!---- APPROVED ----> 
+          <!---- APPROVED ---->
           <mat-form-field appearance="outline" class="field-full" *ngIf="ag.approved && userIsLecturer()">
             <mat-label>State</mat-label>
             <ng-container *ngIf="userIsLecturer() ; else studentApprovedBlock"> 
-              <mat-select [disabled]="!userIsLecturer()" [(ngModel)]="ag.approved">
+              <mat-select [disabled]="!userIsLecturer() || this.agreementsApproved[agIndex]" [(ngModel)]="ag.approved">
                 <mat-option *ngFor="let state of agreementState" [value]="state">
                     {{ state }}
                 </mat-option>
@@ -88,7 +88,7 @@
             <!-- Lecturer -->
             <mat-form-field appearance="outline" class="field-full" *ngIf="userIsLecturer(); else studentDecisionDateBlock">
               <mat-label>Decision Date</mat-label>
-              <input matInput [matDatepicker]="picker" [(ngModel)]="ag.decisionDate">
+              <input matInput [disabled] = "this.agreementsApproved[agIndex]" [matDatepicker]="picker" [(ngModel)]="ag.decisionDate">
               <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
@@ -97,17 +97,11 @@
             <ng-template #studentDecisionDateBlock> 
               <mat-form-field appearance="outline" class="field-full">
                 <mat-label>Decision Date</mat-label>
-                <input matInput [disabled]="true" [ngModel]="ag.decisionDate | date:'MM/dd/yyyy'" />
+                <input matInput [disabled]="true" [ngModel]="ag.decisionDate | date:'dd/MM/yyyy'" />
               </mat-form-field>
             </ng-template>
 
           </ng-container>
-
-
-
-          <button mat-fab color="primary" type="button" class="save-button" *ngIf="userIsLecturer()" (click)="onAgreementUpdate(ag)">
-            <mat-icon>save</mat-icon>
-          </button>
 
         </div>
 
@@ -133,17 +127,17 @@
             <div class="course-inputs">
               <mat-form-field appearance="outline" density="compact" class="field-code">
                 <mat-label>Code</mat-label>
-                <input matInput [(ngModel)]="ce.originalCourse.code"/>
+                <input matInput [disabled] = "this.agreementsApproved[agIndex]" [(ngModel)]="ce.originalCourse.code"/>
               </mat-form-field>
 
               <mat-form-field appearance="outline" density="compact" class="field-title">
                 <mat-label>Course Title</mat-label>
-                <input matInput [(ngModel)]="ce.originalCourse.title"/>
+                <input matInput [disabled] = "this.agreementsApproved[agIndex]" [(ngModel)]="ce.originalCourse.title"/>
               </mat-form-field>
 
               <mat-form-field appearance="outline" density="compact" class="field-cfu">
                 <mat-label>CFU</mat-label>
-                <input matInput [(ngModel)]="ce.originalCourse.credits"/>
+                <input matInput [disabled] = "this.agreementsApproved[agIndex]" [(ngModel)]="ce.originalCourse.credits"/>
               </mat-form-field>
             </div>
           </div>
@@ -159,17 +153,17 @@
             <div class="course-inputs">
               <mat-form-field appearance="outline" density="compact" class="field-code">
                 <mat-label>Code</mat-label>
-                <input matInput [(ngModel)]="ce.equivalentCourse.code"/>
+                <input matInput [disabled] = "this.agreementsApproved[agIndex]" [(ngModel)]="ce.equivalentCourse.code"/>
               </mat-form-field>
 
               <mat-form-field appearance="outline" density="compact" class="field-title">
                 <mat-label>Course Title</mat-label>
-                <input matInput [(ngModel)]="ce.equivalentCourse.title"/>
+                <input matInput [disabled] = "this.agreementsApproved[agIndex]" [(ngModel)]="ce.equivalentCourse.title"/>
               </mat-form-field>
 
               <mat-form-field appearance="outline" density="compact" class="field-cfu">
                 <mat-label>CFU</mat-label>
-                <input matInput [(ngModel)]="ce.equivalentCourse.credits"/>
+                <input matInput [disabled] = "this.agreementsApproved[agIndex]" [(ngModel)]="ce.equivalentCourse.credits"/>
               </mat-form-field>
             </div>
           </div>
@@ -179,7 +173,8 @@
                   mat-mini-fab 
                   color="primary" 
                   class="delete-button" 
-                  (click)="deleteCourseSection(data.application, courseIndex)"
+                  (click)="deleteCourseSection(ag, courseIndex)"
+                  [hidden] = "this.agreementsApproved[agIndex]"
                   aria-label="Delete course">                
             <mat-icon>delete</mat-icon>
           </button>
@@ -190,24 +185,28 @@
                   mat-mini-fab 
                   color="primary" 
                   class="add-button" 
-                  (click)="addCourseSection(data.application)"
+                  (click)="addCourseSection(ag)"
+                  [hidden] = "this.agreementsApproved[agIndex]"
                   aria-label="Add course">                
             <mat-icon>add</mat-icon>
           </button>
+
 
         </div>
 
+        <!-------- SAVE BUTTON ---------->
+        <button mat-fab color="primary"   
+                  class="save-button" 
+                  (click)="onAgreementUpdate(ag)"
+                  [hidden] = "this.agreementsApproved[agIndex]">
+          <mat-icon>save</mat-icon>
+        </button>
 
-          <!-------- PLUS BUTTON IF EMPTY LIST ---------->
-          <button *ngIf="data.application.courses.length == 0 " 
-                  type="button" 
-                  mat-mini-fab 
-                  color="primary" 
-                  class="add-button-if-empty" 
-                  (click)="addCourseSection(data.application)"
-                  aria-label="Add course">                
-            <mat-icon>add</mat-icon>
-          </button>
+        <!---
+        <button mat-fab color="primary" type="button" class="save-button" *ngIf="userIsLecturer()" (click)="onAgreementUpdate(ag)">
+          <mat-icon>save</mat-icon>
+        </button>
+        -->
 
       </div>      
     </div>
@@ -218,7 +217,7 @@
   </ng-template>
 
 
-  <div class="agreement-item agreement-upload-card" *ngIf="!userIsLecturer() && data.application.status !== 'Closed' && data.application.status !== 'Canceled'">
+  <div class="agreement-item agreement-upload-card" *ngIf="userIsStudent() && data.application.status !== 'Closed' && data.application.status !== 'Canceled'">
     <p>Add new learning agreement</p>
     <div class="agreement-content">
 
@@ -231,6 +230,7 @@
 
 
     </div>
+        <!-------- UPLOAD FILE ---------->
           <input 
         type="file" 
         #fileInput
@@ -239,13 +239,25 @@
         (change)="onFileSelected($event)" 
       />
 
+      <!-------- UPLOAD BUTTON ---------->
       <button mat-fab color="primary" class="upload-button" (click)="fileInput.click()">
         <mat-icon>upload_file</mat-icon>
       </button>
 
+      <!-------- SAVE BUTTON (NEW AGREEMENT) ---------->
       <button mat-fab color="primary" class="save-button" (click)="onAgreementSave()">
         <mat-icon>save</mat-icon>
       </button>
+
+      <!-------- FILE UPLOADED VISUALIZATION ---------->
+      <ng-container *ngIf="selectedFile">
+        <mat-form-field appearance="outline" class="field-file">
+          <mat-label>Uploaded File</mat-label>
+          <mat-icon matPrefix class="file-prefix-icon">insert_drive_file</mat-icon>
+          <input matInput readonly [value]="selectedFile.name" />
+        </mat-form-field>
+      </ng-container>
+            
   </div>
 
 </mat-dialog-content>

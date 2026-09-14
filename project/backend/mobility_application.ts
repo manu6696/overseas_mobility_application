@@ -440,8 +440,9 @@ app.put("/api/v1/applications/:applicationid", auth, (req,res,next) => {
     const isOwner = req.auth.username === existingApp.matrNumber;
     const isReferentLecturer = req.auth.roles.includes('LECTURER') && req.auth.username === existingApp.referent;
     const isStaff = req.auth.roles.includes('STAFF');
+    const isStudent = req.auth.roles.includes('STUDENT');
 
-    if (recvapplications.preDepartureCompleted === true && existingApp.status !== 'Waiting for exam score approval') {
+    if (recvapplications.preDepartureCompleted === true && existingApp.status !== 'Waiting for exam score approval' && !isStudent) {
       if (!isStaff) {
         return next({ statusCode: 403, error: true, errormessage: "Not authorized" });
       }
@@ -744,23 +745,14 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
                 return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
             });
 
-
-
-
           }).catch( (reason)=> {
               return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
           }) 
-
-
-
-
 
         } else {
           // Doesn't do anything with the agreements status 'Rejected'
           return res.status(200).json({error:false, errormessage:""});
         }
-
-  
 
       }else {
         return next({ statusCode:404, error: true, errormessage: "Data is not a valid learning agreement"});
@@ -954,8 +946,6 @@ console.log("File ricevuto:", req.file ? req.file.originalname : "nessuno");
             }).catch( (reason)=> {
                 return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
             });
-
-          return res.status(200).json( {error:false, errormessage:""} );
         }
           
         else

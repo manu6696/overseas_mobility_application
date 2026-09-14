@@ -88,7 +88,7 @@ export class ApplicationEditorComponent implements OnInit {
       
       const metaKey = APPLICATION_FIELD_META[key as keyof Application];
       if(metaKey === undefined) continue;
-      if((!metaKey.hidden || metaKey.label === 'Courses') && metaKey.label !== 'Upload Date') {
+      if((!metaKey.hidden || metaKey.label === 'Courses') && metaKey.label !== 'Upload Date' && metaKey.label !== 'Arrival Date' && metaKey.label !== 'Departure Date') {
         const groupName = FIELD_GROUP_LABELS[metaKey.group];
         const groupsFinded = groups.find(elemento => elemento.groupLabel === groupName);
 
@@ -180,16 +180,9 @@ export class ApplicationEditorComponent implements OnInit {
 
 
 
-
-
-
-
-
-
-
-
-
-
+  canEditCourses(){
+    return this.application?.status !== 'Mobility in progress' && this.application?.status !== 'Created'
+  }
 
 
 

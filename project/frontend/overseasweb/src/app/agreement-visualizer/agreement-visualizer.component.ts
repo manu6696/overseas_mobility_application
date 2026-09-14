@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Application, APPLICATION_FIELD_META, FIELD_GROUP_LABELS, FieldGroupEditor, GroupedFieldEditor, dateOptions} from '../application';
+import { Application, APPLICATION_FIELD_META, FIELD_GROUP_LABELS, FieldGroupEditor, GroupedFieldEditor, dateOptions, CourseEval} from '../application';
 import { ApplicationHttpService } from '../application-http.service';
 import { Host } from '../host';
 import { HostHttpService } from '../host-http.service';
@@ -22,7 +22,9 @@ export class AgreementVisualizerComponent implements OnInit {
 
   public application: Application | null = null;
   public agreements: Agreement[] = [];
+  public agreementsApproved: boolean[] = [];
   public isLecturer: boolean = false;
+  public isStudent: boolean = false;
   public fieldGroupEdited: FieldGroupEditor[] = [];
   public newModifyDescription: string = "";
   public newAgreement : Agreement | null = null;
@@ -30,6 +32,7 @@ export class AgreementVisualizerComponent implements OnInit {
   public agreementState: string[] = ['Pending', 'Approved','Rejected'];
   @Output() posted = new EventEmitter<Application>();
 
+  
   constructor( 
     public dialogRef: MatDialogRef<AgreementVisualizerComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { application: Application }, 
@@ -40,16 +43,18 @@ export class AgreementVisualizerComponent implements OnInit {
     private router: Router,  
     private ag: AgreementHttpService,
     private sanitizer: DomSanitizer) { }
+    private applicationCourses: CourseEval[] = [];
 
 
   ngOnInit() {
     this.isLecturer = this.us.is_lecturer();
+    this.isStudent = this.us.is_student();
     this.fieldGroupEdited = this.getFieldsByCategoryEditor(this.data.application);
     this.get_agreement_list_by_query(this.data.application._id!);
     this.sio.connect().subscribe((m) => {
       this.get_agreement_list_by_query(this.data.application._id!);
     });
-
+    this.applicationCourses = this.data.application.courses;
   }
 
 
@@ -59,7 +64,7 @@ export class AgreementVisualizerComponent implements OnInit {
       next: (agreements) => {
         console.log("Agreement successfully received.");
         this.agreements = agreements;
-        
+        this.agreementsApproved = this.agreements.map((elemento) => elemento.approved === 'Approved');
       },
       error: (err) => {
         // Agreement not found
@@ -139,7 +144,6 @@ export class AgreementVisualizerComponent implements OnInit {
   // Saving agreement (needed by student)
   onAgreementSave() {
     const formData = new FormData();
-  
     const date = new Date;
 
     if (this.selectedFile) {
@@ -168,8 +172,32 @@ export class AgreementVisualizerComponent implements OnInit {
 
     this.ag.put_agreement(agreement).subscribe({
       next: () => {
-        this.ag.get_agreement_by_id(agreement._id!);
-        this.ap.get_application_by_matrNumber(this.us.get_username());
+
+        this.get_agreement_list_by_query(this.data.application._id!);
+
+        if(this.isLecturer) {
+          this.ap.get_application_by_query({referent: this.us.get_username()}).subscribe({
+            next: (application) => {
+              this.data.application = application.find((elemento) => elemento._id === this.data.application._id)!;
+              this.dialogRef.close(this.data.application);
+            },
+            error: (err) => {
+              console.log("Error getting application:",err);
+            }
+          });
+        }
+
+        if(this.isStudent) {
+          this.ap.get_application_by_matrNumber(this.us.get_username()).subscribe({
+            next: (application) => {
+              this.data.application = application.find((elemento) => elemento._id === this.data.application._id)!;
+            },
+            error: (err) => {
+              console.log("Error getting application:",err);
+            }
+          });
+        }
+
       },
       error: (err) => {
         console.error("Error updating agreement:", err);
@@ -183,18 +211,20 @@ export class AgreementVisualizerComponent implements OnInit {
     return this.isLecturer;
   }
 
+  userIsStudent() {
+    return this.isStudent;
+  }
 
-  addCourseSection(app: Application){
-
-    app.courses.push({
+  addCourseSection(ag: Agreement){
+    ag.courses.push({
       originalCourse: { code: "", title: "", credits: 0 },
       equivalentCourse: { code: "", title: "", credits: 0 }
     });
 
   }
 
-  deleteCourseSection(app: Application, courseIndex: number){
-    app.courses = app.courses.filter((elemento, index) => index !== courseIndex);
+  deleteCourseSection(ag: Agreement, courseIndex: number){
+    ag.courses = ag.courses.filter((elemento, index) => index !== courseIndex);
   }
 
 }
