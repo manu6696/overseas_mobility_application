@@ -548,20 +548,31 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
     recvagreements.modifyDescription = req.body.modifyDescription;
     recvagreements.lecturerReason = req.body.lecturerReason || 'No reason provided';
     if (agreement.isPartialAgreement(recvagreements)) {
-        agreement.getModel().updateOne({ _id: req.params.agreementid }, recvagreements).then((q) => {
-            if (q.matchedCount > 0) {
+        agreement.getModel().updateOne({ _id: req.params.agreementid }, recvagreements).then((q1) => {
+            if (q1.matchedCount > 0) {
                 let agreementApproved = false;
                 if (recvagreements.approved === 'Approved') {
-                    agreementApproved = true;
+                    agreement.getModel().findOne({ _id: req.params.agreementid }).then((existingAgreement) => {
+                        if (!existingAgreement) {
+                            return next({ statusCode: 404, error: true, errormessage: "Agreement not found" });
+                        }
+                        agreementApproved = true;
+                        application.getModel().updateOne({ _id: recvagreements.applicationid }, { agreementApproved: agreementApproved, courses: existingAgreement.courses }).then((q2) => {
+                            if (q2.matchedCount > 0)
+                                return res.status(200).json({ error: false, errormessage: "" });
+                            else
+                                return next({ statusCode: 404, error: true, errormessage: "Data is not a valid application" });
+                        }).catch((reason) => {
+                            return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
+                        });
+                    }).catch((reason) => {
+                        return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
+                    });
                 }
-                application.getModel().updateOne({ _id: recvagreements.applicationid }, { agreementApproved: agreementApproved }).then((q) => {
-                    if (q.matchedCount > 0)
-                        return res.status(200).json({ error: false, errormessage: "" });
-                    else
-                        return next({ statusCode: 404, error: true, errormessage: "Data is not a valid application" });
-                }).catch((reason) => {
-                    return next({ statusCode: 500, error: true, errormessage: "DB error: " + reason });
-                });
+                else {
+                    // Doesn't do anything with the agreements status 'Rejected'
+                    return res.status(200).json({ error: false, errormessage: "" });
+                }
             }
             else {
                 return next({ statusCode: 404, error: true, errormessage: "Data is not a valid learning agreement" });
@@ -889,7 +900,7 @@ app.use((req, res, next) => {
 mongoose.connect('mongodb://mymongo:27017/mobility_application')
     .then(() => {
     console.log("Connected to MongoDB");
-    return user.getModel().findOne({ mail: "admin@cafoscari.it" });
+    return user.getModel().findOne({ mail: "admin@admin.it" });
 }).then((doc) => {
     if (!doc) {
         console.log("Creating admin user");
@@ -910,7 +921,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
     }
 })
     .then(() => {
-    return user.getModel().findOne({ mail: "123456@stud.univ.it" });
+    return user.getModel().findOne({ mail: "student@student.it" });
 })
     .then((doc) => {
     if (!doc) {
@@ -922,7 +933,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             mail: "student@student.it"
         });
         u.setStudent();
-        u.setPassword("123456");
+        u.setPassword("student");
         return u.save();
     }
     else {
@@ -930,7 +941,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
     }
 })
     .then(() => {
-    return user.getModel().findOne({ mail: "919191@univ.it" });
+    return user.getModel().findOne({ mail: "lecturer@lecturer.it" });
 })
     .then((doc) => {
     if (!doc) {
@@ -942,7 +953,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             mail: "lecturer@lecturer.it"
         });
         u.setLecturer();
-        u.setPassword("919191");
+        u.setPassword("lecturer");
         return u.save();
     }
     else {
@@ -950,7 +961,7 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
     }
 })
     .then(() => {
-    return user.getModel().findOne({ mail: "staff@univ.it" });
+    return user.getModel().findOne({ mail: "staff@staff.it" });
 })
     .then((doc) => {
     if (!doc) {

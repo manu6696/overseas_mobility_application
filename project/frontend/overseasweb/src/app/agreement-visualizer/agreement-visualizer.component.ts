@@ -184,4 +184,17 @@ export class AgreementVisualizerComponent implements OnInit {
   }
 
 
+  addCourseSection(app: Application){
+
+    app.courses.push({
+      originalCourse: { code: "", title: "", credits: 0 },
+      equivalentCourse: { code: "", title: "", credits: 0 }
+    });
+
+  }
+
+  deleteCourseSection(app: Application, courseIndex: number){
+    app.courses = app.courses.filter((elemento, index) => index !== courseIndex);
+  }
+
 }

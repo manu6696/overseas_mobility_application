@@ -118,7 +118,98 @@
           PDF
         </button>
 
+
+
+
       </div>
+      <div class="group-section courses-section">
+        <h3 class="group-title courses-title">Courses</h3>
+
+        <div *ngFor="let ce of ag.courses;let itemNumber = count; let isLast = last; let courseIndex = index" class="course-comparison-row">
+          
+          <!-------- ORIGINAL COURSE ---------->
+          <div class="course-column">
+            <div class="course-subtitle">Original Course</div>
+            <div class="course-inputs">
+              <mat-form-field appearance="outline" density="compact" class="field-code">
+                <mat-label>Code</mat-label>
+                <input matInput [(ngModel)]="ce.originalCourse.code"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" density="compact" class="field-title">
+                <mat-label>Course Title</mat-label>
+                <input matInput [(ngModel)]="ce.originalCourse.title"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" density="compact" class="field-cfu">
+                <mat-label>CFU</mat-label>
+                <input matInput [(ngModel)]="ce.originalCourse.credits"/>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-------- ARROW ---------->
+          <div class="arrow-wrapper">
+            <span class="arrow">→</span>
+          </div>
+
+          <!-------- EQUIVALENT COURSE ---------->
+          <div class="course-column">
+            <div class="course-subtitle">Equivalent Course</div>
+            <div class="course-inputs">
+              <mat-form-field appearance="outline" density="compact" class="field-code">
+                <mat-label>Code</mat-label>
+                <input matInput [(ngModel)]="ce.equivalentCourse.code"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" density="compact" class="field-title">
+                <mat-label>Course Title</mat-label>
+                <input matInput [(ngModel)]="ce.equivalentCourse.title"/>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" density="compact" class="field-cfu">
+                <mat-label>CFU</mat-label>
+                <input matInput [(ngModel)]="ce.equivalentCourse.credits"/>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-------- DELETE BUTTON ---------->
+          <button type="button" 
+                  mat-mini-fab 
+                  color="primary" 
+                  class="delete-button" 
+                  (click)="deleteCourseSection(data.application, courseIndex)"
+                  aria-label="Delete course">                
+            <mat-icon>delete</mat-icon>
+          </button>
+
+          <!-------- PLUS BUTTON ---------->
+          <button *ngIf="isLast || itemNumber == 0 " 
+                  type="button" 
+                  mat-mini-fab 
+                  color="primary" 
+                  class="add-button" 
+                  (click)="addCourseSection(data.application)"
+                  aria-label="Add course">                
+            <mat-icon>add</mat-icon>
+          </button>
+
+        </div>
+
+
+          <!-------- PLUS BUTTON IF EMPTY LIST ---------->
+          <button *ngIf="data.application.courses.length == 0 " 
+                  type="button" 
+                  mat-mini-fab 
+                  color="primary" 
+                  class="add-button-if-empty" 
+                  (click)="addCourseSection(data.application)"
+                  aria-label="Add course">                
+            <mat-icon>add</mat-icon>
+          </button>
+
+      </div>      
     </div>
   </div>
 
