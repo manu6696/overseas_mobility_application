@@ -2,7 +2,7 @@
     "name": "mobility_application",
     "main": "mobility_application",
     "version": "0.0.1",
-    "author": "Filippo Bergamasco",
+    "author": "Manuel Rosace",
     "dependencies": {
         "colors": "^1.4.0",
         "cors": "^2.8.5",
