@@ -30,6 +30,7 @@ export class AgreementVisualizerComponent implements OnInit {
   public newAgreement : Agreement | null = null;
   public selectedFile : File | null = null;
   public agreementState: string[] = ['Pending', 'Approved','Rejected'];
+  public courses: CourseEval[] = [];
   @Output() posted = new EventEmitter<Application>();
 
   
@@ -55,6 +56,7 @@ export class AgreementVisualizerComponent implements OnInit {
       this.get_agreement_list_by_query(this.data.application._id!);
     });
     this.applicationCourses = this.data.application.courses;
+    this.courses = this.data.application.courses;
   }
 
 
@@ -152,7 +154,7 @@ export class AgreementVisualizerComponent implements OnInit {
     formData.append('matrNumber', this.data.application.matrNumber);
     formData.append('modifyDescription', this.newModifyDescription);
     formData.append('applicationid', this.data.application._id!);
-    formData.append('courses', JSON.stringify(this.data.application.courses));
+    formData.append('courses', JSON.stringify(this.courses));
     
     this.ag.post_agreement(formData, this.data.application._id!).subscribe({
       next: () => {
@@ -227,4 +229,11 @@ export class AgreementVisualizerComponent implements OnInit {
     ag.courses = ag.courses.filter((elemento, index) => index !== courseIndex);
   }
 
+  agreementIsEditable() {
+    const notClosed = this.data.application.status !== 'Closed';
+    const notCanceled = this.data.application.status !== 'Canceled'
+    const notAwaitingScoreAppr = this.data.application.status !== 'Waiting for exam score approval'
+    const notAwaitingLAAppr = this.data.application.status !== 'Awaiting Agreement approval'
+    return notClosed && notCanceled && notAwaitingScoreAppr && notAwaitingLAAppr;
+  }
 }

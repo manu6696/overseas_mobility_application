@@ -449,6 +449,10 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
 
   }
 
+  applicationIsEditable() {
+    return this.application?.status === 'Created';
+  }
+
 }
 
 

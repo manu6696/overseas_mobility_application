@@ -59,7 +59,10 @@ export class DashboardLecturerComponent implements OnInit {
     });
   }
 
-
+  // Needed to make the expansion panel not to collapse
+  trackByApplicationId(index: number, application: Application): string {
+    return application._id ?? index.toString();
+  }
 
 
 }

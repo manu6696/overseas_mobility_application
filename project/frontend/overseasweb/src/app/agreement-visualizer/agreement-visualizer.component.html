@@ -23,7 +23,7 @@
           <!---- STATE ----> 
             <mat-form-field appearance="outline" class="field-date" *ngIf="!userIsLecturer()">
               <mat-label>State</mat-label>
-              <input matInput [disabled]="true" [value]="this.agreementsApproved[agIndex]" />
+              <input matInput [disabled]="true" [value]="ag.approved" />
             </mat-form-field>
           </div>
 
@@ -217,7 +217,7 @@
   </ng-template>
 
 
-  <div class="agreement-item agreement-upload-card" *ngIf="userIsStudent() && data.application.status !== 'Closed' && data.application.status !== 'Canceled'">
+  <div class="agreement-item agreement-upload-card" *ngIf="userIsStudent() && agreementIsEditable()">
     <p>Add new learning agreement</p>
     <div class="agreement-content">
 

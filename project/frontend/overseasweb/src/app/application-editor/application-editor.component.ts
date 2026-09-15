@@ -181,7 +181,7 @@ export class ApplicationEditorComponent implements OnInit {
 
 
   canEditCourses(){
-    return this.application?.status !== 'Mobility in progress' && this.application?.status !== 'Created'
+    return (this.application?.status === 'Mobility in progress' || this.application?.status === 'Created');
   }
 
 
