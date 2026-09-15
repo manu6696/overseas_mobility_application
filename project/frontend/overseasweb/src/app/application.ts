@@ -254,7 +254,7 @@ export const APPLICATION_FIELD_META : Record<keyof Application, FieldMeta> = {
     recordsUploaded : {
         label: 'Transcript of Records uploaded', 
         group: 'general', 
-        hidden: false, 
+        hidden: true, 
         editableFrom: ['ADMIN', 'MODERATOR', 'STAFF']
     }
 }

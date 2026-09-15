@@ -304,6 +304,11 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
               this.application = updatedApplication;
               this.applicationModified.emit(updatedApplication._id);
               this.clonedCourses = updatedApplication.courses;
+              this.rec.get_transcript_by_id(updatedApplication._id!).subscribe({
+                next: (updatedTranscript) => {
+                  this.transcriptRecords = updatedTranscript;
+                }
+              });
             }
           });
         },
@@ -376,7 +381,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
     return this.isStudent;
   }
 
-  // Needed to change phase status
+  // Needed to change phase status (only for staff)
   confirmPhaseUpdate(application: Application) {
     console.log(application);
     if(this.preDepartureCompleted || this.applicationClosed ) {
@@ -392,7 +397,8 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
         next: () => {
           console.log("Application successfully modified.");
           //this.posted.emit(this.data.application);
-          this.dialogApplicationPhase.close();
+          if(this.userIsStaff())
+            this.dialogApplicationPhase.close();
         },
         error:(err) => {
           console.log('Error occurred while putting: ' + err);
@@ -415,6 +421,7 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
         
         this.applicationModified.emit(updatedApplication._id);
         this.clonedCourses = updatedApplication.courses;
+
       }
     });
   }
@@ -428,13 +435,14 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
       next: () => {
         console.log("Application successfully modified.");
         //this.posted.emit(this.data.application);
-        this.dialogApplicationPhase.close();
+
       },
       error:(err) => {
         console.log('Error occurred while putting: ' + err);
       }
-
+      
     });
+    this.dialogConfirmDeletion.close(application);
   }
 
   // Needed for visualization

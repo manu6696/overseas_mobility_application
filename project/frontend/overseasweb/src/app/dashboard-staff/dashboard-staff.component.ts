@@ -66,7 +66,10 @@ export class DashboardStaffComponent implements OnInit {
 
 
 
-
+  // Needed to update the dashboard after a delete
+  onApplicationDeleted(id: string) {
+    this.get_all_applications();
+  }
 
 
 

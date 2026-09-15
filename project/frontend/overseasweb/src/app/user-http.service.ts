@@ -39,7 +39,8 @@ export class UserHttpService {
   constructor( private http: HttpClient ) {
     console.log('User service instantiated');
     
-    const loadedtoken = localStorage.getItem('mobility_application_token');
+    const loadedtoken = localStorage.getItem('mobility_application_token') 
+                        || sessionStorage.getItem('mobility_application_token');
     if ( !loadedtoken || loadedtoken.length < 1 ) {
       console.log("No token found in local storage");
       this.token = ""
@@ -83,6 +84,7 @@ export class UserHttpService {
           localStorage.setItem('mobility_application_token', this.token as string);
         } else {
           console.log("Token not saved to local storage.")
+          sessionStorage.setItem('mobility_application_token', this.token as string);
         }
       }));
   }

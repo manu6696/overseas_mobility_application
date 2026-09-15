@@ -161,4 +161,10 @@ export class RecordsVisualizerComponent implements OnInit{
     });
   }
 
+  transcriptIsNotEditable() {
+    const appClosed = this.data.application.status === 'Closed';
+    const appCanceled = this.data.application.status === 'Canceled';
+    const recordsApproved = this.data.application?.recordsUploaded || false;
+    return appClosed || appCanceled || recordsApproved;
+  }
 }

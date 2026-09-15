@@ -64,5 +64,9 @@ export class DashboardLecturerComponent implements OnInit {
     return application._id ?? index.toString();
   }
 
+  // Needed to update the dashboard after a delete
+  onApplicationDeleted(id: string) {
+    this.get_application_by_referent(this.us.get_username());
+  }
 
 }

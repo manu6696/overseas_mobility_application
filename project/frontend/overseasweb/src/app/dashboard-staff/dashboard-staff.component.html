@@ -5,6 +5,7 @@
     <ng-container *ngIf="application?._id && application.status !== 'Closed' && application.status !== 'Canceled'">
      <app-application-status
         class="application-status"
+        (applicationDeleted)="onApplicationDeleted($event)"
         [application]="application">
       </app-application-status>
       <br>

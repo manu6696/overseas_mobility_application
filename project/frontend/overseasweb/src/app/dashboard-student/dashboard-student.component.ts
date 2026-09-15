@@ -98,7 +98,7 @@ export class DashboardStudentComponent implements OnInit  {
     });
   }
 
-
+  // Needed to update the dashboard after a delete
   onApplicationDeleted(id: string) {
     this.get_application_by_matrNumber(this.us.get_username());
   }

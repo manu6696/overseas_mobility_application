@@ -62,6 +62,7 @@ export class AgreementVisualizerComponent implements OnInit {
 
   public get_agreement_list_by_query(applicationid : string){
 
+    
     this.ag.get_agreement_list_no_content_by_query({applicationid}).subscribe( {
       next: (agreements) => {
         console.log("Agreement successfully received.");
@@ -160,6 +161,7 @@ export class AgreementVisualizerComponent implements OnInit {
       next: () => {
         this.get_agreement_list_by_query(this.data.application._id!);
         this.newModifyDescription = '';
+        this.dialogRef.close(this.data.application);
       },
       error: (err) => {
         console.error("Error saving PDF:", err);
@@ -176,7 +178,7 @@ export class AgreementVisualizerComponent implements OnInit {
       next: () => {
 
         this.get_agreement_list_by_query(this.data.application._id!);
-
+        
         if(this.isLecturer) {
           this.ap.get_application_by_query({referent: this.us.get_username()}).subscribe({
             next: (application) => {
@@ -193,6 +195,7 @@ export class AgreementVisualizerComponent implements OnInit {
           this.ap.get_application_by_matrNumber(this.us.get_username()).subscribe({
             next: (application) => {
               this.data.application = application.find((elemento) => elemento._id === this.data.application._id)!;
+              this.dialogRef.close(this.data.application);
             },
             error: (err) => {
               console.log("Error getting application:",err);
@@ -229,6 +232,7 @@ export class AgreementVisualizerComponent implements OnInit {
     ag.courses = ag.courses.filter((elemento, index) => index !== courseIndex);
   }
 
+  // For visualize the agreement's edit section
   agreementIsEditable() {
     const notClosed = this.data.application.status !== 'Closed';
     const notCanceled = this.data.application.status !== 'Canceled'
