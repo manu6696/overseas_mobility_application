@@ -458,7 +458,10 @@ export class ApplicationStatusComponent implements OnInit, OnChanges {
   }
 
   applicationIsEditable() {
-    return this.application?.status === 'Created';
+    const created = this.application?.status === 'Created';
+    const notClosed = this.application?.status !== 'Closed';
+    const notCanceled = this.application?.status !== 'Canceled';
+    return created && notClosed && notCanceled;
   }
 
 }

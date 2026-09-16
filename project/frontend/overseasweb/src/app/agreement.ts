@@ -47,3 +47,4 @@ export function isAgreement(arg: any): arg is Agreement {
     && arg.courses && Array.isArray(arg.courses)
     && typeof(arg.modified) == 'boolean'
 }
+

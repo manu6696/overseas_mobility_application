@@ -33,8 +33,7 @@
           <!----- Editor ---->
           <button mat-fab 
                   color="primary" 
-                  class="edit-button" 
-                  *ngIf="application.status !== 'Closed' && application.status !== 'Canceled'"
+                  class="edit-button"
                   (click)="openApplicationEditor()"
                   [hidden]="!applicationIsEditable()"
                   aria-label="Modifica">

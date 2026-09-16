@@ -227,4 +227,12 @@ export class UserHttpService {
     }
     return false;
   }
+
+
+  is_logged(): boolean {
+    const loadedtoken = localStorage.getItem('mobility_application_token') || sessionStorage.getItem('mobility_application_token');
+    if(loadedtoken)
+      return true;
+    return false;
+  }
 }
