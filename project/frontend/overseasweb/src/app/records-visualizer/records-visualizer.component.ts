@@ -167,4 +167,9 @@ export class RecordsVisualizerComponent implements OnInit{
     const recordsApproved = this.data.application?.recordsUploaded || false;
     return appClosed || appCanceled || recordsApproved;
   }
+
+  isPdfUploaded() {
+    const pdfName = this.data.transcriptRecords.filename;
+    return !!pdfName;
+  }
 }

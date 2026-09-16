@@ -1,0 +1,623 @@
+openapi: 3.0.0
+info:
+  title: Overseas Mobility Application API
+  version: 1.0.0
+  description: API backend per la gestione dei periodi di mobilità fuori sede.
+
+servers:
+  - url: http://localhost:8080
+    description: Server di sviluppo locale
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ==========================================
+  # APPLICATIONS
+  # ==========================================
+  /api/v1/applications:
+    get:
+      summary: Recupera la lista delle application
+      description: Filtra le domande in base al ruolo dell'utente autenticato.
+      parameters:
+        - name: matrNumber
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: referent
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Contenuto dell'application
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+  /api/v1/applications/{matrNumber}:
+    get:
+      summary: Recupera le application di uno specifico utente
+      parameters:
+        - name: matrNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application trovata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+    post:
+      summary: Crea una nuova application
+      parameters:
+        - name: matrNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        '200':
+          description: Application creata con successo
+
+  /api/v1/applications/{applicationid}:
+    put:
+      summary: Modifica lo stato o i dati di un'application
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        '200':
+          description: Application aggiornata
+    delete:
+      summary: Elimina un'application
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application eliminata
+
+  # ==========================================
+  # LEARNING AGREEMENTS
+  # ==========================================
+  /api/v1/agreements:
+    get:
+      summary: Cerca i Learning Agreement per ID domanda o Matricola
+      parameters:
+        - name: applicationid
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: matrNumber
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Learning Agreements trovati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Agreement'
+
+  /api/v1/agreements/{applicationid}:
+    post:
+      summary: Carica un nuovo Learning Agreement (PDF)
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                agreement:
+                  type: string
+                  format: binary
+                  description: File PDF del Learning Agreement.
+                matrNumber:
+                  type: string
+                modifyDescription:
+                  type: string
+                courses:
+                  type: string
+                  description: Array JSON di CourseEval
+      responses:
+        '200':
+          description: Agreement caricato
+    delete:
+      summary: Elimina tutti gli agreement associati a un'application
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Agreement eliminato
+
+  /api/v1/agreements/{agreementid}:
+    get:
+      summary: Scarica il file PDF del Learning Agreement
+      parameters:
+        - name: agreementid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File PDF ritornato
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+    put:
+      summary: Aggiorna lo stato o il file di un Learning Agreement
+      parameters:
+        - name: agreementid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                agreement:
+                  type: string
+                  format: binary
+                approved:
+                  $ref: '#/components/schemas/ApprovalStatus'
+                applicationid:
+                  type: string
+                matrNumber:
+                  type: string
+                lecturerReason:
+                  type: string
+      responses:
+        '200':
+          description: Successo
+
+  # ==========================================
+  # TRANSCRIPT OF RECORDS
+  # ==========================================
+  /api/v1/transcriptRecords:
+    post:
+      summary: Carica il certificato degli esami sostenuti (PDF)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                transcriptRecords:
+                  type: string
+                  format: binary
+                applicationid:
+                  type: string
+                matrNumber:
+                  type: string
+                records:
+                  type: string
+                  description: Array JSON di CourseResult
+      responses:
+        '200':
+          description: Certificato registrato
+
+  /api/v1/transcriptRecords/{applicationid}:
+    get:
+      summary: Recupera i dati del Transcript (senza file)
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dati trovati
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranscriptRecord'
+    put:
+      summary: Aggiorna i dati del transcript o il file PDF
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                transcriptRecords:
+                  type: string
+                  format: binary
+                records:
+                  type: string
+      responses:
+        '200':
+          description: Aggiornato
+    delete:
+      summary: Elimina il Transcript
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Eliminato
+
+  /api/v1/transcriptRecords/{applicationid}/file:
+    get:
+      summary: Scarica il file PDF del Transcript
+      parameters:
+        - name: applicationid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  # ==========================================
+  # HOST INSTITUTIONS
+  # ==========================================
+  /api/v1/hosts:
+    get:
+      summary: Recupera la lista degli host
+      responses:
+        '200':
+          description: Lista host
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Host'
+    post:
+      summary: Aggiunge un nuovo host
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Host'
+      responses:
+        '200':
+          description: Host creato
+
+  # ==========================================
+  # USERS
+  # ==========================================
+  /api/v1/users:
+    get:
+      summary: Ottieni lista di tutti gli host
+      responses:
+        '200':
+          description: Lista host
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Registrazione utente
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Utente registrato
+
+# ==========================================
+# COMPONENTS & SCHEMAS
+# ==========================================
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApprovalStatus:
+      type: string
+      enum:
+        - Pending
+        - Approved
+        - Rejected
+
+    Course:
+      type: object
+      required:
+        - code
+        - title
+        - credits
+      properties:
+        code:
+          type: string
+        title:
+          type: string
+        credits:
+          type: number
+
+    CourseEval:
+      type: object
+      required:
+        - originalCourse
+        - equivalentCourse
+      properties:
+        originalCourse:
+          $ref: '#/components/schemas/Course'
+        equivalentCourse:
+          $ref: '#/components/schemas/Course'
+
+    CourseResult:
+      type: object
+      required:
+        - code
+        - grade
+        - examDate
+        - approved
+      properties:
+        code:
+          type: string
+        grade:
+          type: string
+        examDate:
+          type: string
+          format: date-time
+        approved:
+          $ref: '#/components/schemas/ApprovalStatus'
+
+    Application:
+      type: object
+      required:
+        - _id
+        - status
+        - uploadDate
+        - academicYear
+        - semester
+        - matrNumber
+        - name
+        - surname
+        - departement
+        - sendingInst
+        - sendingCountry
+        - hostInst
+        - hostCountry
+        - hostCity
+        - courses
+        - referent
+        - agreementApproved
+        - modified
+        - lecturerReason
+      properties:
+        _id:
+          type: string
+        status:
+          type: string
+        uploadDate:
+          type: string
+          format: date-time
+        academicYear:
+          type: string
+        semester:
+          type: string
+        matrNumber:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        departement:
+          type: string
+        sendingInst:
+          type: string
+        sendingCountry:
+          type: string
+        hostInst:
+          type: string
+        hostCountry:
+          type: string
+        hostCity:
+          type: string
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseEval'
+        referent:
+          type: string
+        agreementApproved:
+          type: boolean
+        modified:
+          type: boolean
+        lecturerReason:
+          type: string
+        preDepartureCompleted:
+          type: boolean
+        recordsUploaded:
+          type: boolean
+        arrivalDate:
+          type: string
+          format: date-time
+        departureDate:
+          type: string
+          format: date-time
+
+    Agreement:
+      type: object
+      required:
+        - filename
+        - content
+        - mimetype
+        - uploadDate
+        - applicationid
+        - matrNumber
+        - approved
+        - modified
+        - modifyDescription
+        - lecturerReason
+        - decisionDate
+        - courses
+      properties:
+        filename:
+          type: string
+        content:
+          type: string
+          format: binary
+        mimetype:
+          type: string
+        uploadDate:
+          type: string
+          format: date-time
+        applicationid:
+          type: string
+        matrNumber:
+          type: string
+        approved:
+          $ref: '#/components/schemas/ApprovalStatus'
+        modified:
+          type: boolean
+        modifyDescription:
+          type: string
+        lecturerReason:
+          type: string
+        decisionDate:
+          type: string
+          format: date-time
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseEval'
+
+    Host:
+      type: object
+      required:
+        - name
+        - mail
+        - country
+        - city
+      properties:
+        name:
+          type: string
+        mail:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+
+    TranscriptRecord:
+      type: object
+      required:
+        - filename
+        - content
+        - mimetype
+        - records
+        - uploadDate
+        - applicationid
+        - matrNumber
+      properties:
+        filename:
+          type: string
+        content:
+          type: string
+          format: binary
+        mimetype:
+          type: string
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseResult'
+        uploadDate:
+          type: string
+          format: date-time
+        applicationid:
+          type: string
+        matrNumber:
+          type: string
+
+    User:
+      type: object
+      required:
+        - username
+        - name
+        - surname
+        - mail
+        - roles
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        mail:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        password:
+          type: string
+          description: Usato solo in fase di creazione/aggiornamento, non restituito (digest/salt sono gestiti internamente al server).

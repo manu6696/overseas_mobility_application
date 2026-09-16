@@ -61,10 +61,10 @@
             </mat-form-field>
 
             <!---- Approved ---->
-            <ng-container *ngIf="userIsLecturer()"> 
+            <ng-container *ngIf="userIsLecturer() && isPdfUploaded()"> 
                 <mat-form-field appearance="outline" class="field-approved">
                   <mat-label>Approved</mat-label>
-                  <mat-select [disabled] = "transcriptIsNotEditable()" [(ngModel)]="recordStateSelected[courseIndex]">
+                  <mat-select [disabled] = "transcriptIsNotEditable()"  [(ngModel)]="recordStateSelected[courseIndex]">
                     <mat-option *ngFor="let state of recordState" [value]="state">
                       {{ state }}
                     </mat-option>
@@ -75,7 +75,7 @@
             <!---- PDF button ---->
             <button mat-fab extended class="transcript-button" 
                     (click)="openPdfViewer(this.data.application._id!)"
-
+                    
                     *ngIf="this.data.application._id! && this.data.transcriptRecords.filename !== '' && this.data.transcriptRecords.mimetype === 'application/pdf' && courseIndex === 0 "> 
               <mat-icon>picture_as_pdf</mat-icon>
               PDF

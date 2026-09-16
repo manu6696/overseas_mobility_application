@@ -2,57 +2,6 @@
 /*
  *  Overseas applications HTTP REST server v1   MongoDB (Mongoose) + Express
  *
- *  Post and get simple text messages. Each message has a text content, a list of tags
- *  and an associated timestamp.
- *  All the posted messages are stored in a MongoDB collection.
- *
- *  The application also provide user authentication through JWT. The provided
- *  APIs are fully stateless.
- *
- *
- *
- *  Endpoints          Attributes          Method        Description
- *
- *     /                  -                  GET         Returns the version and a list of available endpoints
- *     /messages        ?tags=               GET         Returns all the posted messages, optionally filtered by tags
- *                      ?skip=n
- *                      ?limit=m
- *     /messages          -                  POST        Post a new message
- *     /messages/:id      -                  DELETE      Delete a message by id
- *     /tags              -                  GET         Get a list of tags
- *
- *     /users             -                  GET         List all users (moderators and admin only)
- *     /users/:mail       -                  GET         Get user info by mail
- *     /users/:mail       -                  DELETE      Delete a user by mail (moderators and admin only)
- *     /users             -                  POST        Add a new normal user
- *     /users/moderators  -                  POST        Add a new moderator (admin only)
- *     /login             -                  POST        login an existing user, returning a JWT
- *
- *
- * ------------------------------------------------------------------------------------
- *  To install the required modules:
- *  $ npm install
- *
- *  To compile:
- *  $ npm run compile
- *
- *  To setup:
- *  1) Create a file ".env" to store the JWT secret:
- *     JWT_SECRET=<secret>
- *
- *    $ echo "JWT_SECRET=secret" > ".env"
- *
- *  If you want to use HTTPS:
- * -------------------------------------------------
- *  2) Generate HTTPS self-signed certificates
- *    $ cd keys
- *    $ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 36
- *    $ openssl rsa -in key.pem -out newkey.pem && mv newkey.pem key.pem
- *
- *  3) In postman go to settings and deselect HTTPS certificate check (self-signed
- *     certificate will not work otherwise)
- * -------------------------------------------------
- *
  *  To run:
  *  $ node mobility_application.js
  *
@@ -64,6 +13,8 @@
  *  to delete all the messages:
  *  > db.host.deleteMany( {} )
  *
+ *  For documentation create an openapi.yaml file using Swagger and run this command on the same folder:
+ *  npx @redocly/cli build-docs openapi3_0.yaml -o api-docs.html
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
