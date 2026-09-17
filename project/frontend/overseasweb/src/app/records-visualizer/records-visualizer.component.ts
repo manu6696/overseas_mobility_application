@@ -99,16 +99,19 @@ export class RecordsVisualizerComponent implements OnInit{
   // Saving transcript
   onTranscriptSave() {
     const formData = new FormData();
-    formData.append('applicationid', this.data.application._id!);
-    formData.append('matrNumber', this.data.application.matrNumber);
-    formData.append('records', JSON.stringify(this.buildRecordsPayload()));
+
 
     if (this.selectedFile) {
+      console.log("CIAO da this.", this.selectedFile);
       formData.append('transcriptRecords', this.selectedFile);
     }
 
+    formData.append('applicationid', this.data.application._id!);
+    formData.append('matrNumber', this.data.application.matrNumber);
+    formData.append('records', JSON.stringify(this.buildRecordsPayload()));
+    
     const isUpdate = !!this.data.transcriptRecords?._id;
-
+    
     const request$ = isUpdate
       ? this.rec.put_transcript(formData, this.data.application._id!)
       : this.rec.post_transcript(formData);
@@ -129,6 +132,7 @@ export class RecordsVisualizerComponent implements OnInit{
                 }
               });
             } else {
+              this.data.application.recordsUploaded = this.data.transcriptRecords.records.every((elemento) => elemento.approved === 'Approved');
               this.dialogRef.close(this.data.application);
             }
             

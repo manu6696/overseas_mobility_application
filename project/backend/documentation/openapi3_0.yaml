@@ -235,10 +235,7 @@ paths:
     get:
       summary: Cerca i Learning Agreement per ID application o Matricola
       description: >
-        Se filtrato per `applicationid`, esclude il campo `content` (proiezione
-        `{content:0}`) e restituisce un array leggero. Se filtrato per
-        `matrNumber`, non applica la stessa proiezione: la risposta
-        include quindi anche `content` (il PDF binario) per ogni Agreement.
+        Esclude il campo `content` (`{content:0}`) e restituisce un array leggero.
       parameters:
         - name: applicationid
           in: query
@@ -345,7 +342,7 @@ paths:
             type: string
       responses:
         '200':
-          description: File PDF ritornato come stream binario grezzo (non incapsulato in JSON)
+          description: File PDF allegato al body della risposta
           content:
             application/pdf:
               schema:
@@ -356,7 +353,7 @@ paths:
             Agreement non trovato per l'id indicato
 
     put:
-      summary: Registra la decisione del docente su una versione, o carica un file sostitutivo
+      summary: Registra la decisione del docente su una versione o carica un file sostitutivo
       description: >
         Se approved === 'Approved', i `courses` di questa specifica versione
         vengono copiati su `Application.courses` e viene impostato
@@ -410,9 +407,7 @@ paths:
     post:
       summary: Carica il Transcript of Records (PDF) e i voti
       description: >
-        Endpoint tuttora funzionante nel backend che in automatico orta lo stato a `Waiting for exam score approval`, ma nel flusso attuale il
-        documento Transcript viene già creato automaticamente (vuoto) dal
-        server come side-effect della PUT su `/applications/{applicationid}`
+        Viene utilizzato dal server come side-effect della PUT su `/applications/{applicationid}`
         quando lo stato passa a `Mobility in progress`.Viene preferita la PUT su
         `/transcriptRecords/{applicationid}` per allegare il file al
         documento già esistente.
@@ -506,10 +501,10 @@ paths:
                 $ref: '#/components/schemas/ApiSuccess'
         '400':
           description:  >
-            Formato JSON non valido in records, o records mancante/non valido
+            Formato JSON non valido in records o records mancante/non valido
         '404':
           description:  >
-            Transcript o application non trovati, o Errore DB
+            Transcript / application non trovati o Errore DB
         '500':
           description:  >
             Errore DB

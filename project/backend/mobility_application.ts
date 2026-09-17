@@ -59,6 +59,7 @@ import express = require('express');
 import multer = require('multer');
 const uploadLA = multer({ dest: 'learning_agreement/' })
 const uploadTR = multer({ dest: 'transcript_records/' })
+import path from 'path';
 
 import passport = require('passport');           // authentication middleware for Express
 import passportHTTP = require('passport-http');  // implements Basic and Digest authentication for HTTP (used for /login endpoint)
@@ -453,7 +454,17 @@ app.put("/api/v1/applications/:applicationid", auth, (req,res,next) => {
             return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
           });
         } else {
-
+          if(ios) {
+            // Notify all socket.io clients
+            console.log("socket.io send");
+            ios.emit("broadcast", {
+              type: "APPLICATION_UPDATED",
+              applicationid: req.params.applicationid,
+              status: recvapplications.status,
+              agreementApproved: recvapplications.agreementApproved,
+              lecturerReason: recvapplications.lecturerReason
+            });
+          }
           return res.status(200).json({error:false, errormessage:""});
 
         }
@@ -508,7 +519,7 @@ app.post("/api/v1/agreements/:applicationid", auth, uploadLA.single('agreement')
     //&& req.file.buffer.byteLength > 0
     let recvagreements= req.body;
     recvagreements.filename = req.file.originalname;
-    recvagreements.content = req.file.destination;
+    recvagreements.content = req.file.path;
     recvagreements.mimetype = req.file.mimetype;
     recvagreements.uploadDate = new Date();
     recvagreements.applicationid = req.params.applicationid;
@@ -529,7 +540,7 @@ app.post("/api/v1/agreements/:applicationid", auth, uploadLA.single('agreement')
 
         application.getModel().updateOne(
           { _id: recvagreements.applicationid },
-          { status: 'Awaiting Agreement approval' }
+          { status: 'Awaiting Agreement approval', agreementApproved: false }
         ).then( 
           ( q )=> {
             if(ios) {
@@ -568,7 +579,10 @@ app.get("/api/v1/agreements/:agreementid", auth, (req,res,next) => {
 
       if(q) {
         res.setHeader('Content-Type', 'application/pdf');
-        return res.status(200).send(q.content);
+        const pathAbs = path.resolve(q.content);
+        console.log(pathAbs);
+        //return res.status(200).send(q.file);
+        return res.status(200).sendFile(pathAbs);
       }
         
       else 
@@ -622,18 +636,34 @@ app.delete("/api/v1/agreements/:applicationid", auth, (req,res,next) => {
 
   console.log("Delete request for learning agreement with application id: "+req.params.applicationid )
 
-  agreement.getModel().deleteMany( {applicationid: req.params.applicationid } ).then( 
-    ( q )=> {
+  agreement.getModel().find({applicationid: req.params.applicationid }).then((docs) => {
+    agreement.getModel().deleteMany( {applicationid: req.params.applicationid } ).then( 
+      ( q )=> {
 
-      if( q.deletedCount > 0 )
-        return res.status(200).json( {error:false, errormessage:""} );
-      else 
-        return res.status(404).json( {error:true, errormessage:"Invalid application id"} );
-      
+        if( q.deletedCount > 0 ) {
+
+          docs.forEach((doc) => {
+            const filePath = path.resolve(doc.content.toString());
+            if (fs.existsSync(filePath)) {
+              fs.unlink(filePath, (err) => {
+                if (err) {
+                  console.error("Error during the delete:", err);
+                }
+              });
+            } 
+          });
+
+          return res.status(200).json( {error:false, errormessage:""} );
+
+        } else {
+          return res.status(404).json( {error:true, errormessage:"Invalid application id"} );
+        }
+    }).catch( (reason)=> {
+        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    }) 
   }).catch( (reason)=> {
       return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-  }) 
-
+  });
 });
 
 
@@ -657,7 +687,7 @@ app.put("/api/v1/agreements/:agreementid", auth, uploadLA.single('agreement'), (
     console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
     console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
     recvagreements.filename = req.file.originalname;
-    recvagreements.content = req.file.buffer;
+    recvagreements.content = req.file.path;
     recvagreements.mimetype = req.file.mimetype;
     recvagreements.uploadDate = new Date();
   }
@@ -689,11 +719,20 @@ app.put("/api/v1/agreements/:agreementid", auth, uploadLA.single('agreement'), (
               { agreementApproved: agreementApproved, courses: existingAgreement.courses}
             ).then( 
               ( q2 )=> {            
-                if( q2.matchedCount > 0 )
+                if( q2.matchedCount > 0 ) {
+                  if (ios) {
+                    console.log("socket.io send");
+                    ios.emit("broadcast", {
+                      applicationid: recvagreements.applicationid,
+                      agreementApproved: agreementApproved,
+                      courses: existingAgreement.courses,
+                      type: "AGREEMENT_APPROVAL_UPDATED"
+                    });
+                  }
                   return res.status(200).json( {error:false, errormessage:""} );
-                else
+                } else {
                   return next({ statusCode:404, error: true, errormessage: "Data is not a valid application"});
-                
+                }
             }).catch( (reason)=> {
                 return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
             });
@@ -716,11 +755,20 @@ app.put("/api/v1/agreements/:agreementid", auth, uploadLA.single('agreement'), (
               { agreementApproved: agreementApproved, courses: existingAgreement.courses}
             ).then( 
               ( q2 )=> {            
-                if( q2.matchedCount > 0 )
+                if( q2.matchedCount > 0 ){
+                  if (ios) {
+                    console.log("socket.io send");
+                    ios.emit("broadcast", {
+                      applicationid: recvagreements.applicationid,
+                      agreementApproved: agreementApproved,
+                      courses: existingAgreement.courses,
+                      type: "AGREEMENT_APPROVAL_UPDATED"
+                    });
+                  }
                   return res.status(200).json( {error:false, errormessage:""} );
-                else
+                }else{
                   return next({ statusCode:404, error: true, errormessage: "Data is not a valid application"});
-                
+                }
             }).catch( (reason)=> {
                 return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
             });
@@ -743,8 +791,6 @@ app.put("/api/v1/agreements/:agreementid", auth, uploadLA.single('agreement'), (
 
 
 
-
-
 /////////////////////////
 // Transcript of Records
 /////////////////////////
@@ -753,13 +799,13 @@ app.put("/api/v1/agreements/:agreementid", auth, uploadLA.single('agreement'), (
 app.post("/api/v1/transcriptRecords", auth, uploadTR.single('transcriptRecords'), (req,res,next) => {
 
   console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
-  console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
-
-  if(req.file && req.file.buffer.byteLength > 0 && req.file.mimetype === 'application/pdf') {
+  //console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
+  //&& req.file.buffer.byteLength > 0
+  if(req.file  && req.file.mimetype === 'application/pdf') {
     console.log("Received: " + JSON.stringify(req.body) );
     let recvtranscriptRecords= req.body;
     recvtranscriptRecords.filename = req.file.originalname;
-    recvtranscriptRecords.content = req.file.buffer;
+    recvtranscriptRecords.content = req.file.path;
     recvtranscriptRecords.mimetype = req.file.mimetype;
     recvtranscriptRecords.uploadDate = new Date();
     recvtranscriptRecords.applicationid = req.body.applicationid;
@@ -829,7 +875,9 @@ app.get("/api/v1/transcriptRecords/:applicationid/file", auth, (req,res,next) =>
     ( q )=> {
       if( q ) {
         res.setHeader('Content-Type', 'application/pdf');
-        return res.status(200).send(q.content);
+        const pathAbs = path.resolve(q.content);
+        //return res.status(200).send(q.file);
+        return res.status(200).sendFile(pathAbs);
       }
       else 
         return res.status(404).json( {error:true, errormessage:"no file present"} );
@@ -843,19 +891,36 @@ app.delete("/api/v1/transcriptRecords/:applicationid", auth, (req,res,next) => {
   console.log("Delete request for transcript of records with application id: "+req.params.applicationid )
 
   // req.params.applicationid contains the :applicationid URL component
+  transcriptRecord.getModel().find({applicationid: req.params.applicationid } ).then((docs) => {
 
-  transcriptRecord.getModel().deleteMany( {applicationid: req.params.applicationid } ).then( 
-    ( q )=> {
+    transcriptRecord.getModel().deleteMany( {applicationid: req.params.applicationid } ).then( 
+      ( q )=> {
 
-      if( q.deletedCount > 0 )
-        return res.status(200).json( {error:false, errormessage:""} );
-      else 
-        return res.status(404).json( {error:true, errormessage:"Invalid application ID"} );
-      
+        if( q.deletedCount > 0 ) {
+
+          docs.forEach((doc) => {
+            const filePath = path.resolve(doc.content.toString());
+            if (fs.existsSync(filePath)) {
+              fs.unlink(filePath, (err) => {
+                if (err) {
+                  console.error("Error during the delete:", err);
+                }
+              });
+            } 
+          });
+
+          return res.status(200).json( {error:false, errormessage:""} );
+
+        } else {
+          return res.status(404).json( {error:true, errormessage:"Invalid application id"} );
+        }
+        
+    }).catch( (reason)=> {
+        return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
+    })
   }).catch( (reason)=> {
       return next({ statusCode:404, error: true, errormessage: "DB error: "+reason });
-  })
-
+  });
 });
 
 
@@ -868,7 +933,7 @@ console.log("File ricevuto:", req.file ? req.file.originalname : "nessuno");
   let recvtranscriptRecords = req.body;
   if(req.file) {
     recvtranscriptRecords.filename = req.file.originalname;
-    recvtranscriptRecords.content = req.file.buffer;
+    recvtranscriptRecords.content = req.file.path;
     recvtranscriptRecords.mimetype = req.file.mimetype;
     recvtranscriptRecords.uploadDate = new Date();
   }
@@ -897,11 +962,19 @@ console.log("File ricevuto:", req.file ? req.file.originalname : "nessuno");
             { status: 'Waiting for exam score approval'}
           ).then( 
             ( q )=> {
-              if( q.matchedCount > 0 )
+              if( q.matchedCount > 0 ) {
+                  if (ios) {
+                    console.log("socket.io send");
+                    ios.emit("broadcast", {
+                      applicationid: req.params.applicationid,
+                      status: 'Waiting for exam score approval',
+                      type: "TRANSCRIPT_UPLOADED"
+                    });
+                  }
                 return res.status(200).json( {error:false, errormessage:""} );
-              else
+              }else{
                 return next({ statusCode:404, error: true, errormessage: "Data is not a valid application"});
-              
+              }
           }).catch( (reason)=> {
               return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
           });
@@ -914,11 +987,20 @@ console.log("File ricevuto:", req.file ? req.file.originalname : "nessuno");
               { recordsUploaded: allApproved}
             ).then( 
               ( q )=> {
-                if( q.matchedCount > 0 )
+                if( q.matchedCount > 0 ) {
+                  if (ios) {
+                    console.log("socket.io send");
+                    ios.emit("broadcast", {
+                      applicationid: req.params.applicationid,
+                      recordsUploaded: allApproved,
+                      records: recvtranscriptRecords.records,
+                      type: "TRANSCRIPT_EVALUATED"
+                    });
+                  }
                   return res.status(200).json( {error:false, errormessage:""} );
-                else
+                }else{
                   return next({ statusCode:404, error: true, errormessage: "Data is not a valid application"});
-                
+                }
             }).catch( (reason)=> {
                 return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
             });
@@ -1357,6 +1439,7 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
           city: "Lund",
         });
 
+        /*
         const fileAgreement = await open('./asset/learning_agreement.pdf');
         let contentsAgreement;
         try{
@@ -1380,7 +1463,7 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
         } finally {
           await fileRecords.close();
         }
-
+        */
       let application1 = await application
         .getModel()
         .create({
@@ -1421,7 +1504,7 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
         .getModel()
         .create({
           filename: "transcript_of_records.pdf",
-          content:  contentsRecords,
+          content:  "transcript_records/442bb5065ed01128d10d1935fa38b788",
           mimetype:  "application/pdf",
           records: [
             { code: "CS201", grade: "25", approved: "Approved", examDate: new Date() },
@@ -1436,7 +1519,7 @@ mongoose.connect( 'mongodb://mymongo:27017/mobility_application' )
         .getModel()
         .create({
           filename: "learning_agreement.pdf",
-          content:  contentsAgreement,
+          content:  "learning_agreement/76a4d499d95758653b592e485e4b1eeb",
           mimetype:  "application/pdf",
           uploadDate: new Date(),
           applicationid: application1._id,

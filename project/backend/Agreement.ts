@@ -6,7 +6,7 @@ export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface Agreement {
     filename: String,
-    content: String,
+    content: string,
     mimetype: String,
     uploadDate: Date,
     applicationid: String,
@@ -27,7 +27,7 @@ export interface Agreement {
 //
 export function isAgreement(arg: any): arg is Agreement {
     return arg 
-    && !!arg.content
+    && arg.content && typeof(arg.content) == 'string'
     && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.filename && typeof(arg.filename) == 'string' 
@@ -46,9 +46,9 @@ export function isPartialAgreement(arg: any): arg is Agreement {
         && arg.courses && Array.isArray(arg.courses)
         && typeof(arg.modified) == 'boolean';
 
-    const hasFile = !!arg.content;
+    const hasFile = arg.content;
     const hasValidFile = !hasFile || (
-        arg.content.byteLength > 0
+        arg.content && typeof(arg.content) == 'string'
         && arg.filename && typeof(arg.filename) == 'string' 
         && arg.mimetype && typeof(arg.mimetype) == 'string'
     );   
@@ -105,7 +105,7 @@ let AgreementSchema = new mongoose.Schema<Agreement>( {
         required: true
     },
     content: {
-        type: Buffer,
+        type: mongoose.SchemaTypes.String,
         required: true
     },
     mimetype: {

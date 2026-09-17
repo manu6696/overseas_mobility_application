@@ -61,10 +61,10 @@
             </mat-form-field>
 
             <!---- Approved ---->
-            <ng-container *ngIf="userIsLecturer() && isPdfUploaded()"> 
+            <ng-container *ngIf="isPdfUploaded()"> 
                 <mat-form-field appearance="outline" class="field-approved">
                   <mat-label>Approved</mat-label>
-                  <mat-select [disabled] = "transcriptIsNotEditable()"  [(ngModel)]="recordStateSelected[courseIndex]">
+                  <mat-select [disabled] = "!userIsLecturer() || transcriptIsNotEditable()"  [(ngModel)]="recordStateSelected[courseIndex]">
                     <mat-option *ngFor="let state of recordState" [value]="state">
                       {{ state }}
                     </mat-option>

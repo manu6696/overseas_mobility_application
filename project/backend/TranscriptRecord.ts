@@ -11,7 +11,7 @@ interface CourseResult {
 
 export interface TranscriptRecord {
     filename: String,
-    content: Buffer,
+    content: string,
     mimetype: String,
     records: CourseResult[],
     uploadDate: Date,
@@ -27,7 +27,7 @@ export interface TranscriptRecord {
 //
 export function isTranscriptRecord(arg: any): arg is TranscriptRecord {
     return arg 
-    && !!arg.content && arg.content.byteLength > 0
+    && arg.content && typeof(arg.content) == 'string'
     && arg.filename && typeof(arg.filename) == 'string'
     && arg.mimetype && typeof(arg.mimetype) == 'string'
     && arg.applicationid && typeof(arg.applicationid) == 'string'
@@ -44,7 +44,7 @@ export function isPartialTranscriptRecord(arg: any): arg is TranscriptRecord {
 
     const hasFile = !!arg.content;
     const hasValidFile = !hasFile || (
-        arg.content.byteLength > 0
+        arg.content && typeof(arg.content) == 'string'
         && arg.filename && typeof(arg.filename) == 'string'
         && arg.mimetype && typeof(arg.mimetype) == 'string'
     );
@@ -87,7 +87,7 @@ let TranscriptRecordSchema = new mongoose.Schema<TranscriptRecord>( {
         required: false
     },
     content: {
-        type: Buffer,
+        type: mongoose.SchemaTypes.String,
         required: false
     },
     mimetype: {

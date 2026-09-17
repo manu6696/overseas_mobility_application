@@ -159,16 +159,20 @@ export class AgreementVisualizerComponent implements OnInit {
     
     this.ag.post_agreement(formData, this.data.application._id!).subscribe({
       next: () => {
+        this.data.application.status = 'Awaiting Agreement approval';
+        this.data.application.agreementApproved = false;
         this.get_agreement_list_by_query(this.data.application._id!);
         this.newModifyDescription = '';
+        this.posted.emit(this.data.application);
         this.dialogRef.close(this.data.application);
+        
       },
       error: (err) => {
         console.error("Error saving PDF:", err);
       }
     });
 
-    this.posted.emit(this.data.application);
+    
   }
 
   // Updating agreement (needed by lecturers)
