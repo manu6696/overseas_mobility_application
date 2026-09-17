@@ -672,13 +672,14 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
         let agreementApproved = false;
         if (recvagreements.approved === 'Approved') {
 
+          agreementApproved = true;
 
           agreement.getModel().findOne({_id: req.params.agreementid}).then((existingAgreement) => {
             if(!existingAgreement) {
               return next({ statusCode:404, error: true, errormessage: "Agreement not found"});
             }
 
-            agreementApproved = true;
+            
             application.getModel().updateOne(
               { _id: recvagreements.applicationid },
               { agreementApproved: agreementApproved, courses: existingAgreement.courses}
@@ -699,7 +700,30 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
 
         } else {
           // Doesn't do anything with the agreements status 'Rejected'
-          return res.status(200).json({error:false, errormessage:""});
+          //return res.status(200).json({error:false, errormessage:""});
+          agreement.getModel().findOne({_id: req.params.agreementid}).then((existingAgreement) => {
+            if(!existingAgreement) {
+              return next({ statusCode:404, error: true, errormessage: "Agreement not found"});
+            }
+
+            
+            application.getModel().updateOne(
+              { _id: recvagreements.applicationid },
+              { agreementApproved: agreementApproved, courses: existingAgreement.courses}
+            ).then( 
+              ( q2 )=> {            
+                if( q2.matchedCount > 0 )
+                  return res.status(200).json( {error:false, errormessage:""} );
+                else
+                  return next({ statusCode:404, error: true, errormessage: "Data is not a valid application"});
+                
+            }).catch( (reason)=> {
+                return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
+            });
+
+          }).catch( (reason)=> {
+              return next({ statusCode:500, error: true, errormessage: "DB error: "+reason });
+          }) 
         }
 
       }else {

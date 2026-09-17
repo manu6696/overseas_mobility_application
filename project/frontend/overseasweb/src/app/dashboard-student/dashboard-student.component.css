@@ -25,7 +25,7 @@
   background-color: #AC0033 !important;
   color: white !important;
   position: relative;
-  bottom: -800px;
+  bottom: -600px;
   left: 100%;
   transform: translateX(-50%) scale(2);
   z-index: 10;
