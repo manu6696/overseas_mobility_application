@@ -2,23 +2,58 @@ openapi: 3.0.0
 info:
   title: Overseas Mobility Application API
   version: 1.0.0
-  description: API backend per la gestione dei periodi di mobilità fuori sede.
+  description: >
+    API backend per la gestione dei periodi di mobilità fuori sede.
 
 servers:
   - url: http://localhost:8080
-    description: Server di sviluppo locale
-
-security:
-  - bearerAuth: []
 
 paths:
+  # ==========================================
+  # LOGIN
+  # ==========================================
+  /api/v1/login:
+    get:
+      summary: Login utente
+      description: >
+        Autenticazione tramite header `Authorization: Basic <credenziali>`
+        (email come username, password in chiaro). Se valide, il server
+        genera e restituisce un JWT (validità 1 ora) da usare come Bearer
+        token in tutte le richieste successive.
+      responses:
+        '200':
+          description: Login riuscito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  errormessage:
+                    type: string
+                    example: ""
+                  token:
+                    type: string
+                    description: JWT firmato, valido 1 ora
+        '500':
+          description: >
+            Credenziali non valide (utente inesistente o password errata).
+
   # ==========================================
   # APPLICATIONS
   # ==========================================
   /api/v1/applications:
     get:
       summary: Recupera la lista delle application
-      description: Filtra le domande in base al ruolo dell'utente autenticato.
+      description: >
+        Filtra le application in base al ruolo dell'utente autenticato, con
+        verifica di ownership: un LECTURER deve passare `referent` uguale al
+        proprio username, uno STUDENT deve passare `matrNumber` uguale al
+        proprio username, uno STAFF non passa parametri e vede tutte le
+        application. Se nessuna di queste condizioni è soddisfatta, la
+        richiesta viene rifiutata anche se autenticata.
       parameters:
         - name: matrNumber
           in: query
@@ -32,17 +67,29 @@ paths:
             type: string
       responses:
         '200':
-          description: Contenuto dell'application
+          description: Lista delle application trovate
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Application'
+                type: object
+                properties:
+                  q:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Application'
+        '404':
+          description: >
+            Nessuna application presente, oppure nessun parametro di query
+            valido/coerente con il ruolo dell'utente.
 
   /api/v1/applications/{matrNumber}:
     get:
-      summary: Recupera le application di uno specifico utente
+      summary: Recupera tutte le application di uno specifico studente
+      description: >
+        Consentito solo se l'utente autenticato corrisponde esattamente alla
+        matricola richiesta (`req.auth.username === matrNumber`); altrimenti
+        risponde 404 con messaggio esplicito (inviato direttamente, quindi
+        visibile correttamente al client).
       parameters:
         - name: matrNumber
           in: path
@@ -51,13 +98,28 @@ paths:
             type: string
       responses:
         '200':
-          description: Application trovata
+          description: Application trovate per la matricola indicata
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Application'
+                type: object
+                properties:
+                  q:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Application'
+        '404':
+          description: >
+            Nessuna application presente per questa matricola, Errore DB,
+            oppure autorizzazione non corretta (messaggio "No correct
+            authorization for this application", mostrato correttamente).
+
     post:
       summary: Crea una nuova application
+      description: >
+        Consentito solo se l'utente autenticato corrisponde alla matricola nel
+        path. Imposta automaticamente `status: 'Created'`, `agreementApproved: false`,
+        `modified: false`, `lecturerReason` di default e `uploadDate`.
       parameters:
         - name: matrNumber
           in: path
@@ -73,10 +135,40 @@ paths:
       responses:
         '200':
           description: Application creata con successo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: Id della application appena creata
+        '404':
+          description: >
+            I dati non costituiscono un'application valida, matrNumber non coerente con l'utente autenticato o Errore DB
 
   /api/v1/applications/{applicationid}:
     put:
       summary: Modifica lo stato o i dati di un'application
+      description: >
+        Endpoint unico multiuso, con logica differenziata in base al body e
+        al ruolo:
+
+        - **Studente proprietario**: può aggiornare i dati anagrafici/corsi.
+
+        - **Referent lecturer o Staff**: possono impostare `agreementApproved`
+          e `lecturerReason`.
+
+        - **Staff, con `preDepartureCompleted: true`**: la richiesta viene
+          accettata solo se lo stato attuale è `Awaiting Agreement approval`,
+          `agreementApproved` è già `true`, e lo stato attuale NON è già
+          `Waiting for exam score approval`. In caso di successo, lo stato
+          passa a `Mobility in progress` e viene creato automaticamente un
+          Transcript of Records vuoto (righe precompilate dai corsi
+          dell'application, senza voti), con notifica broadcast via Socket.io.
+
       parameters:
         - name: applicationid
           in: path
@@ -91,7 +183,32 @@ paths:
               $ref: '#/components/schemas/Application'
       responses:
         '200':
-          description: Application aggiornata
+          description: >
+            Application aggiornata. Se l'aggiornamento fa scattare la
+            transizione a `Mobility in progress`, la risposta include l'id
+            del nuovo Transcript of Records creato automaticamente.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Presente solo se è stato creato un nuovo Transcript of Records come side-effect
+        '400':
+          description:  >
+            Body vuoto, dati non validi, Learning Agreement non ancora approvato, o fase dell'application non corretta per l'operazione richiesta
+
+        '403':
+          description:  >
+            Non autorizzato (utente non è owner, referent lecturer o staff a seconda dell'operazione)
+
+        '404':
+          description:  >
+            Application non trovata o Errore DB
+
     delete:
       summary: Elimina un'application
       parameters:
@@ -103,13 +220,25 @@ paths:
       responses:
         '200':
           description: Application eliminata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '404':
+          description:  >
+            Application non trovata o Errore DB
 
   # ==========================================
   # LEARNING AGREEMENTS
   # ==========================================
   /api/v1/agreements:
     get:
-      summary: Cerca i Learning Agreement per ID domanda o Matricola
+      summary: Cerca i Learning Agreement per ID application o Matricola
+      description: >
+        Se filtrato per `applicationid`, esclude il campo `content` (proiezione
+        `{content:0}`) e restituisce un array leggero. Se filtrato per
+        `matrNumber`, non applica la stessa proiezione: la risposta
+        include quindi anche `content` (il PDF binario) per ogni Agreement.
       parameters:
         - name: applicationid
           in: query
@@ -123,17 +252,25 @@ paths:
             type: string
       responses:
         '200':
-          description: Learning Agreements trovati
+          description: Learning Agreement trovati
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Agreement'
+                type: object
+                properties:
+                  q:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AgreementSummary'
+        '404':
+          description:  >
+            Nessun Learning Agreement trovato, nessun parametro di query valido, o Errore DB
 
   /api/v1/agreements/{applicationid}:
     post:
-      summary: Carica un nuovo Learning Agreement (PDF)
+      summary: Carica un nuovo Learning Agreement come PDF con i relativi metadati
+      description: >
+        Ogni volta che viene caricato un nuovo Agreement allora l'application passa allo stato di `Awaiting Agreement approval`.
       parameters:
         - name: applicationid
           in: path
@@ -157,10 +294,27 @@ paths:
                   type: string
                 courses:
                   type: string
-                  description: Array JSON di CourseEval
+                  description: Array JSON serializzato di CourseEval (mappatura proposta)
       responses:
         '200':
-          description: Agreement caricato
+          description: Agreement caricato con successo. Restituisce l'id del nuovo documento.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+        '404':
+          description:  >
+            File mancante o non PDF, dati non validi, application non trovata o Errore DB
+
+        '500':
+          description:  >
+            Errore DB
+
     delete:
       summary: Elimina tutti gli agreement associati a un'application
       parameters:
@@ -171,11 +325,18 @@ paths:
             type: string
       responses:
         '200':
-          description: Agreement eliminato
+          description: Agreement eliminati
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '404':
+          description:  >
+            Nessun agreement trovato per questa application o Errore DB
 
   /api/v1/agreements/{agreementid}:
     get:
-      summary: Scarica il file PDF del Learning Agreement
+      summary: Scarica il file PDF di una specifica versione del Learning Agreement
       parameters:
         - name: agreementid
           in: path
@@ -184,14 +345,23 @@ paths:
             type: string
       responses:
         '200':
-          description: File PDF ritornato
+          description: File PDF ritornato come stream binario grezzo (non incapsulato in JSON)
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
+        '404':
+          description:  >
+            Agreement non trovato per l'id indicato
+
     put:
-      summary: Aggiorna lo stato o il file di un Learning Agreement
+      summary: Registra la decisione del docente su una versione, o carica un file sostitutivo
+      description: >
+        Se approved === 'Approved', i `courses` di questa specifica versione
+        vengono copiati su `Application.courses` e viene impostato
+        `agreementApproved: true` sull'application collegata. Se `Rejected`, invece, viene impostato a 
+        `agreementApproved: false`.
       parameters:
         - name: agreementid
           in: path
@@ -207,6 +377,7 @@ paths:
                 agreement:
                   type: string
                   format: binary
+                  description: Opzionale, presente solo se si sta sostituendo il file
                 approved:
                   $ref: '#/components/schemas/ApprovalStatus'
                 applicationid:
@@ -217,14 +388,34 @@ paths:
                   type: string
       responses:
         '200':
-          description: Successo
+          description: Aggiornamento completato (ed eventuale propagazione su Application se approvato)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '400':
+          description:  >
+            Dati non validi
+        '404':
+          description:  >
+            Agreement o application collegata non trovati o Errore DB
+        '500':
+          description:  >
+            Errore DB
 
   # ==========================================
   # TRANSCRIPT OF RECORDS
   # ==========================================
   /api/v1/transcriptRecords:
     post:
-      summary: Carica il certificato degli esami sostenuti (PDF)
+      summary: Carica il Transcript of Records (PDF) e i voti
+      description: >
+        Endpoint tuttora funzionante nel backend che in automatico orta lo stato a `Waiting for exam score approval`, ma nel flusso attuale il
+        documento Transcript viene già creato automaticamente (vuoto) dal
+        server come side-effect della PUT su `/applications/{applicationid}`
+        quando lo stato passa a `Mobility in progress`.Viene preferita la PUT su
+        `/transcriptRecords/{applicationid}` per allegare il file al
+        documento già esistente.
       requestBody:
         required: true
         content:
@@ -241,14 +432,24 @@ paths:
                   type: string
                 records:
                   type: string
-                  description: Array JSON di CourseResult
+                  description: Array JSON serializzato di CourseResult
       responses:
         '200':
-          description: Certificato registrato
+          description: Transcript registrato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '404':
+          description:  >
+            File mancante o non PDF o dati non validi.
+        '500':
+          description:  >
+            Errore DB
 
   /api/v1/transcriptRecords/{applicationid}:
     get:
-      summary: Recupera i dati del Transcript (senza file)
+      summary: Recupera i dati del Transcript (senza il PDF - {content:0})
       parameters:
         - name: applicationid
           in: path
@@ -257,13 +458,26 @@ paths:
             type: string
       responses:
         '200':
-          description: Dati trovati
+          description: Dati del Transcript trovati (senza PDF)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TranscriptRecord'
+                type: object
+                properties:
+                  q:
+                    $ref: '#/components/schemas/TranscriptRecordSummary'
+        '404':
+          description:  >
+            Nessun Transcript presente per questa application
+
     put:
-      summary: Aggiorna i dati del transcript o il file PDF
+      summary: Aggiorna i voti/date esame del Transcript, o allega/sostituisce il file PDF
+      description: >
+        **Se la richiesta include un nuovo file**: aggiorna il documento e
+        porta lo stato dell'application a `Waiting for exam score approval`.
+        **Se la richiesta NON include un file** (solo aggiornamento voti):
+        calcola se tutti i record hanno `approved: 'Approved'` e imposta il
+        flag `Application.recordsUploaded` di conseguenza.
       parameters:
         - name: applicationid
           in: path
@@ -279,11 +493,27 @@ paths:
                 transcriptRecords:
                   type: string
                   format: binary
+                  description: Opzionale, presente solo se si sta caricando/sostituendo il file
                 records:
                   type: string
+                  description: Array JSON serializzato di CourseResult
       responses:
         '200':
-          description: Aggiornato
+          description: Transcript aggiornato (ed eventuale transizione di stato/flag dell'application)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '400':
+          description:  >
+            Formato JSON non valido in records, o records mancante/non valido
+        '404':
+          description:  >
+            Transcript o application non trovati, o Errore DB
+        '500':
+          description:  >
+            Errore DB
+
     delete:
       summary: Elimina il Transcript
       parameters:
@@ -294,11 +524,18 @@ paths:
             type: string
       responses:
         '200':
-          description: Eliminato
+          description: Transcript eliminato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '404':
+          description:  >
+            Transcript non trovato o Errore DB
 
   /api/v1/transcriptRecords/{applicationid}/file:
     get:
-      summary: Scarica il file PDF del Transcript
+      summary: Scarica il file PDF del Transcript of Records
       parameters:
         - name: applicationid
           in: path
@@ -307,18 +544,38 @@ paths:
             type: string
       responses:
         '200':
+          description: File PDF ritornato come stream binario
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
+        '404':
+          description:  >
+            File non trovato per questa application
+        '500':
+          description:  >
+            Errore DB
 
   # ==========================================
   # HOST INSTITUTIONS
   # ==========================================
-  /api/v1/hosts:
+  /api/v1/hosts/:
     get:
       summary: Recupera la lista degli host
+      parameters:
+        - name: skip
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
       responses:
         '200':
           description: Lista host
@@ -328,8 +585,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Host'
+        '404':
+          description:  >
+            Errore DB
+
     post:
       summary: Aggiunge un nuovo host
+      description: Richiede ruolo MODERATOR.
       requestBody:
         required: true
         content:
@@ -339,25 +601,117 @@ paths:
       responses:
         '200':
           description: Host creato
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+        '404':
+          description:  >
+            Dati dell'host non validi o errore DB
+
+  /api/v1/hosts/{hostid}:
+    get:
+      summary: Recupera un singolo host per id
+      parameters:
+        - name: hostid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Host trovato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  q:
+                    $ref: '#/components/schemas/Host'
+        '404':
+          description:  >
+            Nessun host con questo id o errore DB
+
+    put:
+      summary: Modifica un host esistente
+      description: Richiede ruolo MODERATOR.
+      parameters:
+        - name: hostid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Host'
+      responses:
+        '200':
+          description: Host aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '404':
+          description:  >
+            Dati non validi, host non modificato o errore DB
+
+    delete:
+      summary: Elimina un host
+      description: Richiede ruolo MODERATOR.
+      parameters:
+        - name: hostid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Host eliminato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '404':
+          description:  >
+            Nessun host con questo id
 
   # ==========================================
   # USERS
   # ==========================================
   /api/v1/users:
     get:
-      summary: Ottieni lista di tutti gli host
+      summary: Recupera la lista di tutti gli utenti
+      description: >
+        Esclude `digest` e `salt`.
       responses:
         '200':
-          description: Lista host
+          description: Lista utenti (array diretto)
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+        '500':
+          description:  >
+            Errore DB
+
     post:
-      summary: Registrazione utente
-      security: []
+      summary: Registrazione di un nuovo studente
+      description: >
+        Endpoint pubblico (nessuna autenticazione richiesta). Il ruolo è
+        sempre forzato a STUDENT lato server, indipendentemente da cosa
+        contiene il body (`req.body.roles` viene azzerato esplicitamente
+        prima della creazione, per evitare che un utente si auto-assegni
+        ruoli privilegiati).
       requestBody:
         required: true
         content:
@@ -367,18 +721,124 @@ paths:
       responses:
         '200':
           description: Utente registrato
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+        '404':
+          description:  >
+            Password mancante, utente già esistente (email duplicata) o Errore DB
+
+  /api/v1/users/moderators:
+    post:
+      summary: Registrazione di un nuovo utente con ruolo MODERATOR
+      description: Richiede ruolo ADMIN e MODERATOR. Stessa logica di POST /users, ma assegna il ruolo MODERATOR invece di STUDENT.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Moderatore registrato
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+        '404':
+          description:  >
+            Password mancante, utente già esistente o Errore DB
+
+  /api/v1/users/lecturers:
+    get:
+      summary: Recupera la lista dei soli docenti (per permettere la selezione del docente referente da una lista nell'application)
+      description: >
+        Risposta incapsulata sotto la chiave `lecturers` (non `q`, unico
+        endpoint con questa convenzione). Restituisce solo `username`, `name`,
+        `surname`, `mail` per ciascun docente (proiezione esplicita).
+      responses:
+        '200':
+          description: Lista docenti trovata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lecturers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserSummary'
+        '500':
+          description:  >
+            Errore DB
+
+  /api/v1/users/{mail}:
+    get:
+      summary: Recupera un singolo utente per email
+      description: Richiede ruolo MODERATOR. Esclude `digest`/`salt`.
+      parameters:
+        - name: mail
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Utente trovato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description:  >
+            Errore DB
+
+    delete:
+      summary: Elimina un utente per email
+      description: Richiede ruolo ADMIN. Impedisce esplicitamente l'eliminazione di un utente con ruolo ADMIN.
+      parameters:
+        - name: mail
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Utente eliminato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+        '404':
+          description:  >
+            Utente non trovato, tentativo di eliminare un admin, o Errore DB
 
 # ==========================================
 # COMPONENTS & SCHEMAS
 # ==========================================
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
   schemas:
+    ApiSuccess:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: false
+        errormessage:
+          type: string
+          example: ""
+
     ApprovalStatus:
       type: string
       enum:
@@ -415,9 +875,6 @@ components:
       type: object
       required:
         - code
-        - grade
-        - examDate
-        - approved
       properties:
         code:
           type: string
@@ -432,7 +889,6 @@ components:
     Application:
       type: object
       required:
-        - _id
         - status
         - uploadDate
         - academicYear
@@ -448,7 +904,6 @@ components:
         - hostCity
         - courses
         - referent
-        - agreementApproved
         - modified
         - lecturerReason
       properties:
@@ -456,6 +911,13 @@ components:
           type: string
         status:
           type: string
+          enum:
+            - Created
+            - Awaiting Agreement approval
+            - Mobility in progress
+            - Waiting for exam score approval
+            - Closed
+            - Canceled
         uploadDate:
           type: string
           format: date-time
@@ -517,7 +979,6 @@ components:
         - modified
         - modifyDescription
         - lecturerReason
-        - decisionDate
         - courses
       properties:
         filename:
@@ -550,6 +1011,14 @@ components:
           items:
             $ref: '#/components/schemas/CourseEval'
 
+    AgreementSummary:
+      allOf:
+        - $ref: '#/components/schemas/Agreement'
+        - type: object
+          properties:
+            content:
+              nullable: true
+
     Host:
       type: object
       required:
@@ -558,6 +1027,8 @@ components:
         - country
         - city
       properties:
+        _id:
+          type: string
         name:
           type: string
         mail:
@@ -597,6 +1068,14 @@ components:
         matrNumber:
           type: string
 
+    TranscriptRecordSummary:
+      allOf:
+        - $ref: '#/components/schemas/TranscriptRecord'
+        - type: object
+          properties:
+            content:
+              nullable: true
+
     User:
       type: object
       required:
@@ -606,6 +1085,8 @@ components:
         - mail
         - roles
       properties:
+        _id:
+          type: string
         username:
           type: string
         name:
@@ -618,6 +1099,23 @@ components:
           type: array
           items:
             type: string
+            enum:
+              - STUDENT
+              - LECTURER
+              - STAFF
+              - MODERATOR
+              - ADMIN
         password:
           type: string
-          description: Usato solo in fase di creazione/aggiornamento, non restituito (digest/salt sono gestiti internamente al server).
+
+    UserSummary:
+      type: object
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        mail:
+          type: string

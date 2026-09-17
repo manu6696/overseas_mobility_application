@@ -9,7 +9,7 @@
  *  > show collections
  *  > db.host.find( {} )
  *  
- *  to delete all the messages:
+ *  to delete all the hosts:
  *  > db.host.deleteMany( {} )
  * 
  *  For swagger editor
@@ -57,6 +57,8 @@ import * as host from './Host';
 import express = require('express');
 
 import multer = require('multer');
+const uploadLA = multer({ dest: 'learning_agreement/' })
+const uploadTR = multer({ dest: 'transcript_records/' })
 
 import passport = require('passport');           // authentication middleware for Express
 import passportHTTP = require('passport-http');  // implements Basic and Digest authentication for HTTP (used for /login endpoint)
@@ -494,19 +496,19 @@ app.delete("/api/v1/applications/:applicationid", auth, (req,res,next) => {
 // The file is not stored on disk but in database as a Buffer
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+//const upload = multer({ storage: storage });
 
-app.post("/api/v1/agreements/:applicationid", auth, upload.single('agreement'), (req,res,next) => {
+app.post("/api/v1/agreements/:applicationid", auth, uploadLA.single('agreement'), (req,res,next) => {
 
   console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
-  console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
-  if(req.file && req.file.buffer.byteLength > 0 && req.file.mimetype === 'application/pdf') {
+  //console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
+  if(req.file && req.file.mimetype === 'application/pdf') {
     console.log("Received: " + JSON.stringify(req.body) );
     //console.log("Received file: " + JSON.stringify(req.file) );
-    
+    //&& req.file.buffer.byteLength > 0
     let recvagreements= req.body;
     recvagreements.filename = req.file.originalname;
-    recvagreements.content = req.file.buffer;
+    recvagreements.content = req.file.destination;
     recvagreements.mimetype = req.file.mimetype;
     recvagreements.uploadDate = new Date();
     recvagreements.applicationid = req.params.applicationid;
@@ -636,7 +638,7 @@ app.delete("/api/v1/agreements/:applicationid", auth, (req,res,next) => {
 
 
 
-app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (req,res,next) => {
+app.put("/api/v1/agreements/:agreementid", auth, uploadLA.single('agreement'), (req,res,next) => {
 
   console.log("Update request for learning agreement with id: "+req.params.agreementid)
   console.log("Received: " + JSON.stringify(req.body) );
@@ -748,7 +750,7 @@ app.put("/api/v1/agreements/:agreementid", auth, upload.single('agreement'), (re
 /////////////////////////
 
 
-app.post("/api/v1/transcriptRecords", auth, upload.single('transcriptRecords'), (req,res,next) => {
+app.post("/api/v1/transcriptRecords", auth, uploadTR.single('transcriptRecords'), (req,res,next) => {
 
   console.log("Received mimetype: " + JSON.stringify(req.file.mimetype) );
   console.log("Received bytes: " + JSON.stringify(req.file.buffer.byteLength) );
@@ -858,7 +860,7 @@ app.delete("/api/v1/transcriptRecords/:applicationid", auth, (req,res,next) => {
 
 
 
-app.put("/api/v1/transcriptRecords/:applicationid", auth, upload.single('transcriptRecords'), (req,res,next) => {
+app.put("/api/v1/transcriptRecords/:applicationid", auth, uploadTR.single('transcriptRecords'), (req,res,next) => {
 
 console.log("Body ricevuto:", JSON.stringify(req.body));
 console.log("File ricevuto:", req.file ? req.file.originalname : "nessuno");
