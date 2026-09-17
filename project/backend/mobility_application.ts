@@ -12,6 +12,8 @@
  *  to delete all the messages:
  *  > db.host.deleteMany( {} )
  * 
+ *  For swagger editor
+ *  docker run -d -p 8080:80 swaggerapi/swagger-editor
  *  For documentation create an openapi.yaml file using Swagger and run this command on the same folder:
  *  npx @redocly/cli build-docs openapi3_0.yaml -o api-docs.html
  */
