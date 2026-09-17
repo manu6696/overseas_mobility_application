@@ -13,7 +13,7 @@ const mongoose = require("mongoose");
 //
 function isAgreement(arg) {
     return arg
-        && !!arg.content && arg.content.byteLength > 0
+        && !!arg.content
         && arg.applicationid && typeof (arg.applicationid) == 'string'
         && arg.matrNumber && typeof (arg.matrNumber) == 'string'
         && arg.filename && typeof (arg.filename) == 'string'

@@ -6,7 +6,7 @@ export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface Agreement {
     filename: String,
-    content: Buffer,
+    content: String,
     mimetype: String,
     uploadDate: Date,
     applicationid: String,
@@ -27,7 +27,7 @@ export interface Agreement {
 //
 export function isAgreement(arg: any): arg is Agreement {
     return arg 
-    && !!arg.content && arg.content.byteLength > 0
+    && !!arg.content
     && arg.applicationid && typeof(arg.applicationid) == 'string'
     && arg.matrNumber && typeof(arg.matrNumber) == 'string' 
     && arg.filename && typeof(arg.filename) == 'string' 
