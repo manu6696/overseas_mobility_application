@@ -5,7 +5,7 @@ import mongoose = require('mongoose');
 export interface Course {
     code: String,
     title: String,
-    credits: Number,
+    credits: String,
 }
 
 export interface CourseEval {
@@ -112,7 +112,7 @@ const CourseSchema = new mongoose.Schema<Course>({
     },
 
     credits: {
-        type: Number, 
+        type: String, 
         required: true
     }
 

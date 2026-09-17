@@ -10,7 +10,7 @@ Come lanciare l'applicazione:
 
 Comandi:
 1. cd project/ oppure cd overseas_mobilty_application/project/
-2. docker compose up --build
+2. docker compose up --build --detach
 3. Collegarsi all'indirizzo http://localhost:4200/login
 
 

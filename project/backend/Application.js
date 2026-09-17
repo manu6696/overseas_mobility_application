@@ -64,7 +64,7 @@ const CourseSchema = new mongoose.Schema({
         required: true
     },
     credits: {
-        type: Number,
+        type: String,
         required: true
     }
 }, { _id: false });

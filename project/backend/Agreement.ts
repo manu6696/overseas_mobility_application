@@ -78,7 +78,7 @@ const CourseSchema = new mongoose.Schema<Course>({
     },
 
     credits: {
-        type: Number, 
+        type: String, 
         required: true
     }
 

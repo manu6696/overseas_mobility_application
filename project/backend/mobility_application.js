@@ -834,7 +834,7 @@ app.use(( (err,req,res,next) => {
 app.use(((err, req, res, next) => {
     console.log("Request error:", err.message || err);
     console.log("Stack:", err.stack);
-    res.status(err.statusCode || 500).json({ error: true, errormessage: err.message || "Unknown error" });
+    res.status(err.statusCode || 500).json({ error: true, errormessage: err.errormessage || "Unknown error" });
 }));
 // The very last middleware will report an error 404 
 // (will be eventually reached if no error occurred and if
@@ -1021,12 +1021,12 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             hostCity: "Edinburgh",
             courses: [
                 {
-                    originalCourse: { code: "CS101", title: "Sistemi Distribuiti", credits: 6 },
-                    equivalentCourse: { code: "CS201", title: "Distributed Systems", credits: 6 }
+                    originalCourse: { code: "CS101", title: "Sistemi Distribuiti", credits: "6" },
+                    equivalentCourse: { code: "CS201", title: "Distributed Systems", credits: "6" }
                 },
                 {
-                    originalCourse: { code: "CS102", title: "Machine Learning", credits: 8 },
-                    equivalentCourse: { code: "CS305", title: "Machine Learning Fundamentals", credits: 8 }
+                    originalCourse: { code: "CS102", title: "Machine Learning", credits: "8" },
+                    equivalentCourse: { code: "CS305", title: "Machine Learning Fundamentals", credits: "8" }
                 }
             ],
             referent: "919191",
@@ -1045,8 +1045,8 @@ mongoose.connect('mongodb://mymongo:27017/mobility_application')
             content: contentsRecords,
             mimetype: "application/pdf",
             records: [
-                { code: "CS201", grade: "25", approved: "Pending" },
-                { code: "CS305", grade: "26", approved: "Pending" }
+                { code: "CS201", grade: "25", approved: "Approved", examDate: new Date() },
+                { code: "CS305", grade: "26", approved: "Approved", examDate: new Date() }
             ],
             uploadDate: new Date(),
             applicationid: application1._id,

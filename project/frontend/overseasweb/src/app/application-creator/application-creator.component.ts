@@ -220,8 +220,8 @@ export class ApplicationCreatorComponent {
 
   addCourseSection(app: Application){
     app.courses.push({
-      originalCourse: { code: "", title: "", credits: 0 },
-      equivalentCourse: { code: "", title: "", credits: 0 }
+      originalCourse: { code: "", title: "", credits: '' },
+      equivalentCourse: { code: "", title: "", credits: '' }
     });
 
   }
