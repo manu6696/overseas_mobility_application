@@ -1,10 +1,10 @@
-# 🌍 Gestione Mobilità Overseas - Ca' Foscari
+# 🌍 Overseas Mobility Application - Ca' Foscari
 
 Progetto per l'esame di **Tecnologie e Applicazioni Web (A.A. 2025/2026)** - Università Ca' Foscari Venezia.
 
 ## 📝 Descrizione del Progetto
 
-Questa applicazione web nasce per semplificare e digitalizzare la gestione delle principali fasi amministrative della mobilità *Overseas* (pre-partenza, durante la mobilità e post-rientro) per gli studenti dell'Università Ca' Foscari.
+Questa applicazione nasce per semplificare e digitalizzare la gestione delle principali fasi amministrative del periodo di studio fuorisede *Overseas* (pre-partenza, durante la mobilità e post-rientro) per gli studenti dell'Università Ca' Foscari.
 L'applicativo gestisce il flusso completo dell'approvazione del Learning Agreement, il monitoraggio della mobilità e il riconoscimento degli esami tramite il Transcript of Records.
 
 ## ✨ Funzionalità Principali
