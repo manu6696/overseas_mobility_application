@@ -1,4 +1,4 @@
-# 🌍 Overseas Mobility Application - Ca' Foscari
+# 🌍 Overseas Mobility Application
 
 Progetto per l'esame di **Tecnologie e Applicazioni Web (A.A. 2025/2026)** - Università Ca' Foscari Venezia.
 
