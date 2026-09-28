@@ -2,10 +2,14 @@
 
 Progetto per l'esame di **Tecnologie e Applicazioni Web (A.A. 2025/2026)** - Università Ca' Foscari Venezia.
 
+---
+
 ## 📝 Descrizione del Progetto
 
 Questa applicazione nasce per semplificare e digitalizzare la gestione delle principali fasi amministrative del periodo di studio fuorisede *Overseas* (pre-partenza, durante la mobilità e post-rientro) per gli studenti dell'Università Ca' Foscari.
 L'applicativo gestisce il flusso completo dell'approvazione del Learning Agreement, il monitoraggio della mobilità e il riconoscimento degli esami tramite il Transcript of Records.
+
+---
 
 ## ✨ Funzionalità Principali
 
@@ -30,6 +34,8 @@ Il sistema gestisce tre tipologie di utenti, ciascuno con permessi e viste dedic
 * Validazione della fase pre-partenza.
 * Chiusura definitiva della pratica una volta completato l'intero iter.
 
+---
+
 ## 🏗️ Architettura
 
 L'applicazione è sviluppata come una **Single Page Application (SPA)** con architettura a microservizi (eseguiti in container separati):
@@ -38,6 +44,8 @@ L'applicazione è sviluppata come una **Single Page Application (SPA)** con arch
 * **Backend:** Node.js con Express (API RESTful in TypeScript).
 * **Database:** MongoDB.
 * **Infrastruttura:** Docker + Docker Compose.
+
+---
 
 ## 🚀 Istruzioni per l'avvio (How to Run)
 
@@ -63,7 +71,9 @@ L'intero ambiente è dockerizzato per garantire un'esecuzione semplice e riprodu
 
    * **Frontend (SPA Angular):** `http://localhost:4200`
    * **Backend (API REST):** `http://localhost:8080`
-   * **DB (MongoDB):** `http://localhost:27017` 
+   * **DB (MongoDB):** `http://localhost:27017`
+     
+---
 
 ### 🧪 Dati caricati al bootstrap dell’applicazione
 
