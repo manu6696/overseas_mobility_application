@@ -1,92 +1,80 @@
-# 🌍 Gestione Mobilità Overseas - Ca' Foscari
+🌍 Gestione Mobilità Overseas - Ca' Foscari
+Progetto per l'esame di Tecnologie e Applicazioni Web (A.A. 2025/2026) - Università Ca' Foscari Venezia.
 
-Progetto per l'esame di **Tecnologie e Applicazioni Web (A.A. 2025/2026)** - Università Ca' Foscari Venezia.
-
-## 📝 Descrizione del Progetto
-
-Questa applicazione web nasce per semplificare e digitalizzare la gestione delle principali fasi amministrative della mobilità *Overseas* (pre-partenza, durante la mobilità e post-rientro) per gli studenti dell'Università Ca' Foscari.
+📝 Descrizione del Progetto
+Questa applicazione web nasce per semplificare e digitalizzare la gestione delle principali fasi amministrative della mobilità Overseas (pre-partenza, durante la mobilità e post-rientro) per gli studenti dell'Università Ca' Foscari.
 L'applicativo gestisce il flusso completo dell'approvazione del Learning Agreement, il monitoraggio della mobilità e il riconoscimento degli esami tramite il Transcript of Records.
 
-## ✨ Funzionalità Principali
-
+✨ Funzionalità Principali
 Il sistema gestisce tre tipologie di utenti, ciascuno con permessi e viste dedicate (basic authentication in HTTP + token JWT):
 
-🎓 **Studenti:**
+🎓 Studenti:
+Creazione e gestione delle domande di mobilità (scelta istituzione ospitante, periodo, docente referente).
+Compilazione del mapping degli esami (esami esteri vs esami Ca' Foscari).
+Upload del Learning Agreement e proposta di modifiche durante la mobilità.
+Upload del Transcript of Records al rientro.
 
-* Creazione e gestione delle domande di mobilità (scelta istituzione ospitante, periodo, docente referente).
+👨‍🏫 Docenti Referenti:
+Visualizzazione delle domande a loro assegnate.
 
-* Compilazione del mapping degli esami (esami esteri vs esami Ca' Foscari).
+Valutazione (approvazione/rifiuto con motivazione) del Learning Agreement e delle sue successive modifiche.
 
-* Upload del *Learning Agreement* e proposta di modifiche durante la mobilità.
+Approvazione finale degli esami sostenuti e dei relativi voti.
 
-* Upload del *Transcript of Records* al rientro.
+🏢 Staff Ufficio Overseas:
 
-👨‍🏫 **Docenti Referenti:**
+Monitoraggio globale di tutte le pratiche.
 
-* Visualizzazione delle domande a loro assegnate.
+Validazione della fase pre-partenza.
 
-* Valutazione (approvazione/rifiuto con motivazione) del *Learning Agreement* e delle sue successive modifiche.
+Chiusura definitiva della pratica una volta completato l'intero iter.
 
-* Approvazione finale degli esami sostenuti e dei relativi voti.
+🏗️ Architettura
 
-🏢 **Staff Ufficio Overseas:**
+L'applicazione è sviluppata come una Single Page Application (SPA) con architettura a microservizi (eseguiti in container separati):
 
-* Monitoraggio globale di tutte le pratiche.
+Frontend: Angular.
 
-* Validazione della fase pre-partenza.
+Backend: Node.js con Express (API RESTful in TypeScript).
 
-* Chiusura definitiva della pratica una volta completato l'intero iter.
+Database: MongoDB.
 
-## 🏗️ Architettura
+Infrastruttura: Docker + Docker Compose.
 
-L'applicazione è sviluppata come una **Single Page Application (SPA)** con architettura a microservizi (eseguiti in container separati):
-
-* **Frontend:** Angular.
-
-* **Backend:** Node.js con Express (API RESTful in TypeScript).
-
-* **Database:** MongoDB.
-
-* **Infrastruttura:** Docker + Docker Compose.
-
-## 🚀 Istruzioni per l'avvio (How to Run)
+🚀 Istruzioni per l'avvio (How to Run)
 
 L'intero ambiente è dockerizzato per garantire un'esecuzione semplice e riproducibile, come richiesto dalle specifiche.
 
-### Prerequisiti
+Prerequisiti
 
-* [Docker](https://www.docker.com/?utm_source=gemini) e [Docker Compose](https://docs.docker.com/compose/?utm_source=gemini) installati sul proprio sistema.
+Docker e Docker Compose installati sul proprio sistema.
 
-### Avvio dell'Applicazione
+Avvio dell'Applicazione
 
-1. ```
-   cd project/
-   ```
+cd project/
 
-2. ```
-   docker compose up --build --detach
-   ```
+docker compose up --build --detach
 
-   *Nota: Il comando scaricherà le dipendenze, compilerà i sorgenti (Angular e Node.js) ed esporrà i servizi.*
+Nota: Il comando scaricherà le dipendenze, compilerà i sorgenti (Angular e Node.js) ed esporrà i servizi.
 
-3. **Accesso ai servizi:**
+Accesso ai servizi:
 
-   * **Frontend (SPA Angular):** `http://localhost:4200`
+Frontend (SPA Angular): http://localhost:4200
 
-   * **Backend (API REST):** `http://localhost:8080` 
+Backend (API REST): http://localhost:8080 
 
-### 🧪 Dati caricati al bootstrap dell’applicazione
+🧪 Dati caricati al bootstrap dell’applicazione
 
-Come da specifiche, all'avvio del backend il database viene **popolato automaticamente** con un set di dati di test (istituzioni partner, utenti fittizi per i tre ruoli, application di prova).
+Come da specifiche, all'avvio del backend il database viene popolato automaticamente con un set di dati di test (istituzioni partner, utenti fittizi per i tre ruoli, application di prova).
 
 Puoi accedere al sistema utilizzando le seguenti credenziali di test:
 
-* **Studente:** `student@student.it` / password: `student`/ role: `STUDENT`
+Studente: student@student.it / password: student/ role: STUDENT
 
-* **Docente:**` lecturer@lecturer.it` / password: `lecturer`/ role: `LECTURER`
+Docente: lecturer@lecturer.it / password: lecturer/ role: LECTURER
 
-* **Ufficio:** `staff@staff.it` / password: `staff`/ role: `STAFF`
+Ufficio: staff@staff.it / password: staff/ role: STAFF
 
-## 👥 Autori (Gruppo)
+👥 Autori (Gruppo)
 
-* Manuel Rosace - 901771
+Manuel Rosace - 901771
