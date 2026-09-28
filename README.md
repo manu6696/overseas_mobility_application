@@ -75,7 +75,7 @@ L'intero ambiente è dockerizzato per garantire un'esecuzione semplice e riprodu
      
 ---
 
-### 🧪 Dati caricati al bootstrap dell’applicazione
+## 🧪 Dati caricati al bootstrap dell’applicazione
 
 Come da specifiche, all'avvio del backend il database viene **popolato automaticamente** con un set di dati di test (istituzioni partner, utenti fittizi per i tre ruoli, application di prova).
 
