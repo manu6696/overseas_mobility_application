@@ -79,7 +79,7 @@ L'intero ambiente è dockerizzato per garantire un'esecuzione semplice e riprodu
 
 Come da specifiche, all'avvio del backend il database viene **popolato automaticamente** con un set di dati di test (istituzioni partner, utenti fittizi per i tre ruoli, application di prova).
 
-Puoi accedere al sistema utilizzando le seguenti credenziali di test:
+Si può accedere al sistema utilizzando le seguenti credenziali di test:
 
 * **Studente:** `student@student.it` / password: `student`/ role: `STUDENT`
 * **Docente:**` lecturer@lecturer.it` / password: `lecturer`/ role: `LECTURER`
